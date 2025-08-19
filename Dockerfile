@@ -1,28 +1,27 @@
 # Use Node.js 18 LTS
 FROM node:18-alpine
 
-# Set working directory
+# Diretório de trabalho
 WORKDIR /app
 
-# Copy package files
+# Copia apenas os manifests para aproveitar cache de camadas
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --production
+# Instala apenas dependências de produção (npm v10+ usa --omit=dev)
+RUN npm install --omit=dev
 
-# Copy source code
+# Copia o restante do código
 COPY . .
 
-# Build the React app
+# Build do front (Vite) para a pasta dist/
 RUN npm run build
 
-# Expose port
+# Expõe a porta usada pelo servidor
 EXPOSE 3000
 
-# Set environment variables
+# Variáveis padrão
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Start the application
+# Sobe o servidor Express (server.js serve a pasta dist/)
 CMD ["npm", "start"]
-
