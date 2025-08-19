@@ -1,40 +1,36 @@
 # ====== STAGE 1: BUILD ======
 FROM node:20-alpine AS build
-
 WORKDIR /app
 
-# Copia só manifests para melhor cache
+# Copia configs e instala dependências (inclui devDependencies p/ Vite)
 COPY package*.json ./
-
-# Instala TAMBÉM as devDependencies (precisamos do Vite no build)
-# Se você tem package-lock.json, prefira `npm ci`
 RUN npm install
 
-# Copia o restante do código
+# Copia o restante do código-fonte
 COPY . .
 
-# Build do front (gera /dist)
+# Gera os artefatos de produção em /dist
 RUN npm run build
-
 
 # ====== STAGE 2: RUNTIME ======
 FROM node:20-alpine AS runtime
-
 WORKDIR /app
 
-# Copia apenas arquivos necessários para rodar
+# Copia apenas package.json e instala dependências de produção
 COPY package*.json ./
-# Instala apenas dependências de produção
 RUN npm install --omit=dev
 
-# Copia a pasta dist gerada no estágio de build e o servidor
+# Copia o build do front + scripts do backend necessários
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/server.cjs ./server.cjs
+COPY --from=build /app/cron-update.js ./cron-update.js
+COPY --from=build /app/update-data.js ./update-data.js
+COPY --from=build /app/components.json ./components.json
 
-# Porta e env
+# Expõe a porta configurada
 EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Start
+# Comando de start
 CMD ["node", "server.cjs"]
