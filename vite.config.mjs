@@ -28,6 +28,6 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    chunkSizeWarningLimit: 1200, // evita warning chato de chunk > 500kB
+    chunkSizeWarningLimit: 1200,
   },
 })
