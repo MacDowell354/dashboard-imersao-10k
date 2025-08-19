@@ -23,10 +23,10 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/server.cjs ./server.cjs
 COPY --from=build /app/cron-update.js ./cron-update.js
 COPY --from=build /app/update-data.js ./update-data.js
-# (NÃO precisa copiar components.json – já está dentro de dist/)
+# (não precisa copiar components.json — ele já vai em dist/)
 
+# Porta informativa (pode manter 3000). O Render fornecerá PORT dinamicamente.
 EXPOSE 3000
 ENV NODE_ENV=production
-ENV PORT=3000
 
 CMD ["node", "server.cjs"]
