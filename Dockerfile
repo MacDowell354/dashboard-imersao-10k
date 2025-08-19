@@ -1,27 +1,40 @@
-# Use Node.js 18 LTS
-FROM node:18-alpine
+# ====== STAGE 1: BUILD ======
+FROM node:20-alpine AS build
 
-# Diretório de trabalho
 WORKDIR /app
 
-# Copia apenas os manifests para aproveitar cache de camadas
+# Copia só manifests para melhor cache
 COPY package*.json ./
 
-# Instala apenas dependências de produção (npm v10+ usa --omit=dev)
-RUN npm install --omit=dev
+# Instala TAMBÉM as devDependencies (precisamos do Vite no build)
+# Se você tem package-lock.json, prefira `npm ci`
+RUN npm install
 
 # Copia o restante do código
 COPY . .
 
-# Build do front (Vite) para a pasta dist/
+# Build do front (gera /dist)
 RUN npm run build
 
-# Expõe a porta usada pelo servidor
-EXPOSE 3000
 
-# Variáveis padrão
+# ====== STAGE 2: RUNTIME ======
+FROM node:20-alpine AS runtime
+
+WORKDIR /app
+
+# Copia apenas arquivos necessários para rodar
+COPY package*.json ./
+# Instala apenas dependências de produção
+RUN npm install --omit=dev
+
+# Copia a pasta dist gerada no estágio de build e o servidor
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/server.js ./server.js
+
+# Porta e env
+EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Sobe o servidor Express (server.js serve a pasta dist/)
-CMD ["npm", "start"]
+# Start
+CMD ["node", "server.js"]
