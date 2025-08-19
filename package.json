@@ -7,7 +7,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node server.js",
+    "start": "node server.cjs"
     "update-data": "node update-data.js",
     "start-cron": "node cron-update.js"
   },
