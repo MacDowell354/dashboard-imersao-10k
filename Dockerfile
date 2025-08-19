@@ -29,7 +29,7 @@ RUN npm install --omit=dev
 
 # Copia a pasta dist gerada no estágio de build e o servidor
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/server.js ./server.js
+COPY --from=build /app/server.cjs ./server.cjs
 
 # Porta e env
 EXPOSE 3000
