@@ -1,20 +1,33 @@
+// vite.config.mjs (ESM)
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
+import { fileURLToPath } from 'url'
+import { dirname, resolve } from 'path'
 
-// https://vite.dev/config/
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
 export default defineConfig({
-  plugins: [react(),tailwindcss()],
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': resolve(__dirname, './src'),
     },
   },
   server: {
     host: '0.0.0.0',
     port: 5173,
     strictPort: true,
-    allowedHosts: 'all'
-  }
+    allowedHosts: 'all',
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 5173,
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    chunkSizeWarningLimit: 1200, // evita warning chato de chunk > 500kB
+  },
 })
