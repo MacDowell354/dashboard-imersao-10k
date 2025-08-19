@@ -37,4 +37,4 @@ ENV NODE_ENV=production
 ENV PORT=3000
 
 # Start
-CMD ["node", "server.js"]
+CMD ["node", "server.cjs"]
