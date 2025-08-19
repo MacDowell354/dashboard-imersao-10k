@@ -9,7 +9,7 @@ async function fetchDataFromSharePoint() {
   try {
     console.log('🔄 Iniciando atualização dos dados...');
 
-    // ===== DADOS SIMULADOS (substituir pela coleta real quando integrar) =====
+    // ===== DADOS SIMULADOS =====
     const dadosAtualizados = {
       dataAtualizacao: new Date().toISOString().split('T')[0],
       vendas: { total: 104, faturamento: 16845, investimento: 34671, roas: -0.51, cac: 333, ticketMedio: 162 },
@@ -25,9 +25,9 @@ async function fetchDataFromSharePoint() {
         { nome: 'Outros', vendas: 16, percentual: 15.4, crescimento: 6.7, ticketMedio: 152 }
       ]
     };
-    // ========================================================================
+    // ============================
 
-    // 🔑 Salva dentro de dist/data (servido pelo Express)
+    // Salvar dentro de dist/data (servido pelo Express)
     const dataDir = path.join(__dirname, 'dist', 'data');
     const dataPath = path.join(dataDir, 'dados-atualizados.json');
     fs.mkdirSync(dataDir, { recursive: true });
