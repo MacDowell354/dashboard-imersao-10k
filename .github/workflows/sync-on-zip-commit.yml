@@ -3,29 +3,58 @@ name: Sync from ZIP upload (incoming/)
 on:
   push:
     paths:
-      - 'incoming/*.zip'
+      - 'incoming/*.zip'   # dispara quando você subir um zip nessa pasta
 
 jobs:
   unzip-and-sync:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Extract ZIP
-        run: |
-          mkdir extracted
-          unzip -o incoming/*.zip -d extracted
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y unzip rsync
 
-      - name: Copy extracted to repo
+      - name: Find latest ZIP in incoming/
+        id: findzip
         run: |
-          rsync -av extracted/ ./
-          rm -rf incoming/*.zip
+          LATEST="$(ls -t incoming/*.zip 2>/dev/null | head -n1 || true)"
+          if [ -z "$LATEST" ]; then
+            echo "Nenhum ZIP em incoming/"; exit 1
+          fi
+          echo "zip_path=$LATEST" >> $GITHUB_OUTPUT
+          echo "ZIP encontrado: $LATEST"
 
-      - name: Commit changes
+      - name: Unzip payload
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add .
-          git commit -m "Sync from ZIP upload"
-          git push
+          rm -rf /tmp/_unz && mkdir -p /tmp/_unz
+          unzip -q "${{ steps.findzip.outputs.zip_path }}" -d /tmp/_unz
+          ROOT="$(find /tmp/_unz -maxdepth 1 -type d | tail -n 1)"
+          echo "ROOT=$ROOT"
+          ls -la "$ROOT"
+
+      - name: Sync files to repo (exclude build artifacts)
+        run: |
+          ROOT="$(find /tmp/_unz -maxdepth 1 -type d | tail -n 1)"
+          rsync -av --delete \
+            --exclude ".git" \
+            --exclude "node_modules" \
+            --exclude "dist" \
+            "$ROOT"/ ./
+
+      - name: Remove processed ZIP
+        run: rm -f "${{ steps.findzip.outputs.zip_path }}"
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore: sync from incoming ZIP ($(date +'%Y-%m-%d %H:%M %Z'))"
+            git push
+          else
+            echo "Sem mudanças para commit."
+          fi
