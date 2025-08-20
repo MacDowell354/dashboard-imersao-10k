@@ -5,9 +5,8 @@ on:
     paths:
       - 'incoming/*.zip'
 
-# dá permissão explícita p/ poder fazer git push
 permissions:
-  contents: write
+  contents: write  # permite git push pelo GITHUB_TOKEN
 
 jobs:
   unzip-and-sync:
@@ -30,36 +29,39 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          echo "Arquivos em incoming/:"
-          ls -l incoming || true
+          echo "Listando incoming/:"
+          ls -lah incoming || true
           LATEST="$(ls -t incoming/*.zip 2>/dev/null | head -n1 || true)"
           if [[ -z "$LATEST" ]]; then
             echo "Nenhum ZIP em incoming/"; exit 1
           fi
-          echo "zip_path=$LATEST" >> "$GITHUB_OUTPUT"
           echo "ZIP escolhido: $LATEST"
+          echo "zip_path=$LATEST" >> "$GITHUB_OUTPUT"
 
-      - name: Unzip
+      - name: Unzip to /tmp/_unz
         shell: bash
         run: |
           set -euxo pipefail
           rm -rf /tmp/_unz && mkdir -p /tmp/_unz
-          unzip -q "${{ steps.pick.outputs.zip_path }}" -d /tmp/_unz
-          echo "Conteúdo unzip:"
-          ls -la /tmp/_unz
+          unzip -o "${{ steps.pick.outputs.zip_path }}" -d /tmp/_unz
+          echo "Conteúdo de /tmp/_unz (nível 1):"
+          find /tmp/_unz -maxdepth 1 -mindepth 1 -printf "%y %p\n" | sort
+
+          # Se tiver uma única pasta raiz, usa ela como ROOT
           ROOT="/tmp/_unz"
-          ONLY_DIRS=$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type d | wc -l)
-          ONLY_FILES=$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type f | wc -l)
-          if [[ "$ONLY_DIRS" -eq 1 && "$ONLY_FILES" -eq 0 ]]; then
+          DIRS=$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type d | wc -l)
+          FILES=$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type f | wc -l)
+          if [[ "$DIRS" -eq 1 && "$FILES" -eq 0 ]]; then
             ROOT="$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type d | head -n1)"
           fi
           echo "ROOT=$ROOT" | tee /tmp/root_path
 
-      - name: Sync to repo (exclude build artifacts)
+      - name: Sync ROOT to repo (exclude build artifacts)
         shell: bash
         run: |
           set -euxo pipefail
           ROOT="$(cat /tmp/root_path)"
+          echo "Sincronizando de: $ROOT"
           rsync -av --delete \
             --exclude ".git" \
             --exclude "node_modules" \
@@ -77,12 +79,13 @@ jobs:
           set -euxo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # evita erro se alguém pushou algo no meio
+          # Puxa alterações remotas antes de commitar (evita conflitos)
           git pull --rebase origin "$GITHUB_REF_NAME" || true
           if [[ -n "$(git status --porcelain)" ]]; then
             git add -A
             git commit -m "chore: sync from incoming ZIP $(date +'%Y-%m-%d %H:%M %Z')"
             git push
+            echo "Commit feito e push realizado."
           else
             echo "Sem mudanças para commit."
           fi
