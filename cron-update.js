@@ -20,7 +20,7 @@ async function runUpdate(tag) {
   }
 }
 
-// Executa ao subir
+// executa logo que o serviço sobe
 runUpdate('inicial');
 
 // 06:00, 12:00 e 18:00 todos os dias
