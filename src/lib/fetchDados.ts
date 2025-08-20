@@ -8,15 +8,18 @@ export async function fetchDadosSeguro() {
   const urls = [
     '/data/dados-atualizados.json',
     (import.meta as any)?.env?.BASE_URL
-      ? String((import.meta as any).env.BASE_URL).replace(/\/?$/, '/') + 'data/dados-atualizados.json'
-      : '/data/dados-atualizados.json'
+      ? String((import.meta as any).env.BASE_URL).replace(/\/?$/, '/') +
+        'data/dados-atualizados.json'
+      : '/data/dados-atualizados.json',
   ];
 
   for (const url of urls) {
     try {
       const res = await fetch(url, { cache: 'no-store' });
       if (res.ok) return await res.json();
-    } catch (_e) {}
+    } catch (_e) {
+      // ignora erro e tenta a próxima URL
+    }
   }
   return null;
 }
@@ -29,12 +32,16 @@ export function normalizarDados(raw: any) {
   if (raw.medicos_dentistas) return raw;
 
   const profs = Array.isArray(raw.profissoes) ? raw.profissoes : [];
+
   const med =
-    profs.find((p) =>
-      String(p?.nome).toLowerCase().startsWith('médico') ||
-      String(p?.nome).toLowerCase().startsWith('medico')
+    profs.find(
+      (p) =>
+        String(p?.nome).toLowerCase().startsWith('médico') ||
+        String(p?.nome).toLowerCase().startsWith('medico')
     ) || {};
-  const den = profs.find((p) => String(p?.nome).toLowerCase().startsWith('dent')) || {};
+
+  const den =
+    profs.find((p) => String(p?.nome).toLowerCase().startsWith('dent')) || {};
 
   return {
     ...raw,
@@ -44,4 +51,3 @@ export function normalizarDados(raw: any) {
       total: (med.vendas || 0) + (den.vendas || 0),
     },
   };
-}
