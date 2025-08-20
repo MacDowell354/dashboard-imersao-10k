@@ -5,8 +5,9 @@ on:
     paths:
       - 'incoming/*.zip'
 
+# permite git push com o GITHUB_TOKEN
 permissions:
-  contents: write  # permite git push pelo GITHUB_TOKEN
+  contents: write
 
 jobs:
   unzip-and-sync:
@@ -24,44 +25,36 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y unzip rsync
 
-      - name: Pick latest ZIP
-        id: pick
-        shell: bash
+      - name: Find latest ZIP in incoming/
+        id: findzip
         run: |
           set -euxo pipefail
-          echo "Listando incoming/:"
-          ls -lah incoming || true
           LATEST="$(ls -t incoming/*.zip 2>/dev/null | head -n1 || true)"
-          if [[ -z "$LATEST" ]]; then
+          if [ -z "$LATEST" ]; then
             echo "Nenhum ZIP em incoming/"; exit 1
           fi
-          echo "ZIP escolhido: $LATEST"
           echo "zip_path=$LATEST" >> "$GITHUB_OUTPUT"
+          echo "ZIP encontrado: $LATEST"
 
-      - name: Unzip to /tmp/_unz
-        shell: bash
+      - name: Unzip payload
         run: |
           set -euxo pipefail
           rm -rf /tmp/_unz && mkdir -p /tmp/_unz
-          unzip -o "${{ steps.pick.outputs.zip_path }}" -d /tmp/_unz
-          echo "Conteúdo de /tmp/_unz (nível 1):"
-          find /tmp/_unz -maxdepth 1 -mindepth 1 -printf "%y %p\n" | sort
-
-          # Se tiver uma única pasta raiz, usa ela como ROOT
+          unzip -o "${{ steps.findzip.outputs.zip_path }}" -d /tmp/_unz
+          echo "Conteúdo /tmp/_unz:"
+          ls -la /tmp/_unz
           ROOT="/tmp/_unz"
           DIRS=$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type d | wc -l)
           FILES=$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type f | wc -l)
-          if [[ "$DIRS" -eq 1 && "$FILES" -eq 0 ]]; then
+          if [ "$DIRS" -eq 1 ] && [ "$FILES" -eq 0 ]; then
             ROOT="$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type d | head -n1)"
           fi
           echo "ROOT=$ROOT" | tee /tmp/root_path
 
-      - name: Sync ROOT to repo (exclude build artifacts)
-        shell: bash
+      - name: Sync files to repo (exclude build artifacts)
         run: |
           set -euxo pipefail
           ROOT="$(cat /tmp/root_path)"
-          echo "Sincronizando de: $ROOT"
           rsync -av --delete \
             --exclude ".git" \
             --exclude "node_modules" \
@@ -71,21 +64,18 @@ jobs:
       - name: Remove processed ZIP
         run: |
           set -euxo pipefail
-          rm -f "${{ steps.pick.outputs.zip_path }}"
+          rm -f "${{ steps.findzip.outputs.zip_path }}"
 
       - name: Commit & push if changed
-        shell: bash
         run: |
           set -euxo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Puxa alterações remotas antes de commitar (evita conflitos)
           git pull --rebase origin "$GITHUB_REF_NAME" || true
-          if [[ -n "$(git status --porcelain)" ]]; then
+          if [ -n "$(git status --porcelain)" ]; then
             git add -A
             git commit -m "chore: sync from incoming ZIP $(date +'%Y-%m-%d %H:%M %Z')"
             git push
-            echo "Commit feito e push realizado."
           else
             echo "Sem mudanças para commit."
           fi
