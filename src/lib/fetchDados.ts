@@ -16,9 +16,11 @@ export async function fetchDadosSeguro() {
   for (const url of urls) {
     try {
       const res = await fetch(url, { cache: 'no-store' });
-      if (res.ok) return await res.json();
+      if (res.ok) {
+        return await res.json();
+      }
     } catch (_e) {
-      // ignora erro e tenta a próxima URL
+      // ignora e tenta a próxima URL
     }
   }
   return null;
@@ -35,13 +37,13 @@ export function normalizarDados(raw: any) {
 
   const med =
     profs.find(
-      (p) =>
+      (p: any) =>
         String(p?.nome).toLowerCase().startsWith('médico') ||
         String(p?.nome).toLowerCase().startsWith('medico')
     ) || {};
 
   const den =
-    profs.find((p) => String(p?.nome).toLowerCase().startsWith('dent')) || {};
+    profs.find((p: any) => String(p?.nome).toLowerCase().startsWith('dent')) || {};
 
   return {
     ...raw,
@@ -51,3 +53,4 @@ export function normalizarDados(raw: any) {
       total: (med.vendas || 0) + (den.vendas || 0),
     },
   };
+}
