@@ -25,9 +25,9 @@ async function fetchDataFromSharePoint() {
         { nome: 'Outros', vendas: 16, percentual: 15.4, crescimento: 6.7, ticketMedio: 152 }
       ]
     };
-    // ============================
+    // ===========================
 
-    // Salvar dentro de dist/data (servido pelo Express)
+    // salva dentro de dist/data (servido pelo Express)
     const dataDir = path.join(__dirname, 'dist', 'data');
     const dataPath = path.join(dataDir, 'dados-atualizados.json');
     fs.mkdirSync(dataDir, { recursive: true });
@@ -38,7 +38,7 @@ async function fetchDataFromSharePoint() {
     console.log(`📊 Vendas: ${dadosAtualizados.vendas.total}`);
     console.log(`💾 Arquivo salvo em: ${dataPath}`);
 
-    return dadosAtualizados;
+    return { ok: true, savedAt: dataPath, data: dadosAtualizados };
   } catch (error) {
     console.error('❌ Erro ao atualizar dados:', error);
     throw error;
