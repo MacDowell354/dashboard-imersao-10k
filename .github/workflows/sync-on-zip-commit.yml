@@ -90,8 +90,8 @@ jobs:
             --filter='P .github/***' \
             --filter='P incoming/***' \
             "$ROOT"/ ./
-          # 2) RESTAURA (descarta) QUALQUER deleção acidental das pastas protegidas (cinto de segurança extra)
-          git checkout -- .github incoming || true
+          # 2) RESTAURA QUALQUER deleção acidental das pastas protegidas
+          git checkout -- .github .github/workflows incoming || true
           # 3) Mostra o que ficou staged/modified
           git status --porcelain
 
@@ -118,27 +118,27 @@ jobs:
             git add -A
             git commit -m "chore: sync from incoming ZIP $(date +'%Y-%m-%d %H:%M %Z')"
 
-            # Tenta até 3 vezes: se remoto avançar, rebase e tenta de novo (sem falhar o job no 1º push)
-            n=0
-            set +e
-            until [ $n -ge 3 ]
-            do
-              if git push; then
-                echo "Push OK"
-                set -e
-                break
-              else
-                echo "Push rejeitado (non-fast-forward). Rebase e tentar novamente..."
+            # 1ª tentativa; se rejeitar, entra no fluxo de retry sem derrubar o job
+            if ! git push; then
+              echo "Push rejeitado (non-fast-forward). Rebase e tentar novamente..."
+              n=1
+              while [ $n -le 3 ]; do
                 git fetch origin "$BR"
-                git pull --rebase origin "$BR" || true
+                # tenta rebase direto; em caso de conflito, aborta e usa pull --rebase
+                if ! git rebase "origin/$BR"; then
+                  git rebase --abort || true
+                  git pull --rebase origin "$BR" || true
+                fi
+                if git push; then
+                  echo "Push OK após retry #$n"
+                  break
+                fi
                 n=$((n+1))
                 sleep 1
-              fi
-            done
-            set -e
-
-            # Falha explícita se ainda não conseguir
-            git push
+              done
+              # tentativa final (falha explicitamente se ainda estiver rejeitando)
+              git push
+            fi
           else
             echo "Sem mudanças para commit."
           fi
