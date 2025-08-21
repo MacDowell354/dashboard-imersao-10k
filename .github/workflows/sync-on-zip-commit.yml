@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Version marker
-        run: echo "SYNC WF v4 - PR mode"
+        run: echo "SYNC WF v5 - PR mode (fix ROOT path)"
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -79,13 +79,15 @@ jobs:
           if [ "$DIRS" -eq 1 ] && [ "$FILES" -eq 0 ]; then
             ROOT="$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type d | head -n1)"
           fi
-          echo "ROOT=$ROOT" | tee /tmp/root_path
+          echo "ROOT: $ROOT"
+          printf '%s' "$ROOT" > /tmp/root_path   # << grava só o caminho
 
       - name: Sync files to repo (com proteção)
         shell: bash
         run: |
           set -euxo pipefail
-          ROOT="$(cat /tmp/root_path)"
+          ROOT="$(cat /tmp/root_path)"          # << agora é só /tmp/_unz ou subpasta
+          test -d "$ROOT"
           # NÃO tocar em .github/ nem incoming/ durante a sync
           rsync -av --delete --safe-links \
             --exclude '.git' \
@@ -113,35 +115,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           BASE="origin/${GITHUB_REF_NAME:-main}"
-          TS="$(date +'%Y%m%d-%H%M%S')"
-          BRANCH="bot/sync-incoming-${TS}"
-
-          # rebase suave no main remoto para garantir base limpa
-          git fetch origin
-          git checkout -B "${BRANCH}" "${BASE}"
-
-          if [ -n "$(git status --porcelain)" ]; then
-            git add -A
-            git commit -m "chore: sync from incoming ZIP ${TS} (PR mode)"
-            git push -u origin "${BRANCH}"
-            echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
-          else
-            echo "Sem mudanças para commit."
-            echo "branch=" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Open Pull Request
-        if: steps.br.outputs.branch != ''
-        uses: peter-evans/create-pull-request@v6
-        with:
-          commit-message: "chore: sync from ZIP (PR mode)"
-          title: "Sync from ZIP upload — ${{ steps.br.outputs.branch }}"
-          body: |
-            Este PR foi criado automaticamente a partir do ZIP mais recente em `incoming/`.
-            - Proteção a `.github/` e `incoming/`.
-            - ZIP processado removido do repositório após sync.
-          branch: ${{ steps.br.outputs.branch }}
-          base: ${{ github.ref_name }}
-          labels: |
-            sync
-            automation
+          TS="$(dat
