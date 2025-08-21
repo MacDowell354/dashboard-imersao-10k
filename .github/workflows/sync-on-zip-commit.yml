@@ -25,8 +25,10 @@ jobs:
 
       # Garante que começamos exatamente do último remoto
       - name: Align working tree to origin/main
+        shell: bash
         run: |
           set -euxo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           BR="${GITHUB_REF_NAME:-main}"
           git fetch origin "$BR"
           git checkout "$BR"
@@ -37,6 +39,7 @@ jobs:
 
       - name: Find latest ZIP in incoming/
         id: findzip
+        shell: bash
         run: |
           set -euxo pipefail
           LATEST="$(ls -t incoming/*.zip 2>/dev/null | head -n1 || true)"
@@ -46,11 +49,25 @@ jobs:
           echo "zip_path=$LATEST" >> "$GITHUB_OUTPUT"
           echo "ZIP encontrado: $LATEST"
 
+      - name: Validate ZIP paths (no / or ../)
+        shell: bash
+        run: |
+          set -euxo pipefail
+          LIST="$(zipinfo -1 "${{ steps.findzip.outputs.zip_path }}")"
+          if echo "$LIST" | grep -E '(^/|(^|/)\.\.(/|$))' >/dev/null; then
+            echo "ZIP contém caminhos inválidos (absolutos ou ../). Abortando."; exit 2
+          fi
+
       - name: Unzip payload
+        shell: bash
         run: |
           set -euxo pipefail
           rm -rf /tmp/_unz && mkdir -p /tmp/_unz
           unzip -q "${{ steps.findzip.outputs.zip_path }}" -d /tmp/_unz
+          # Bloqueia symlinks no pacote
+          if find /tmp/_unz -xtype l -print -quit | grep .; then
+            echo "ZIP contém symlinks. Abortando por segurança."; exit 3
+          fi
           echo "Conteúdo extraído:"; ls -la /tmp/_unz
           ROOT="/tmp/_unz"
           DIRS=$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type d | wc -l)
@@ -61,26 +78,31 @@ jobs:
           echo "ROOT=$ROOT" | tee /tmp/root_path
 
       - name: Sync files to repo (com proteção)
+        shell: bash
         run: |
           set -euxo pipefail
           ROOT="$(cat /tmp/root_path)"
-          # 1) Sincroniza tudo, mas ignora pastas volumosas
-          rsync -av --delete \
+          # 1) Sincroniza tudo, com links seguros e filtros que PROTEGEM .github/ e incoming/
+          rsync -av --delete --safe-links \
             --exclude '.git' \
             --exclude 'node_modules' \
             --exclude 'dist' \
+            --filter='P .github/***' \
+            --filter='P incoming/***' \
             "$ROOT"/ ./
-          # 2) RESTAURA (descarta) QUALQUER deleção acidental das pastas protegidas
+          # 2) RESTAURA (descarta) QUALQUER deleção acidental das pastas protegidas (cinto de segurança extra)
           git checkout -- .github incoming || true
           # 3) Mostra o que ficou staged/modified
           git status --porcelain
 
       - name: Remove processed ZIP
+        shell: bash
         run: |
           set -euxo pipefail
           rm -f "${{ steps.findzip.outputs.zip_path }}" || true
 
       - name: Commit & push (com rebase e retry)
+        shell: bash
         run: |
           set -euxo pipefail
           git config user.name  "github-actions[bot]"
@@ -96,19 +118,24 @@ jobs:
             git add -A
             git commit -m "chore: sync from incoming ZIP $(date +'%Y-%m-%d %H:%M %Z')"
 
-            # Tenta até 3 vezes: se remoto avançar, rebase e tenta de novo
+            # Tenta até 3 vezes: se remoto avançar, rebase e tenta de novo (sem falhar o job no 1º push)
             n=0
+            set +e
             until [ $n -ge 3 ]
             do
               if git push; then
-                echo "Push OK"; break
+                echo "Push OK"
+                set -e
+                break
+              else
+                echo "Push rejeitado (non-fast-forward). Rebase e tentar novamente..."
+                git fetch origin "$BR"
+                git pull --rebase origin "$BR" || true
+                n=$((n+1))
+                sleep 1
               fi
-              echo "Push rejeitado (non-fast-forward). Rebase e tentar novamente..."
-              git fetch origin "$BR"
-              git pull --rebase origin "$BR" || true
-              n=$((n+1))
-              sleep 1
             done
+            set -e
 
             # Falha explícita se ainda não conseguir
             git push
