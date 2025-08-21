@@ -1,62 +1,116 @@
 {
-  "dataAtualizacao": "2025-08-17",
-  "vendas": {
-    "total": 104,
-    "faturamento": 16845,
-    "investimento": 34671,
+  "metricas_principais": {
     "roas": -0.51,
-    "cac": 333,
-    "ticketMedio": 162
+    "cac": 329.14,
+    "total_vendas": 129,
+    "faturamento": 20948.92,
+    "investimento": 42458.72,
+    "deficit": 21509.800000000003,
+    "ticket_medio": 162.35,
+    "data_atualizacao": "20/08/2025"
   },
-  "canais": [
+  "vendas_por_canal": [
     {
-      "nome": "Tráfego Pago",
-      "vendas": 74,
-      "percentual": 71.2,
-      "crescimento": 12.1
+      "canal": "Tráfego Pago",
+      "vendas": 88,
+      "percentual": 68.2
     },
     {
-      "nome": "Bio Instagram", 
-      "vendas": 19,
-      "percentual": 18.3,
-      "crescimento": 26.7
+      "canal": "Bio Instagram",
+      "vendas": 27,
+      "percentual": 20.9
     },
     {
-      "nome": "Outros",
-      "vendas": 11,
-      "percentual": 10.5,
-      "crescimento": 10.0
+      "canal": "Outras",
+      "vendas": 7,
+      "percentual": 5.4
+    },
+    {
+      "canal": "Email",
+      "vendas": 3,
+      "percentual": 2.3
+    },
+    {
+      "canal": "WhatsApp",
+      "vendas": 2,
+      "percentual": 1.6
+    },
+    {
+      "canal": "YouTube",
+      "vendas": 2,
+      "percentual": 1.6
     }
   ],
-  "profissoes": [
+  "vendas_por_dia": [
     {
-      "nome": "Médicos",
-      "vendas": 62,
-      "percentual": 59.6,
-      "crescimento": 26.1,
-      "ticketMedio": 167
-    },
-    {
-      "nome": "Dentistas",
-      "vendas": 14,
-      "percentual": 13.5,
-      "crescimento": 16.7,
-      "ticketMedio": 158
-    },
-    {
-      "nome": "Fisioterapeutas",
+      "dia": "12/08",
       "vendas": 12,
-      "percentual": 11.5,
-      "crescimento": 9.1,
-      "ticketMedio": 155
+      "investimento": 3324.97,
+      "faturamento": 1960.0,
+      "cac": 277.08
     },
     {
-      "nome": "Outros",
-      "vendas": 16,
-      "percentual": 15.4,
-      "crescimento": 6.7,
-      "ticketMedio": 152
+      "dia": "13/08",
+      "vendas": 12,
+      "investimento": 3158.7,
+      "faturamento": 1948.8,
+      "cac": 263.22
+    },
+    {
+      "dia": "14/08",
+      "vendas": 6,
+      "investimento": 1960.7,
+      "faturamento": 937.79,
+      "cac": 326.78
+    },
+    {
+      "dia": "15/08",
+      "vendas": 8,
+      "investimento": 2225.36,
+      "faturamento": 1367.59,
+      "cac": 278.17
+    },
+    {
+      "dia": "16/08",
+      "vendas": 14,
+      "investimento": 2616.41,
+      "faturamento": 2386.99,
+      "cac": 186.89
+    },
+    {
+      "dia": "17/08",
+      "vendas": 6,
+      "investimento": 2655.27,
+      "faturamento": 839.4,
+      "cac": 442.55
+    },
+    {
+      "dia": "18/08",
+      "vendas": 3,
+      "investimento": 2654.3,
+      "faturamento": 518.09,
+      "cac": 884.77
+    },
+    {
+      "dia": "19/08",
+      "vendas": 10,
+      "investimento": 2730.05,
+      "faturamento": 1631.38,
+      "cac": 273.01
+    },
+    {
+      "dia": "20/08",
+      "vendas": 12,
+      "investimento": 2403.51,
+      "faturamento": 1954.4,
+      "cac": 200.29
     }
+  ],
+  "insights_principais": [
+    "EXCELENTE RECUPERAÇÃO: 20/08 teve 12 vendas com CAC R$ 200,29 (melhor CAC dos últimos dias)",
+    "TENDÊNCIA POSITIVA: Dois dias consecutivos de recuperação (19/08: 10 vendas, 20/08: 12 vendas)",
+    "CAC CONTROLADO: 20/08 apresentou o menor CAC desde 16/08 (R$ 186,89)",
+    "FATURAMENTO CRESCENTE: R$ 1.954 no dia 20/08, segundo melhor dia recente",
+    "ÚLTIMOS 2 DIAS: Apenas 21/08 e 22/08 restantes para captação"
   ]
 }
-
