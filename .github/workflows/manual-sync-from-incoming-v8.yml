@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Version marker
-        run: echo "SYNC WF v8.3 - PR mode + ROOT autodetect (no /tmp/root_path, no zipinfo)"
+        run: echo "SYNC WF v8.4 - PR mode + ROOT autodetect (no zipinfo)"
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
           git checkout "$BR"
           git reset --hard "origin/$BR"
 
-      # << zipinfo REMOVIDO >>
+      # zipinfo REMOVIDO — unzip já fornece o comando zipinfo em /usr/bin/zipinfo
       - name: Install tools
         run: sudo apt-get update && sudo apt-get install -y unzip rsync
 
@@ -55,7 +55,7 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          # usa unzip -Z1 (equivalente ao zipinfo -1)
+          # unzip -Z1 é equivalente a 'zipinfo -1'
           LIST="$(unzip -Z1 "${{ steps.findzip.outputs.zip_path }}")"
           if echo "$LIST" | grep -E '(^/|(^|/)\.\.(/|$))' >/dev/null; then
             echo "ZIP contém caminhos inválidos (absolutos ou ../). Abortando."; exit 2
@@ -115,7 +115,7 @@ jobs:
 
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
-            git commit -m "chore: sync from incoming ZIP ${TS} (PR mode v8.3)"
+            git commit -m "chore: sync from incoming ZIP ${TS} (PR mode v8.4)"
             git push -u origin "${BRANCH}"
             echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
           else
@@ -127,7 +127,7 @@ jobs:
         if: steps.br.outputs.branch != ''
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "chore: sync from ZIP (PR mode v8.3)"
+          commit-message: "chore: sync from ZIP (PR mode v8.4)"
           title: "Sync from ZIP upload — ${{ steps.br.outputs.branch }}"
           body: "PR automático a partir do ZIP mais recente em incoming/."
           branch: ${{ steps.br.outputs.branch }}
