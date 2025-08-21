@@ -5,12 +5,12 @@ on:
     paths:
       - 'incoming/*.zip'
 
-# evita dois jobs rodando ao mesmo tempo
+# evita corridas entre execuções
 concurrency:
   group: sync-incoming
   cancel-in-progress: true
 
-# garante permissão de push com GITHUB_TOKEN
+# precisa para permitir git push com o GITHUB_TOKEN
 permissions:
   contents: write
 
@@ -30,21 +30,22 @@ jobs:
       - name: Find latest ZIP in incoming/
         id: findzip
         run: |
-          set -x
+          set -euxo pipefail
           LATEST="$(ls -t incoming/*.zip 2>/dev/null | head -n1 || true)"
           if [ -z "$LATEST" ]; then
             echo "Nenhum ZIP em incoming/"; exit 1
           fi
-          echo "zip_path=$LATEST" >> $GITHUB_OUTPUT
+          echo "zip_path=$LATEST" >> "$GITHUB_OUTPUT"
           echo "ZIP encontrado: $LATEST"
 
       - name: Unzip payload
         run: |
-          set -x
+          set -euxo pipefail
           rm -rf /tmp/_unz && mkdir -p /tmp/_unz
           unzip -q "${{ steps.findzip.outputs.zip_path }}" -d /tmp/_unz || (echo "Erro no unzip"; ls -R /tmp/_unz; exit 1)
           echo "Conteúdo extraído:"
           ls -la /tmp/_unz
+          # define ROOT (se houver uma pasta raiz única, usa ela)
           ROOT="/tmp/_unz"
           DIRS=$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type d | wc -l)
           FILES=$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type f | wc -l)
@@ -55,7 +56,7 @@ jobs:
 
       - name: Sync files to repo (exclude build artifacts)
         run: |
-          set -x
+          set -euxo pipefail
           ROOT="$(cat /tmp/root_path)"
           rsync -av --delete \
             --exclude ".git" \
@@ -67,18 +68,19 @@ jobs:
 
       - name: Remove processed ZIP
         run: |
-          set -x
+          set -euxo pipefail
           rm -f "${{ steps.findzip.outputs.zip_path }}" || true
 
       - name: Commit & push if changed
         run: |
-          set -x
+          set -euxo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           BR="${GITHUB_REF_NAME:-main}"
           git fetch origin "$BR"
           git checkout "$BR" || true
+          # incorpora o commit do upload antes de push (evita non-fast-forward)
           git pull --rebase origin "$BR" || true
 
           if [ -n "$(git status --porcelain)" ]; then
