@@ -5,24 +5,34 @@ on:
     paths:
       - 'incoming/*.zip'
 
-# evita corridas entre execuções
+# evita duas execuções concorrentes
 concurrency:
   group: sync-incoming
   cancel-in-progress: true
 
-# precisa para permitir git push com o GITHUB_TOKEN
+# permite git push com GITHUB_TOKEN
 permissions:
   contents: write
 
 jobs:
   unzip-and-sync:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: true
+
+      # **Novo**: garanta que a árvore local esteja exatamente em origin/main
+      - name: Align working tree to origin/main
+        run: |
+          set -euxo pipefail
+          BR="${GITHUB_REF_NAME:-main}"
+          git fetch origin "$BR"
+          git checkout "$BR"
+          git reset --hard "origin/$BR"
 
       - name: Install tools
         run: sudo apt-get update && sudo apt-get install -y unzip rsync
@@ -42,10 +52,10 @@ jobs:
         run: |
           set -euxo pipefail
           rm -rf /tmp/_unz && mkdir -p /tmp/_unz
-          unzip -q "${{ steps.findzip.outputs.zip_path }}" -d /tmp/_unz || (echo "Erro no unzip"; ls -R /tmp/_unz; exit 1)
+          unzip -q "${{ steps.findzip.outputs.zip_path }}" -d /tmp/_unz
           echo "Conteúdo extraído:"
           ls -la /tmp/_unz
-          # define ROOT (se houver uma pasta raiz única, usa ela)
+          # Se o ZIP tiver uma única pasta raiz, usa-a como ROOT; senão usa /tmp/_unz
           ROOT="/tmp/_unz"
           DIRS=$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type d | wc -l)
           FILES=$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type f | wc -l)
@@ -54,14 +64,14 @@ jobs:
           fi
           echo "ROOT=$ROOT" | tee /tmp/root_path
 
-      - name: Sync files to repo (exclude build artifacts)
+      - name: Sync files to repo (exclude & protect)
         run: |
           set -euxo pipefail
           ROOT="$(cat /tmp/root_path)"
           rsync -av --delete \
             --exclude ".git" \
-            --exclude ".github" \
-            --exclude "incoming" \
+            --exclude ".github/**" \
+            --exclude "incoming/**" \
             --exclude "node_modules" \
             --exclude "dist" \
             "$ROOT"/ ./
@@ -71,22 +81,23 @@ jobs:
           set -euxo pipefail
           rm -f "${{ steps.findzip.outputs.zip_path }}" || true
 
-      - name: Commit & push if changed
+      - name: Commit & push if changed (fast-forward only)
         run: |
           set -euxo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          # re-alinha antes de commitar para garantir fast-forward
           BR="${GITHUB_REF_NAME:-main}"
           git fetch origin "$BR"
-          git checkout "$BR" || true
-          # incorpora o commit do upload antes de push (evita non-fast-forward)
-          git pull --rebase origin "$BR" || true
+          git checkout "$BR"
+          git reset --soft "origin/$BR"
 
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
             git commit -m "chore: sync from incoming ZIP $(date +'%Y-%m-%d %H:%M %Z')"
-            git push || git push --force-with-lease
+            # push será fast-forward (sem force) por conta do reset --soft acima
+            git push
           else
             echo "Sem mudanças para commit."
           fi
