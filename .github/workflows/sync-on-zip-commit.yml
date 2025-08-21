@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'incoming/*.zip'
-  workflow_dispatch: {}  # permite rodar manualmente a versão nova
+  workflow_dispatch: {}  # rodar manualmente a versão nova
 
 concurrency:
   group: sync-incoming
@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Version marker
-        run: echo "SYNC WF v5 - PR mode (fix ROOT path)"
+        run: echo "SYNC WF v6 - PR mode + ROOT sanitize"
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -80,15 +80,20 @@ jobs:
             ROOT="$(find /tmp/_unz -mindepth 1 -maxdepth 1 -type d | head -n1)"
           fi
           echo "ROOT: $ROOT"
-          printf '%s' "$ROOT" > /tmp/root_path   # << grava só o caminho
+          printf '%s' "$ROOT" > /tmp/root_path   # grava SOMENTE o caminho
 
       - name: Sync files to repo (com proteção)
         shell: bash
         run: |
           set -euxo pipefail
-          ROOT="$(cat /tmp/root_path)"          # << agora é só /tmp/_unz ou subpasta
-          test -d "$ROOT"
-          # NÃO tocar em .github/ nem incoming/ durante a sync
+          RAW="$(cat /tmp/root_path || true)"
+          # higieniza mesmo que algum run antigo tenha escrito "ROOT=/tmp/_unz"
+          ROOT="${RAW#ROOT=}"
+          ROOT="${ROOT%/}"
+          echo "ROOT sanitizado: $ROOT"
+          test -n "$ROOT" && test -d "$ROOT"
+
+          # Não tocar em .github/ nem incoming/ durante a sync
           rsync -av --delete --safe-links \
             --exclude '.git' \
             --exclude '.github' \
@@ -96,6 +101,7 @@ jobs:
             --exclude 'node_modules' \
             --exclude 'dist' \
             "$ROOT"/ ./
+
           # Cinto extra: restaura caso algo toque nessas pastas
           git checkout -- .github .github/workflows incoming || true
           git status --porcelain
@@ -115,4 +121,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           BASE="origin/${GITHUB_REF_NAME:-main}"
-          TS="$(dat
+          TS="$(date +'%Y%m%d-%H%M%S')"
+          BRANCH="bot/sync-incoming-${TS}"
+
+          git fetch origin
+          git checkout -B "${BRANCH}" "${BASE}"
+
+          if [ -n "$(git status --porce]()
