@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      # garante que sempre partimos do último commit remoto (história alinhada)
+      # Garante que começamos exatamente do último remoto
       - name: Align working tree to origin/main
         run: |
           set -euxo pipefail
@@ -60,45 +60,58 @@ jobs:
           fi
           echo "ROOT=$ROOT" | tee /tmp/root_path
 
-      - name: Sync files to repo (exclude & PROTECT)
+      - name: Sync files to repo (com proteção)
         run: |
           set -euxo pipefail
           ROOT="$(cat /tmp/root_path)"
-          # Filtros 'P' PROTEGEM pastas contra deleção mesmo com --delete
+          # 1) Sincroniza tudo, mas ignora pastas volumosas
           rsync -av --delete \
-            --filter='P .github/***' \
-            --filter='P incoming/***' \
             --exclude '.git' \
             --exclude 'node_modules' \
             --exclude 'dist' \
             "$ROOT"/ ./
+          # 2) RESTAURA (descarta) QUALQUER deleção acidental das pastas protegidas
+          git checkout -- .github incoming || true
+          # 3) Mostra o que ficou staged/modified
+          git status --porcelain
 
       - name: Remove processed ZIP
         run: |
           set -euxo pipefail
           rm -f "${{ steps.findzip.outputs.zip_path }}" || true
 
-      - name: Commit & push (fast-forward with retry)
+      - name: Commit & push (com rebase e retry)
         run: |
           set -euxo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           BR="${GITHUB_REF_NAME:-main}"
+          # alinhar índice/HEAD ao remoto antes de criar commit => tende a fast‑forward
           git fetch origin "$BR"
           git checkout "$BR"
-          # index/HEAD alinhados ao último remoto para garantir fast-forward
           git reset --soft "origin/$BR"
 
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
             git commit -m "chore: sync from incoming ZIP $(date +'%Y-%m-%d %H:%M %Z')"
-            # 1ª tentativa
-            if ! git push; then
-              echo "Push rejeitado, fazendo rebase e tentando novamente..."
+
+            # Tenta até 3 vezes: se remoto avançar, rebase e tenta de novo
+            n=0
+            until [ $n -ge 3 ]
+            do
+              if git push; then
+                echo "Push OK"; break
+              fi
+              echo "Push rejeitado (non-fast-forward). Rebase e tentar novamente..."
+              git fetch origin "$BR"
               git pull --rebase origin "$BR" || true
-              git push
-            fi
+              n=$((n+1))
+              sleep 1
+            done
+
+            # Falha explícita se ainda não conseguir
+            git push
           else
             echo "Sem mudanças para commit."
           fi
