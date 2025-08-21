@@ -1,7 +1,7 @@
 name: Manual Sync from incoming ZIP (v8)
 
 on:
-  workflow_dispatch: {}   # só manual
+  workflow_dispatch: {}   # apenas manual
 
 concurrency:
   group: manual-sync-incoming
@@ -14,9 +14,10 @@ permissions:
 jobs:
   unzip-and-sync:
     runs-on: ubuntu-latest
+
     steps:
       - name: Version marker
-        run: echo "SYNC WF v8.1 - PR mode + ROOT autodetect (no /tmp/root_path)"
+        run: echo "SYNC WF v8.2 - PR mode + ROOT autodetect (no /tmp/root_path)"
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -35,7 +36,7 @@ jobs:
           git reset --hard "origin/$BR"
 
       - name: Install tools
-        run: sudo apt-get update && sudo apt-get install -y unzip rsync zipinfo
+        run: sudo apt-get update && sudo apt-get install -y unzip rsync
 
       - name: Find latest ZIP in incoming/
         id: findzip
@@ -53,7 +54,8 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          LIST="$(zipinfo -1 "${{ steps.findzip.outputs.zip_path }}")"
+          # usa unzip -Z1 (equivalente ao zipinfo -1)
+          LIST="$(unzip -Z1 "${{ steps.findzip.outputs.zip_path }}")"
           if echo "$LIST" | grep -E '(^/|(^|/)\.\.(/|$))' >/dev/null; then
             echo "ZIP contém caminhos inválidos (absolutos ou ../). Abortando."; exit 2
           fi
@@ -64,8 +66,9 @@ jobs:
           set -euxo pipefail
           rm -rf /tmp/_unz && mkdir -p /tmp/_unz
           unzip -q "${{ steps.findzip.outputs.zip_path }}" -d /tmp/_unz
+          # Bloqueia symlinks no pacote
           if find /tmp/_unz -xtype l -print -quit | grep .; then
-            echo "ZIP contém symlinks. Abortando."; exit 3
+            echo "ZIP contém symlinks. Abortando por segurança."; exit 3
           fi
           echo "Conteúdo extraído:"; ls -la /tmp/_unz
 
@@ -73,6 +76,7 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
+          # Autodetecta raiz (se o ZIP tiver uma pasta única no topo)
           ROOT="/tmp/_unz"
           DIRS=$(find "$ROOT" -mindepth 1 -maxdepth 1 -type d | wc -l)
           FILES=$(find "$ROOT" -mindepth 1 -maxdepth 1 -type f | wc -l)
@@ -82,6 +86,7 @@ jobs:
           echo "ROOT autodetectado: $ROOT"
           test -d "$ROOT"
 
+          # Sync sem tocar em .github/ e incoming/
           rsync -av --delete --safe-links \
             --exclude '.git' \
             --exclude '.github' \
@@ -90,6 +95,7 @@ jobs:
             --exclude 'dist' \
             "$ROOT"/ ./
 
+          # Cinto extra
           git checkout -- .github .github/workflows incoming || true
           git status --porcelain
 
@@ -100,6 +106,7 @@ jobs:
           set -euxo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           BASE="origin/${GITHUB_REF_NAME:-main}"
           TS="$(date +'%Y%m%d-%H%M%S')"
           BRANCH="bot/sync-incoming-${TS}"
@@ -109,7 +116,7 @@ jobs:
 
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
-            git commit -m "chore: sync from incoming ZIP ${TS} (PR mode v8.1)"
+            git commit -m "chore: sync from incoming ZIP ${TS} (PR mode v8.2)"
             git push -u origin "${BRANCH}"
             echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
           else
@@ -121,9 +128,11 @@ jobs:
         if: steps.br.outputs.branch != ''
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "chore: sync from ZIP (PR mode v8.1)"
+          commit-message: "chore: sync from ZIP (PR mode v8.2)"
           title: "Sync from ZIP upload — ${{ steps.br.outputs.branch }}"
-          body: "PR automático a partir do ZIP mais recente em incoming/."
+          body: |
+            PR criado automaticamente a partir do ZIP mais recente em `incoming/`.
+            Proteção a `.github/` e `incoming/`. Conteúdo sincronizado.
           branch: ${{ steps.br.outputs.branch }}
           base: ${{ github.ref_name }}
           labels: sync, automation
