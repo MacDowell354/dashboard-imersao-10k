@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Version marker
-        run: echo "SYNC WF v8.2 - PR mode + ROOT autodetect (no /tmp/root_path)"
+        run: echo "SYNC WF v8.3 - PR mode + ROOT autodetect (no /tmp/root_path, no zipinfo)"
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -35,6 +35,7 @@ jobs:
           git checkout "$BR"
           git reset --hard "origin/$BR"
 
+      # << zipinfo REMOVIDO >>
       - name: Install tools
         run: sudo apt-get update && sudo apt-get install -y unzip rsync
 
@@ -86,7 +87,6 @@ jobs:
           echo "ROOT autodetectado: $ROOT"
           test -d "$ROOT"
 
-          # Sync sem tocar em .github/ e incoming/
           rsync -av --delete --safe-links \
             --exclude '.git' \
             --exclude '.github' \
@@ -95,7 +95,6 @@ jobs:
             --exclude 'dist' \
             "$ROOT"/ ./
 
-          # Cinto extra
           git checkout -- .github .github/workflows incoming || true
           git status --porcelain
 
@@ -116,7 +115,7 @@ jobs:
 
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
-            git commit -m "chore: sync from incoming ZIP ${TS} (PR mode v8.2)"
+            git commit -m "chore: sync from incoming ZIP ${TS} (PR mode v8.3)"
             git push -u origin "${BRANCH}"
             echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
           else
@@ -128,11 +127,9 @@ jobs:
         if: steps.br.outputs.branch != ''
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "chore: sync from ZIP (PR mode v8.2)"
+          commit-message: "chore: sync from ZIP (PR mode v8.3)"
           title: "Sync from ZIP upload — ${{ steps.br.outputs.branch }}"
-          body: |
-            PR criado automaticamente a partir do ZIP mais recente em `incoming/`.
-            Proteção a `.github/` e `incoming/`. Conteúdo sincronizado.
+          body: "PR automático a partir do ZIP mais recente em incoming/."
           branch: ${{ steps.br.outputs.branch }}
           base: ${{ github.ref_name }}
           labels: sync, automation
