@@ -1,0 +1,130 @@
+name: Manual Sync from incoming ZIP (v8)
+
+on:
+  workflow_dispatch: {}   # só manual
+
+concurrency:
+  group: manual-sync-incoming
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  unzip-and-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Version marker
+        run: echo "SYNC WF v8.1 - PR mode + ROOT autodetect (no /tmp/root_path)"
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Align working tree to origin/main
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          BR="${GITHUB_REF_NAME:-main}"
+          git fetch origin "$BR"
+          git checkout "$BR"
+          git reset --hard "origin/$BR"
+
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y unzip rsync zipinfo
+
+      - name: Find latest ZIP in incoming/
+        id: findzip
+        shell: bash
+        run: |
+          set -euxo pipefail
+          LATEST="$(ls -t incoming/*.zip 2>/dev/null | head -n1 || true)"
+          if [ -z "$LATEST" ]; then
+            echo "Nenhum ZIP em incoming/"; exit 1
+          fi
+          echo "zip_path=$LATEST" >> "$GITHUB_OUTPUT"
+          echo "ZIP encontrado: $LATEST"
+
+      - name: Validate ZIP paths (no / or ../)
+        shell: bash
+        run: |
+          set -euxo pipefail
+          LIST="$(zipinfo -1 "${{ steps.findzip.outputs.zip_path }}")"
+          if echo "$LIST" | grep -E '(^/|(^|/)\.\.(/|$))' >/dev/null; then
+            echo "ZIP contém caminhos inválidos (absolutos ou ../). Abortando."; exit 2
+          fi
+
+      - name: Unzip payload
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf /tmp/_unz && mkdir -p /tmp/_unz
+          unzip -q "${{ steps.findzip.outputs.zip_path }}" -d /tmp/_unz
+          if find /tmp/_unz -xtype l -print -quit | grep .; then
+            echo "ZIP contém symlinks. Abortando."; exit 3
+          fi
+          echo "Conteúdo extraído:"; ls -la /tmp/_unz
+
+      - name: Sync files to repo (com proteção)
+        shell: bash
+        run: |
+          set -euxo pipefail
+          ROOT="/tmp/_unz"
+          DIRS=$(find "$ROOT" -mindepth 1 -maxdepth 1 -type d | wc -l)
+          FILES=$(find "$ROOT" -mindepth 1 -maxdepth 1 -type f | wc -l)
+          if [ "$DIRS" -eq 1 ] && [ "$FILES" -eq 0 ]; then
+            ROOT="$(find "$ROOT" -mindepth 1 -maxdepth 1 -type d | head -n1)"
+          fi
+          echo "ROOT autodetectado: $ROOT"
+          test -d "$ROOT"
+
+          rsync -av --delete --safe-links \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'incoming' \
+            --exclude 'node_modules' \
+            --exclude 'dist' \
+            "$ROOT"/ ./
+
+          git checkout -- .github .github/workflows incoming || true
+          git status --porcelain
+
+      - name: Prepare PR branch
+        id: br
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BASE="origin/${GITHUB_REF_NAME:-main}"
+          TS="$(date +'%Y%m%d-%H%M%S')"
+          BRANCH="bot/sync-incoming-${TS}"
+
+          git fetch origin
+          git checkout -B "${BRANCH}" "${BASE}"
+
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore: sync from incoming ZIP ${TS} (PR mode v8.1)"
+            git push -u origin "${BRANCH}"
+            echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+          else
+            echo "Sem mudanças para commit."
+            echo "branch=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open Pull Request
+        if: steps.br.outputs.branch != ''
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore: sync from ZIP (PR mode v8.1)"
+          title: "Sync from ZIP upload — ${{ steps.br.outputs.branch }}"
+          body: "PR automático a partir do ZIP mais recente em incoming/."
+          branch: ${{ steps.br.outputs.branch }}
+          base: ${{ github.ref_name }}
+          labels: sync, automation
+          delete-branch: true
