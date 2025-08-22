@@ -1,44 +1,44 @@
 {
   "metricas_principais": {
-    "roas": -0.51,
-    "cac": 329.14,
-    "total_vendas": 129,
-    "faturamento": 20948.92,
-    "investimento": 42458.72,
-    "deficit": 21509.800000000003,
-    "ticket_medio": 162.35,
-    "data_atualizacao": "20/08/2025"
+    "roas": -0.5,
+    "cac": 326.6,
+    "total_vendas": 137,
+    "faturamento": 22226.51,
+    "investimento": 44744.46,
+    "deficit": 22517.95,
+    "ticket_medio": 162.26,
+    "data_atualizacao": "21/08/2025"
   },
   "vendas_por_canal": [
     {
       "canal": "Tráfego Pago",
-      "vendas": 88,
-      "percentual": 68.2
+      "vendas": 93,
+      "percentual": 67.9
     },
     {
       "canal": "Bio Instagram",
-      "vendas": 27,
-      "percentual": 20.9
+      "vendas": 29,
+      "percentual": 21.2
     },
     {
       "canal": "Outras",
       "vendas": 7,
-      "percentual": 5.4
+      "percentual": 5.1
     },
     {
       "canal": "Email",
-      "vendas": 3,
-      "percentual": 2.3
+      "vendas": 4,
+      "percentual": 2.9
     },
     {
       "canal": "WhatsApp",
       "vendas": 2,
-      "percentual": 1.6
+      "percentual": 1.5
     },
     {
       "canal": "YouTube",
       "vendas": 2,
-      "percentual": 1.6
+      "percentual": 1.5
     }
   ],
   "vendas_por_dia": [
@@ -104,13 +104,20 @@
       "investimento": 2403.51,
       "faturamento": 1954.4,
       "cac": 200.29
+    },
+    {
+      "dia": "21/08",
+      "vendas": 8,
+      "investimento": 2285.74,
+      "faturamento": 1277.59,
+      "cac": 285.72
     }
   ],
   "insights_principais": [
-    "EXCELENTE RECUPERAÇÃO: 20/08 teve 12 vendas com CAC R$ 200,29 (melhor CAC dos últimos dias)",
-    "TENDÊNCIA POSITIVA: Dois dias consecutivos de recuperação (19/08: 10 vendas, 20/08: 12 vendas)",
-    "CAC CONTROLADO: 20/08 apresentou o menor CAC desde 16/08 (R$ 186,89)",
-    "FATURAMENTO CRESCENTE: R$ 1.954 no dia 20/08, segundo melhor dia recente",
-    "ÚLTIMOS 2 DIAS: Apenas 21/08 e 22/08 restantes para captação"
+    "PENÚLTIMO DIA: 21/08 teve 8 vendas com CAC R$ 285,72 (controlado)",
+    "TENDÊNCIA ESTÁVEL: Três dias consecutivos de performance (19/08: 10, 20/08: 12, 21/08: 8)",
+    "CAC CONTROLADO: 21/08 manteve CAC abaixo de R$ 300 (R$ 285,72)",
+    "ÚLTIMO DIA CRÍTICO: Apenas 22/08 restante para captação",
+    "BIO INSTAGRAM CRESCENDO: 29 vendas (+2 vs 20/08) - 21.2% do total"
   ]
 }
