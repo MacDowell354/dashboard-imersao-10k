@@ -1084,13 +1084,13 @@ function App() {
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Total de Leads Captados</td>
                           <td className="py-3 px-4 text-center">455</td>
-                          <td className="py-3 px-4 text-center font-bold">150</td>
+                          <td className="py-3 px-4 text-center font-bold">152</td>
                           <td className="py-3 px-4 text-center text-red-600">-67%</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Comparecimento (90%)</td>
                           <td className="py-3 px-4 text-center">410 presentes</td>
-                          <td className="py-3 px-4 text-center font-bold">135 presentes</td>
+                          <td className="py-3 px-4 text-center font-bold">137 presentes</td>
                           <td className="py-3 px-4 text-center text-red-600">-67%</td>
                         </tr>
                         <tr className="hover:bg-slate-50 bg-gray-100">
@@ -1222,7 +1222,7 @@ function App() {
                 <Lightbulb className="h-4 w-4" />
                 <AlertTitle className="text-blue-800">Conclusão da Análise Realista</AlertTitle>
                 <AlertDescription className="text-blue-700">
-                  Com as <strong>taxas de conversão confirmadas</strong> (3% curso, 30% mentoria) e projeção de ~150 leads até 22/08, 
+                  Com as <strong>taxas de conversão confirmadas</strong> (3% curso, 30% mentoria) e <strong>152 leads captados</strong> em 22/08, 
                   o evento tem potencial de gerar <strong>R$ 47-75k</strong>, resultando em lucro final de <strong>R$ 26-54k</strong>. 
                   A campanha é <strong>lucrativa e sustentável</strong>, mesmo com o déficit atual de R$ 21k. 
                   Foco deve ser na <strong>qualidade dos leads</strong> e <strong>otimização da apresentação</strong> para médicos (59% dos leads).
