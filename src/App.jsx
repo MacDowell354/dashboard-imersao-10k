@@ -18,57 +18,57 @@ import './App.css'
 
 // Cache Busting - Força atualização
 const CACHE_VERSION = Date.now();
-const BUILD_VERSION = "20250821_" + CACHE_VERSION;
+const BUILD_VERSION = "20250822_FINAL_" + CACHE_VERSION;
 
-// Dados atualizados com foco em conversão histórica - 21/08/2025
+// Dados FINAIS da campanha - 22/08/2025 - CAMPANHA ENCERRADA
 const dadosAtualizados = {
   metricas_principais: {
-    roas: -0.50,
-    cac: 326.60,
-    total_vendas: 137,
-    faturamento: 22226.51,
-    investimento: 44744.46,
-    deficit: 22517.95,
-    ticket_medio: 162.26,
-    data_atualizacao: '21/08/2025'
+    roas: -0.48,
+    cac: 309.95,
+    total_vendas: 152,
+    faturamento: 24513.40,
+    investimento: 47112.29,
+    deficit: 22598.89,
+    ticket_medio: 161.27,
+    data_atualizacao: '22/08/2025 - CAMPANHA ENCERRADA'
   },
   insights_ia: [
     {
       categoria: 'POSITIVO',
-      insight: '🎯 PENÚLTIMO DIA CONTROLADO - 21/08',
-      detalhes: 'Performance estável: 8 vendas com CAC R$ 285,72 (controlado). Três dias consecutivos de performance consistente (19/08: 10, 20/08: 12, 21/08: 8). CAC mantido abaixo de R$ 300.',
-      acao: 'Manter estratégias atuais no último dia. Focar em CAC < R$ 300 para fechar campanha com sucesso.'
-    },
-    {
-      categoria: 'CRÍTICO',
-      insight: '🚨 ÚLTIMO DIA DE CAPTAÇÃO - PRAZO FINAL HOJE 22/08',
-      detalhes: 'HOJE é o último dia para compra de ingressos: SEXTA-FEIRA 22/08/25. Com 137 leads atuais, projeção final: ~145-150 leads totais. Últimas horas críticas.',
-      acao: 'URGENTE: Máxima intensidade hoje. Comunicar ÚLTIMO DIA em todos os materiais. Push final em todas as campanhas.'
+      insight: '🎉 CAMPANHA ENCERRADA COM SUCESSO - 22/08',
+      detalhes: 'Último dia EXCEPCIONAL: 15 vendas com CAC R$ 157,86 (MELHOR CAC da campanha). Recuperação confirmada nos últimos 4 dias (10→12→8→15). Total final: 152 leads captados.',
+      acao: 'Campanha oficialmente encerrada. Focar na preparação do evento com os 152 leads finais para maximizar conversões.'
     },
     {
       categoria: 'ESTRATÉGICO',
-      insight: 'Projeção Final do Evento - Meta Alcançável',
-      detalhes: 'Com 145-150 leads finais: Curso (3% conversão) = 4-5 vendas × R$ 6.300 = R$ 25-31k. Mentoria (30% das vendas curso) = 1-2 vendas × R$ 22k = R$ 22-44k. Total: R$ 47-75k.',
-      acao: 'Preparar evento com foco em médicos (67% dos leads). Estratégias específicas para maximizar conversão dos 145-150 leads finais.'
+      insight: 'Projeção Final do Evento - 152 Leads Captados',
+      detalhes: 'Com 152 leads finais: Curso (3% conversão) = 4-5 vendas × R$ 6.300 = R$ 25-31k. Mentoria (30% das vendas curso) = 1-2 vendas × R$ 22k = R$ 22-44k. Total: R$ 47-75k.',
+      acao: 'Preparar evento com estratégias específicas para médicos (66% dos leads). Foco na qualidade da apresentação para maximizar conversões.'
     },
     {
-      categoria: 'ALERTA',
-      insight: 'Déficit Final Controlável - Evento Decisivo',
-      detalhes: 'Déficit atual R$ 22.518. Com projeção conservadora do evento (R$ 47k), resultado final: +R$ 24k lucro. Cenário otimista (R$ 75k): +R$ 52k lucro.',
-      acao: 'Evento é decisivo para sucesso da campanha. Focar qualidade da apresentação e follow-up para maximizar conversões.'
+      categoria: 'SUCESSO',
+      insight: 'Bio Instagram: Canal Premium Consolidado',
+      detalhes: 'Bio Instagram: 34 vendas (22.4%) com CAC zero. Crescimento de +5 vendas no último dia. Leads orgânicos têm maior probabilidade de conversão no evento.',
+      acao: 'Usar cases de sucesso do Bio Instagram no evento. Leads orgânicos são premium para conversão em curso e mentoria.'
     },
     {
-      categoria: 'OPORTUNIDADE',
-      insight: 'Bio Instagram: Canal Premium em Crescimento',
-      detalhes: 'Bio Instagram: 29 vendas (21.2%) com CAC zero. Crescimento constante (+2 vendas vs 20/08). Leads orgânicos têm maior probabilidade de conversão no evento.',
-      acao: 'Último push orgânico: posts sobre ÚLTIMO DIA, urgência máxima, cases de transformação. Intensidade máxima hoje.'
+      categoria: 'RESULTADO',
+      insight: 'Déficit Controlável - Evento Decisivo para Lucro',
+      detalhes: 'Déficit final R$ 22.599. Com projeção conservadora do evento (R$ 47k), resultado final: +R$ 24k lucro. Cenário otimista (R$ 75k): +R$ 52k lucro.',
+      acao: 'Evento é decisivo para transformar déficit em lucro. Focar qualidade da apresentação e follow-up para maximizar conversões dos 152 leads.'
+    },
+    {
+      categoria: 'ANÁLISE',
+      insight: 'Métricas Finais - Melhoria Consistente',
+      detalhes: 'CAC final R$ 309,95 (melhoria vs R$ 327). ROAS -0.48 (melhoria vs -0.50). Último dia com melhor CAC da campanha (R$ 157,86). Tendência positiva confirmada.',
+      acao: 'Replicar estratégias do último dia em futuras campanhas. CAC abaixo de R$ 200 é o benchmark ideal para próximas captações.'
     }
   ],
   vendas_por_canal: [
     { 
       canal: 'Tráfego Pago', 
-      vendas: 93, 
-      percentual: 67.9, 
+      vendas: 101, 
+      percentual: 66.4, 
       cor: '#ef4444',
       conversao_curso: 'ALTA',
       conversao_mentoria: 'ALTA',
@@ -76,8 +76,8 @@ const dadosAtualizados = {
     },
     { 
       canal: 'Bio Instagram', 
-      vendas: 29, 
-      percentual: 21.2, 
+      vendas: 34, 
+      percentual: 22.4, 
       cor: '#10b981',
       conversao_curso: 'MÁXIMA',
       conversao_mentoria: 'MÁXIMA',
@@ -85,8 +85,8 @@ const dadosAtualizados = {
     },
     { 
       canal: 'Outras', 
-      vendas: 7, 
-      percentual: 5.1, 
+      vendas: 8, 
+      percentual: 5.3, 
       cor: '#6b7280',
       conversao_curso: 'Baixa',
       conversao_mentoria: 'Baixa',
@@ -95,8 +95,17 @@ const dadosAtualizados = {
     { 
       canal: 'Email', 
       vendas: 4, 
-      percentual: 2.9, 
+      percentual: 2.6, 
       cor: '#3b82f6',
+      conversao_curso: 'Baixa',
+      conversao_mentoria: 'Baixa',
+      prioridade: 'Baixa'
+    },
+    { 
+      canal: 'YouTube', 
+      vendas: 3, 
+      percentual: 2.0, 
+      cor: '#8b5cf6',
       conversao_curso: 'Baixa',
       conversao_mentoria: 'Baixa',
       prioridade: 'Baixa'
@@ -104,18 +113,9 @@ const dadosAtualizados = {
     { 
       canal: 'WhatsApp', 
       vendas: 2, 
-      percentual: 1.5, 
+      percentual: 1.3, 
       cor: '#22c55e',
       conversao_curso: 'Média',
-      conversao_mentoria: 'Baixa',
-      prioridade: 'Baixa'
-    },
-    { 
-      canal: 'YouTube', 
-      vendas: 2, 
-      percentual: 1.5, 
-      cor: '#8b5cf6',
-      conversao_curso: 'Baixa',
       conversao_mentoria: 'Baixa',
       prioridade: 'Baixa'
     }
@@ -252,7 +252,8 @@ const dadosAtualizados = {
     { dia: '18/08', vendas: 3, investimento: 2654.30, faturamento: 518.09, cac: 884.77 },
     { dia: '19/08', vendas: 10, investimento: 2730.05, faturamento: 1631.38, cac: 273.01 },
     { dia: '20/08', vendas: 12, investimento: 2403.51, faturamento: 1954.40, cac: 200.29 },
-    { dia: '21/08', vendas: 8, investimento: 2285.74, faturamento: 1277.59, cac: 285.72 }
+    { dia: '21/08', vendas: 8, investimento: 2285.74, faturamento: 1277.59, cac: 285.72 },
+    { dia: '22/08', vendas: 15, investimento: 2367.83, faturamento: 2286.89, cac: 157.86 }
   ],
   segmentos_prioritarios: {
     medicos_dentistas: {
@@ -405,7 +406,7 @@ function App() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Dashboard Imersão +10K
           </h1>
-          <p className="text-slate-600 text-lg">Análise de IA • Dados de 21/08/2025 • Foco em Conversão Histórica</p>
+          <p className="text-slate-600 text-lg">Análise de IA • Dados FINAIS 22/08/2025 • CAMPANHA ENCERRADA</p>
           <div className="flex justify-center gap-2">
             <Badge variant="secondary" className="text-green-700 bg-green-100">
               🎯 Médicos + Dentistas: 69% das vendas
@@ -1209,9 +1210,10 @@ function App() {
                   <strong>Recuperação Significativa:</strong> Dia 19/08 mostrou excelente recuperação:
                   <br />• 18/08: 3 vendas (CAC R$ 885) - Pior dia
                   <br />• 19/08: 10 vendas (CAC R$ 273) - Recuperação de 233%
+                  <br />• 22/08: 15 vendas (CAC R$ 158) - MELHOR CAC DA CAMPANHA
                   <br /><br />
-                  <strong>⏰ PRAZO FINAL:</strong> Último dia para compra de ingressos é <strong>SEXTA-FEIRA 22/08/25</strong>.
-                  <br />Apenas 3 dias restantes para captação. Estratégias do dia 19/08 devem ser replicadas.
+                  <strong>🎉 CAMPANHA ENCERRADA:</strong> <strong>152 leads captados</strong> em 22/08/2025.
+                  <br />Último dia excepcional com 15 vendas e melhor CAC da campanha (R$ 157,86).
                 </AlertDescription>
               </Alert>
 
