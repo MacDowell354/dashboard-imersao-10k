@@ -1,23 +1,26 @@
-# ----- etapa de build -----
+# ---------- etapa de build ----------
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# instala dependências
+# Instala dependências:
+# - se houver package-lock.json usa "npm ci"
+# - se não houver, usa "npm install" (inclui devDependencies)
 COPY package*.json ./
-RUN npm ci --include=dev
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
-# copia o restante e gera o build
+# Copia o restante do projeto e gera o build
 COPY . .
 ENV NODE_ENV=production
 RUN npm run build
 
-# ----- etapa de runtime (serve estático) -----
+# ---------- etapa de runtime (serve estático) ----------
 FROM node:20-alpine
 WORKDIR /app
 
-# usa "serve" para expor a pasta dist na porta $PORT (exigência do Render)
+# Servidor estático
 RUN npm i -g serve
 COPY --from=builder /app/dist ./dist
 
+ENV NODE_ENV=production
 ENV PORT=10000
 CMD ["sh", "-c", "serve -s dist -l ${PORT}"]
