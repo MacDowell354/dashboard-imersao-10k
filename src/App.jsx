@@ -1188,26 +1188,58 @@ function App() {
                 </Card>
 
                 {/* Resultado Final */}
-                <Card className="border-green-200">
+                <Card className="border-slate-200">
                   <CardHeader>
-                    <CardTitle className="text-green-700 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5" />
-                      Resultado Final Positivo
+                    <CardTitle className="text-slate-700 flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5" />
+                      Resultado Final e Aprendizados
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-green-600">Campanha Lucrativa</h4>
+                      <h4 className="font-semibold text-slate-600">Campanha com Aprendizados Importantes</h4>
                       <p className="text-sm text-slate-600">
-                        O <strong>Realizado até 23/08</strong> confirma um lucro de <strong>R$ 11.503</strong> 
-                        e ROAS de <strong>1,2</strong>. Evento lucrativo com taxa de conversão excepcional de 6%.
+                        O <strong>Realizado até 23/08</strong> confirma <strong>ROAS de 1,2</strong> com retorno líquido de 
+                        R$ 11.503 sobre o investimento em tráfego, mas <strong>não foi suficiente para gerar um ROI positivo</strong> 
+                        quando considerados todos os custos operacionais. ROI final de <strong>-0,51</strong>, o que significa que 
+                        <strong>para cada R$ 1 investido no projeto total, houve perda de R$ 0,51</strong>.
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-green-600">ROI Sustentável</h4>
+                      <h4 className="font-semibold text-red-600">Principais Impactos Identificados</h4>
                       <p className="text-sm text-slate-600">
-                        Com 9 vendas realizadas e 116 presentes no pico, a campanha se pagou e gerou lucro, 
-                        confirmando que a estratégia teve fundamento sólido.
+                        <strong className="text-red-600">CAC Elevado:</strong> O custo por lead (R$ 310) ficou quase <strong className="text-red-600">3 vezes maior</strong> 
+                        do que o previsto (R$ 110), reduzindo significativamente a eficiência da captação.
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-slate-600">Análise de Margem de Contribuição</h4>
+                      <p className="text-sm text-slate-600">
+                        <strong>Margem de Contribuição:</strong> 16,67% (R$ 9.769) - positiva mas insuficiente para cobrir 
+                        custos fixos de R$ 71.669. Necessária receita de <strong>R$ 430.011</strong> para atingir ponto de equilíbrio.
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-slate-600">Análise de Custos Crítica</h4>
+                      <p className="text-sm text-slate-600">
+                        <strong>Retorno líquido do tráfego:</strong> R$ 11.503<br/>
+                        <strong>Custos fixos:</strong> R$ 67.478 (estrutura, equipe, tecnologia)<br/>
+                        <strong>Impostos:</strong> R$ 4.191 (7,15% da receita)<br/>
+                        <strong>ROI Final:</strong> -0,51
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-slate-600">Projeção Estratégica</h4>
+                      <p className="text-sm text-slate-600">
+                        Com investimento de <strong>R$ 200.000</strong> em tráfego, o ROI seria de <strong>-0,78</strong>, 
+                        indicando que mesmo com maior investimento, a otimização do CAC é fundamental para viabilizar rentabilidade.
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-slate-600">Aprendizados Estratégicos</h4>
+                      <p className="text-sm text-slate-600">
+                        ROAS positivo insuficiente para cobrir custos operacionais. Próximas campanhas devem focar na 
+                        <strong className="text-red-600">redução do CAC</strong> e otimização da estrutura de custos para viabilizar rentabilidade.
                       </p>
                     </div>
                   </CardContent>
