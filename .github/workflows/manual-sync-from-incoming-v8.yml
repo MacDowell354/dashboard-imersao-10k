@@ -87,10 +87,13 @@ jobs:
             --exclude 'incoming' \
             --exclude 'node_modules' \
             --exclude 'dist' \
+            --exclude 'Dockerfile' \
+            --exclude '.dockerignore' \
             "$ROOT"/ ./
 
-          # garante que .github/ e incoming/ nunca sejam apagados
-          git checkout -- .github .github/workflows incoming || true
+          # garante que itens críticos de deploy não sejam apagados
+          git checkout -- .github .github/workflows incoming Dockerfile .dockerignore || true
+          echo "Mudanças após sync:"
           git status --porcelain
 
       - name: Commit & push direto no main
