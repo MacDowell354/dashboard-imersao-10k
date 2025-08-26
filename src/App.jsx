@@ -1084,11 +1084,18 @@ function App() {
                           <td className="py-3 px-4 text-center text-green-600">-R$ 32</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
-                          <td className="py-3 px-4 font-medium">Total de Leads Captados</td>
+                          <td className="py-3 px-4 font-medium">Total de Leads Captados (Ingressos)</td>
                           <td className="py-3 px-4 text-center">455</td>
                           <td className="py-3 px-4 text-center font-bold">152</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">152</td>
-                          <td className="py-3 px-4 text-center text-slate-600">Igual</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">157</td>
+                          <td className="py-3 px-4 text-center text-green-600">+5 leads</td>
+                        </tr>
+                        <tr className="hover:bg-slate-50 bg-blue-50">
+                          <td className="py-3 px-4 font-medium">Receita Ingressos</td>
+                          <td className="py-3 px-4 text-center">R$ 54.600</td>
+                          <td className="py-3 px-4 text-center font-bold">R$ 18.240</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 25.113</td>
+                          <td className="py-3 px-4 text-center text-green-600">+R$ 6.873</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Comparecimento (90%)</td>
@@ -1135,23 +1142,23 @@ function App() {
                         <tr className="hover:bg-slate-50 bg-blue-50">
                           <td className="py-3 px-4 font-bold">Receita Total Bruta</td>
                           <td className="py-3 px-4 text-center font-bold text-blue-600">R$ 224.500</td>
-                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 47.200</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 58.615</td>
-                          <td className="py-3 px-4 text-center text-green-600">+R$ 11.415</td>
+                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 65.440</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 83.728</td>
+                          <td className="py-3 px-4 text-center text-green-600">+R$ 18.288</td>
                         </tr>
                         <tr className="hover:bg-slate-50 bg-green-50">
                           <td className="py-3 px-4 font-bold">Receita Líquida (Lucro)</td>
-                          <td className="py-3 px-4 text-center font-bold text-blue-600">R$ 129.600</td>
-                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 26.139</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 11.503</td>
-                          <td className="py-3 px-4 text-center text-red-600">-R$ 14.636</td>
+                          <td className="py-3 px-4 text-center font-bold text-blue-600">R$ 208.448</td>
+                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 60.761</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 77.742</td>
+                          <td className="py-3 px-4 text-center text-green-600">+R$ 16.981</td>
                         </tr>
                         <tr className="hover:bg-slate-50 bg-yellow-50">
                           <td className="py-3 px-4 font-bold">ROAS (Retorno sobre Invest.)</td>
-                          <td className="py-3 px-4 text-center font-bold text-blue-600">4,49</td>
-                          <td className="py-3 px-4 text-center font-bold text-green-600">1,65</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">1,2</td>
-                          <td className="py-3 px-4 text-center text-red-600">-0,45</td>
+                          <td className="py-3 px-4 text-center font-bold text-blue-600">4,486</td>
+                          <td className="py-3 px-4 text-center font-bold text-green-600">1,259</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">1,777</td>
+                          <td className="py-3 px-4 text-center text-green-600">+0,518</td>
                         </tr>
                       </tbody>
                     </table>
@@ -1199,47 +1206,56 @@ function App() {
                     <div className="space-y-2">
                       <h4 className="font-semibold text-slate-600">Campanha com Aprendizados Importantes</h4>
                       <p className="text-sm text-slate-600">
-                        O <strong>Realizado até 23/08</strong> confirma <strong>ROAS de 1,2</strong> com retorno líquido de 
-                        R$ 11.503 sobre o investimento em tráfego, mas <strong>não foi suficiente para gerar um ROI positivo</strong> 
-                        quando considerados todos os custos operacionais. ROI final de <strong>-0,51</strong>, o que significa que 
-                        <strong>para cada R$ 1 investido no projeto total, houve perda de R$ 0,51</strong>.
+                        O <strong>Realizado até 25/08</strong> confirma <strong>ROAS de 1,777</strong> com receita total de 
+                        R$ 83.728 (ingressos + curso), mas <strong>não foi suficiente para gerar um ROI positivo</strong> 
+                        quando considerados todos os custos operacionais. ROI final de <strong>-0,306</strong>, o que significa que 
+                        <strong>para cada R$ 1 investido no projeto total, houve perda de R$ 0,31</strong>.
                       </p>
                     </div>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-red-600">Principais Impactos Identificados</h4>
                       <p className="text-sm text-slate-600">
-                        <strong className="text-red-600">CAC Elevado:</strong> O custo por lead (R$ 310) ficou quase <strong className="text-red-600">3 vezes maior</strong> 
-                        do que o previsto (R$ 110), reduzindo significativamente a eficiência da captação.
+                        <strong className="text-red-600">CAC Elevado:</strong> O custo por lead (R$ 300,08) ficou <strong className="text-red-600">172,8% acima</strong> 
+                        da meta (R$ 110), sendo o principal fator de impacto negativo na rentabilidade da campanha.
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-slate-600">Análise de Margem de Contribuição</h4>
+                      <h4 className="font-semibold text-slate-600">Análise de Receita Detalhada</h4>
                       <p className="text-sm text-slate-600">
-                        <strong>Margem de Contribuição:</strong> 16,67% (R$ 9.769) - positiva mas insuficiente para cobrir 
-                        custos fixos de R$ 71.669. Necessária receita de <strong>R$ 430.011</strong> para atingir ponto de equilíbrio.
+                        <strong>Receita Ingressos:</strong> R$ 25.113 (157 leads captados)<br/>
+                        <strong>Receita Curso:</strong> R$ 58.615 (9 vendas High Ticket)<br/>
+                        <strong>Receita Total Bruta:</strong> R$ 83.728<br/>
+                        <strong>Receita Líquida:</strong> R$ 77.742 (após impostos)<br/>
+                        <strong>Taxa de Conversão:</strong> 5,7%
                       </p>
                     </div>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-slate-600">Análise de Custos Crítica</h4>
                       <p className="text-sm text-slate-600">
-                        <strong>Retorno líquido do tráfego:</strong> R$ 11.503<br/>
-                        <strong>Custos fixos:</strong> R$ 67.478 (estrutura, equipe, tecnologia)<br/>
-                        <strong>Impostos:</strong> R$ 4.191 (7,15% da receita)<br/>
-                        <strong>ROI Final:</strong> -0,51
+                        <strong>Investimento Tráfego:</strong> R$ 47.112<br/>
+                        <strong>Serviços Terceiros:</strong> R$ 32.900<br/>
+                        <strong>Software/Licenças:</strong> R$ 23.566<br/>
+                        <strong>Outros Custos:</strong> R$ 11.011<br/>
+                        <strong>Impostos:</strong> R$ 5.987<br/>
+                        <strong>Custos Totais:</strong> R$ 120.576<br/>
+                        <strong>Prejuízo Final:</strong> R$ 36.848
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-slate-600">Projeção Estratégica</h4>
+                      <h4 className="font-semibold text-slate-600">Métricas de Performance</h4>
                       <p className="text-sm text-slate-600">
-                        Com investimento de <strong>R$ 200.000</strong> em tráfego, o ROI seria de <strong>-0,78</strong>, 
-                        indicando que mesmo com maior investimento, a otimização do CAC é fundamental para viabilizar rentabilidade.
+                        <strong>ROAS:</strong> 1,777 (tráfego eficiente)<br/>
+                        <strong>CPL:</strong> R$ 300,08 (172,8% acima da meta)<br/>
+                        <strong>Custo por Venda:</strong> R$ 5.235<br/>
+                        <strong>ROI Final:</strong> -0,306 (incluindo impostos)
                       </p>
                     </div>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-slate-600">Aprendizados Estratégicos</h4>
                       <p className="text-sm text-slate-600">
-                        ROAS positivo insuficiente para cobrir custos operacionais. Próximas campanhas devem focar na 
-                        <strong className="text-red-600">redução do CAC</strong> e otimização da estrutura de custos para viabilizar rentabilidade.
+                        ROAS positivo (1,777) demonstra eficiência do tráfego, mas <strong className="text-red-600">CPL 172,8% acima da meta</strong> 
+                        foi o principal fator de impacto. Próximas campanhas devem focar na <strong className="text-red-600">otimização do CAC</strong> 
+                        para viabilizar rentabilidade com a estrutura atual.
                       </p>
                     </div>
                   </CardContent>
