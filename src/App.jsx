@@ -1180,14 +1180,14 @@ function App() {
                     <div className="space-y-2">
                       <h4 className="font-semibold text-red-600">CPL Elevado</h4>
                       <p className="text-sm text-slate-600">
-                        O custo para adquirir cada comprador de ingresso está em <strong>R$ 227</strong>, 
+                        O custo para adquirir cada comprador de ingresso está em <strong>R$ 300,08</strong>, 
                         mais que o dobro do estimado (R$ 110). Este é o principal fator de impacto.
                       </p>
                     </div>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-red-600">Leads Abaixo do Esperado</h4>
                       <p className="text-sm text-slate-600">
-                        Com <strong>141 leads</strong> projetados vs. 455 estimados (-69%), 
+                        Com <strong>157 leads</strong> captados vs. 455 estimados (-65%), 
                         o número de vendas de curso e mentoria diminui proporcionalmente.
                       </p>
                     </div>
