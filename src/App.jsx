@@ -1071,7 +1071,7 @@ function App() {
                           <th className="text-left py-3 px-4 font-semibold text-slate-700">Indicador</th>
                           <th className="text-center py-3 px-4 font-semibold text-blue-700">Cenário Conservador (Original)</th>
                           <th className="text-center py-3 px-4 font-semibold text-green-700">Projeção Realista (Atualizada)</th>
-                          <th className="text-center py-3 px-4 font-semibold text-purple-700">Realizado até 23-08</th>
+                          <th className="text-center py-3 px-4 font-semibold text-purple-700">Realizado até 25-08</th>
                           <th className="text-center py-3 px-4 font-semibold text-orange-700">Diferença</th>
                         </tr>
                       </thead>
@@ -1080,8 +1080,8 @@ function App() {
                           <td className="py-3 px-4 font-medium">Custo por Lead (CPL)</td>
                           <td className="py-3 px-4 text-center">R$ 110</td>
                           <td className="py-3 px-4 text-center font-bold text-red-600">R$ 342</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 310</td>
-                          <td className="py-3 px-4 text-center text-green-600">-R$ 32</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 300,08</td>
+                          <td className="py-3 px-4 text-center text-green-600">-R$ 41,92</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Total de Leads Captados (Ingressos)</td>
