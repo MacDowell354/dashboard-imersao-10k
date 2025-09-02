@@ -1,24 +1,18 @@
-# -------- etapa de build --------
-FROM node:20-alpine AS builder
+# Dockerfile - Flask + Gunicorn
+FROM python:3.11-slim
+
+# Evita prompts interativos e melhora desempenho
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
-# instala dependências (rápido com lock; fallback sem lock)
-COPY package*.json ./
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+# Instala dependências Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# copia projeto e builda
+# Copia o restante do projeto
 COPY . .
-ENV NODE_ENV=production
-RUN npm run build
 
-# -------- etapa de runtime (serve estático) --------
-FROM node:20-alpine
-WORKDIR /app
-
-# servidor estático
-RUN npm i -g serve
-COPY --from=builder /app/dist ./dist
-
-ENV NODE_ENV=production
-ENV PORT=10000
-CMD ["sh", "-c", "serve -s dist -l ${PORT}"]
+# Render define a variável de ambiente PORT automaticamente
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:${PORT}", "--workers", "2"]
