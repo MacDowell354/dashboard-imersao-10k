@@ -1,4 +1,5 @@
 # Dockerfile - Flask + Gunicorn
+
 FROM python:3.11-slim
 
 # Evita prompts interativos e melhora desempenho
@@ -14,5 +15,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia o restante do projeto
 COPY . .
 
-# Render define a variável de ambiente PORT automaticamente
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:${PORT}", "--workers", "2"]
+# Comando de start (Render injeta a variável PORT automaticamente)
+CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:${PORT:-10000} --workers 2"]
