@@ -1,9 +1,9 @@
-# 🚀 Instruções de Deploy - Dashboard Nanda Mac IA
+# 🚀 Instruções de Deploy - Dashboard Nanda Mac IA v2.0
 
 ## 📦 Arquivos Preparados para Deploy
 
-### ✅ Arquivos Incluídos:
-1. **index.html** - Dashboard principal
+### ✅ Arquivos Incluídos (16 arquivos):
+1. **index.html** - Dashboard principal (CORRIGIDO v2.0)
 2. **app.py** - Servidor Flask
 3. **requirements.txt** - Dependências Python
 4. **runtime.txt** - Versão Python (3.11.0)
@@ -14,7 +14,19 @@
 9. **package.json** - Metadados do projeto
 10. **google_sheets_api_v2.py** - Script API
 11. **dados_planilha.json** - Dados extraídos
-12. **Arquivos de documentação** (.md)
+12. **CELULAS_DEFINITIVAS_DASHBOARD_FINAL.md**
+13. **CELULAS_CPL_CORRETAS_FINAL.md**
+14. **extract_profissoes.py** - Script profissões
+15. **DEPLOY_INSTRUCTIONS.md** - Este arquivo
+16. **CHANGELOG.md** - **NOVO**: Histórico de correções
+
+## 🔧 Correções v2.0
+
+### **Dados de Projeção Corrigidos**
+- ✅ Todos os valores da tabela "Performance Real (8 dias)" corrigidos
+- ✅ Validação completa com planilha (linha 80)
+- ✅ Cálculos proporcionais corretos (8/28 dias)
+- ✅ ROAS e lucros recalculados corretamente
 
 ## 🔗 Deploy no GitHub + Render
 
