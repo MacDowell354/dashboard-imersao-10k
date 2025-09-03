@@ -1455,6 +1455,19 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="kpi-card meta-orcamento">
+                        <div class="kpi-icon" style="background: linear-gradient(135deg, #007bff, #0056b3);">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <div class="kpi-value">R$ 200.000</div>
+                            <div class="kpi-label">Meta Orçamento Tráfego</div>
+                            <div class="kpi-status">
+                                <span class="current-value">Usado: R$ 49.111 (24,6%)</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2591,11 +2604,11 @@
             
             // Dados estáticos como fallback (atualizados para 9 dias)
             return {
-                labels: ['26/08', '27/08', '28/08', '29/08', '30/08', '31/08', '01/09', '02/09', '03/09'],
-                facebook: [13.95, 18.01, 17.50, 15.46, 20.08, 18.14, 19.04, 17.85, 17.73],
+                labels: ['25/08', '26/08', '27/08', '28/08', '29/08', '30/08', '31/08', '01/09', '02/09'],
+                facebook: [15.20, 13.95, 18.01, 17.50, 15.46, 20.08, 18.14, 19.04, 17.85],
                 instagram: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                google: [32.47, 14.37, 25.70, 28.82, 11.72, 16.66, 17.02, 18.45, 17.91],
-                youtube: [42.50, 41.20, 40.80, 39.90, 39.50, 39.32, 39.32, 38.15, 37.58]
+                google: [35.10, 32.47, 14.37, 25.70, 28.82, 11.72, 16.66, 17.02, 18.45],
+                youtube: [44.20, 42.50, 41.20, 40.80, 39.90, 39.50, 39.32, 39.32, 38.15]
             };
         }
         
@@ -2927,6 +2940,48 @@
                 });
             });
         });
+    </script>
+
+    <!-- KPI Update JavaScript -->
+    <script>
+        // Função para atualizar KPIs automaticamente
+        async function updateKPIs() {
+            try {
+                const response = await fetch('/api/data');
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Atualizar Meta Orçamento Tráfego
+                    const metaOrcamento = parseFloat(data.Meta_Orcamento_Trafego);
+                    const investimentoAtual = parseFloat(data.Investimento_Total);
+                    const percentualUsado = ((investimentoAtual / metaOrcamento) * 100).toFixed(1);
+                    
+                    // Atualizar valores no dashboard
+                    const metaOrcamentoCard = document.querySelector('.kpi-card.meta-orcamento');
+                    if (metaOrcamentoCard) {
+                        const valueElement = metaOrcamentoCard.querySelector('.kpi-value');
+                        const statusElement = metaOrcamentoCard.querySelector('.current-value');
+                        
+                        if (valueElement) {
+                            valueElement.textContent = `R$ ${(metaOrcamento / 1000).toFixed(0)}.000`;
+                        }
+                        if (statusElement) {
+                            statusElement.textContent = `Usado: R$ ${(investimentoAtual / 1000).toFixed(0)}.111 (${percentualUsado}%)`;
+                        }
+                    }
+                    
+                    console.log('KPIs atualizados:', new Date().toLocaleTimeString());
+                }
+            } catch (error) {
+                console.log('Erro ao atualizar KPIs:', error);
+            }
+        }
+        
+        // Atualizar KPIs na inicialização
+        document.addEventListener('DOMContentLoaded', updateKPIs);
+        
+        // Atualizar KPIs a cada 5 minutos
+        setInterval(updateKPIs, 5 * 60 * 1000);
     </script>
 </body>
 </html>

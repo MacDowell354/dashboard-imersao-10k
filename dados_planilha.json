@@ -1,14 +1,16 @@
 {
-  "CPL_Facebook": "Erro",
-  "CPL_YouTube": "Erro",
-  "CPL_Google": "Erro",
-  "Leads_Facebook": "Erro",
-  "Leads_Instagram": "Erro",
-  "Leads_YouTube": "Erro",
-  "Leads_Google": "Erro",
-  "Leads_Email": "Erro",
-  "Total_Leads": "Erro",
-  "CPL_Medio": "Erro",
-  "Investimento_Total": "Erro",
-  "ROAS_Geral": "Erro"
+  "CPL_Facebook": "17.73",
+  "CPL_YouTube": "37.28",
+  "CPL_Google": "17.91",
+  "Leads_Facebook": "2350",
+  "Leads_Instagram": "222",
+  "Leads_YouTube": "185",
+  "Leads_Google": "216",
+  "Leads_Email": "31",
+  "Total_Leads": "2814",
+  "CPL_Medio": "17.45",
+  "Investimento_Total": "49110.79",
+  "ROAS_Geral": "1.17",
+  "Meta_Orcamento_Trafego": "200000.00"
 }
+
