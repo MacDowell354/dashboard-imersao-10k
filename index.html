@@ -1468,6 +1468,32 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="kpi-card seguidores-instagram">
+                        <div class="kpi-icon" style="background: linear-gradient(135deg, #E4405F, #C13584);">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <div class="kpi-value">163.778</div>
+                            <div class="kpi-label">Seguidores Instagram</div>
+                            <div class="kpi-status">
+                                <span class="current-value">Atualizado 02/09</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card seguidores-youtube">
+                        <div class="kpi-icon" style="background: linear-gradient(135deg, #FF0000, #CC0000);">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <div class="kpi-value">636.199</div>
+                            <div class="kpi-label">Seguidores YouTube</div>
+                            <div class="kpi-status">
+                                <span class="current-value">Atualizado 02/09</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2356,6 +2382,10 @@
                             <span class="premissa-label">Ticket Médio Mentoria</span>
                             <span class="premissa-value">R$ 20.000,00</span>
                         </div>
+                        <div class="premissa-item">
+                            <span class="premissa-label">Meta Orçamento Investimento em Tráfego</span>
+                            <span class="premissa-value">R$ 200.000,00</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2968,6 +2998,33 @@
                         if (statusElement) {
                             statusElement.textContent = `Usado: R$ ${(investimentoAtual / 1000).toFixed(0)}.111 (${percentualUsado}%)`;
                         }
+                    }
+                    
+                    // Atualizar valor na seção Premissas CHT22
+                    const premissasItems = document.querySelectorAll('.premissa-item');
+                    premissasItems.forEach(item => {
+                        const label = item.querySelector('.premissa-label');
+                        if (label && label.textContent.includes('Meta Orçamento Investimento em Tráfego')) {
+                            const valueElement = item.querySelector('.premissa-value');
+                            if (valueElement) {
+                                valueElement.textContent = `R$ ${(metaOrcamento / 1000).toFixed(0)}.000,00`;
+                            }
+                        }
+                    });
+                    
+                    // Atualizar seguidores Instagram e YouTube
+                    const seguidoresInstagram = parseInt(data.Seguidores_Instagram);
+                    const seguidoresYoutube = parseInt(data.Seguidores_YouTube);
+                    
+                    const instagramCard = document.querySelector('.kpi-card.seguidores-instagram .kpi-value');
+                    const youtubeCard = document.querySelector('.kpi-card.seguidores-youtube .kpi-value');
+                    
+                    if (instagramCard && seguidoresInstagram) {
+                        instagramCard.textContent = seguidoresInstagram.toLocaleString('pt-BR');
+                    }
+                    
+                    if (youtubeCard && seguidoresYoutube) {
+                        youtubeCard.textContent = seguidoresYoutube.toLocaleString('pt-BR');
                     }
                     
                     console.log('KPIs atualizados:', new Date().toLocaleTimeString());
