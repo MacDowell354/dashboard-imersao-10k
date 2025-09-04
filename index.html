@@ -1323,13 +1323,22 @@
                     <div class="summary-trend trend-warning">R$ 17,65 vs R$ 15,00</div>
                 </div>
 
-                <div class="summary-card conversion-card">
-                    <div class="summary-icon" style="background: linear-gradient(135deg, #6f42c1, #563d7c);">
-                        <i class="fas fa-percentage"></i>
+                <div class="summary-card budget-card">
+                    <div class="summary-icon" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                        <i class="fas fa-chart-pie"></i>
                     </div>
-                    <div class="summary-value">0,70%</div>
-                    <div class="summary-label">Taxa Conversão</div>
-                    <div class="summary-trend trend-good">Dentro da meta</div>
+                    <div class="summary-value">36%</div>
+                    <div class="summary-label">Orçamento Captação</div>
+                    <div class="summary-trend trend-good">R$ 55.106 / R$ 154.297</div>
+                </div>
+
+                <div class="summary-card budget-total-card">
+                    <div class="summary-icon" style="background: linear-gradient(135deg, #6f42c1, #563d7c);">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="summary-value">26%</div>
+                    <div class="summary-label">Orçamento + Aquecimento</div>
+                    <div class="summary-trend trend-good">R$ 55.106 / R$ 214.297</div>
                 </div>
 
                 <div class="summary-card roas-card">
@@ -3034,6 +3043,43 @@
                     
                     if (youtubeCard && seguidoresYoutube) {
                         youtubeCard.textContent = seguidoresYoutube.toLocaleString('pt-BR');
+                    }
+                    
+                    // Atualizar cards de orçamento
+                    const orcamentoCaptacao = parseFloat(data.Orcamento_Captacao_Previsto || 154296.63);
+                    const orcamentoTotal = parseFloat(data.Orcamento_Total_Previsto || 214296.63);
+                    const realizado = parseFloat(data.Investimento_Total || 55105.94);
+                    
+                    // Card Orçamento Captação
+                    const budgetCard = document.querySelector('.summary-card.budget-card');
+                    if (budgetCard) {
+                        const valueElement = budgetCard.querySelector('.summary-value');
+                        const trendElement = budgetCard.querySelector('.summary-trend');
+                        
+                        const percentualCaptacao = ((realizado / orcamentoCaptacao) * 100).toFixed(0);
+                        
+                        if (valueElement) {
+                            valueElement.textContent = `${percentualCaptacao}%`;
+                        }
+                        if (trendElement) {
+                            trendElement.textContent = `R$ ${(realizado / 1000).toFixed(0)}.106 / R$ ${(orcamentoCaptacao / 1000).toFixed(0)}.297`;
+                        }
+                    }
+                    
+                    // Card Orçamento + Aquecimento
+                    const budgetTotalCard = document.querySelector('.summary-card.budget-total-card');
+                    if (budgetTotalCard) {
+                        const valueElement = budgetTotalCard.querySelector('.summary-value');
+                        const trendElement = budgetTotalCard.querySelector('.summary-trend');
+                        
+                        const percentualTotal = ((realizado / orcamentoTotal) * 100).toFixed(0);
+                        
+                        if (valueElement) {
+                            valueElement.textContent = `${percentualTotal}%`;
+                        }
+                        if (trendElement) {
+                            trendElement.textContent = `R$ ${(realizado / 1000).toFixed(0)}.106 / R$ ${(orcamentoTotal / 1000).toFixed(0)}.297`;
+                        }
                     }
                     
                     console.log('KPIs atualizados:', new Date().toLocaleTimeString());
