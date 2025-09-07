@@ -1,28 +1,72 @@
 {
-  "CPL_Facebook": "18.14",
-  "CPL_YouTube": "34.88",
-  "CPL_Google": "17.37",
-  "Leads_Facebook": "2577",
-  "Leads_Instagram": "260",
-  "Leads_YouTube": "221",
-  "Leads_Google": "258",
-  "Leads_Email": "37",
-  "Total_Leads": "3122",
-  "CPL_Medio": "17.65",
-  "Investimento_Total": "55105.94",
-  "ROAS_Geral": "1.26",
-  "Meta_Orcamento_Trafego": "200000.00",
-  "Seguidores_Instagram": "163938",
-  "Seguidores_YouTube": "636224",
-  "Investimento_Facebook": "46755.02",
-  "Investimento_YouTube": "7708.30",
-  "Investimento_Google": "642.62",
-  "ROAS_Facebook": "2.43",
-  "ROAS_YouTube": "1.26",
-  "ROAS_Google": "2.54",
-  "Orcamento_Captacao_Previsto": "154296.63",
-  "Orcamento_Captacao_Realizado": "55105.94",
-  "Orcamento_Total_Previsto": "214296.63",
-  "Orcamento_Total_Realizado": "55105.94"
+  "timestamp": "2025-09-07T01:50:13.931215",
+  "source": "Google Sheets",
+  "sheet_id": "1f5qcPc4l0SYVQv3qhq8d17s_fTMPkyoT",
+  "data": {
+    "metricas_principais": {
+      "total_leads": 3695.0,
+      "cpl_medio_geral": 18.26,
+      "investimento_total": "67.467,30",
+      "roas": 2420.0,
+      "faturamento_previsto": " R$  380.215,50 ",
+      "taxa_conversao": 700.0,
+      "ticket_medio": " R$  6.300,00 "
+    },
+    "canais": {
+      "facebook": {
+        "leads": 3062.0,
+        "percentual": 82.9,
+        "cpl": 0,
+        "investido": "58.139,54",
+        "roas": 2320.0
+      },
+      "instagram": {
+        "leads": 311.0,
+        "percentual": 8.4,
+        "cpl": 0,
+        "investido": 0,
+        "roas": "Infinity"
+      },
+      "youtube": {
+        "leads": 255.0,
+        "percentual": 6.9,
+        "cpl": 0,
+        "investido": 0,
+        "roas": "Infinity"
+      },
+      "google": {
+        "leads": 682.7,
+        "percentual": 18.5,
+        "cpl": 0,
+        "investido": 0,
+        "roas": 0
+      },
+      "email": {
+        "leads": 15.0,
+        "percentual": 0.4,
+        "cpl": 0,
+        "investido": 0,
+        "roas": "Infinity"
+      }
+    },
+    "orcamentos": {
+      "captacao_previsto": " R$  157.423,70 ",
+      "total_previsto": "67.467,30"
+    },
+    "projecoes": {
+      "qt_prevista_leads": 8622.0,
+      "dias_incorridos": 12.0,
+      "faltam_dias": 16.0,
+      "total_vendas_previstas": 60.0,
+      "meta_dia_lead": 321.0,
+      "media_realizada_lead_dia": 308.0
+    },
+    "profissoes": {
+      "dentista": 837.0,
+      "medico": 525.0,
+      "fisioterapeuta": 555.0,
+      "psicologo": 489.0,
+      "nutricionista": 253.0
+    }
+  }
 }
-
