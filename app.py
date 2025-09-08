@@ -10,7 +10,12 @@ app = Flask(__name__)
 @app.route('/')
 def dashboard():
     """Serve the main dashboard HTML file"""
-    return send_from_directory('.', 'index.html')
+    response = send_from_directory('.', 'index.html')
+    # Força o navegador a sempre buscar a versão mais recente
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.route('/api/data')
 def get_data():
