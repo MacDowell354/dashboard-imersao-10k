@@ -9,7 +9,7 @@
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">{{ "%.0f"|format((dados.cpl_medio / dados.meta_cpl * 100)) }}%</div>
+        <div class="metric-value">{{ "%.0f"|format(((dados.cpl_medio / dados.meta_cpl - 1) * 100)) }}%</div>
         <div class="metric-label">Meta CPL</div>
         <div class="metric-status status-warning">R$ {{ "%.2f"|format(dados.cpl_medio) }} vs R$ {{ "%.2f"|format(dados.meta_cpl) }}</div>
     </div>

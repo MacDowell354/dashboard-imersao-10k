@@ -95,7 +95,7 @@ DADOS_DASHBOARD = {
 
 # Status da sincronização
 ultima_sincronizacao = datetime.now()
-sincronizacao_ativa = True
+sincronizacao_ativa = False
 
 def extrair_dados_planilha():
     """Extrai dados da planilha Google Sheets"""
