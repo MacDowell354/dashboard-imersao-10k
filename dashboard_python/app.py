@@ -15,9 +15,11 @@ SYNC_INTERVAL = 300  # 5 minutos
 
 # Dados atualizados da planilha
 DADOS_DASHBOARD = {
-    'dias_campanha': 17,
-    'total_leads': 5585,    'cpl_medio': 17.30,    'investimento_total': 96609.49,
-    'roas_geral': 2.00,
+    'dias_campanha': 18,
+    'total_leads': 6218,
+    'cpl_medio': 16.62,
+    'investimento_total': 103321.41,
+    'roas_geral': 2.13,
     'meta_leads': 9000,
     'meta_cpl': 15.00,
     'orcamento_total': 140000.00,
@@ -25,32 +27,32 @@ DADOS_DASHBOARD = {
     # Dados por canal
     'canais': {
         'facebook': {
-            'leads': 4563,
-            'percentual': 81.7,
-            'cpl': 18.54,
-            'investimento': 84605.80,
-            'roas': 2.38
+            'leads': 5123,
+            'percentual': 82.4,
+            'cpl': 17.72,
+            'investimento': 90792.25,
+            'roas': 2.49
         },
         'instagram': {
-            'leads': 545,
-            'percentual': 9.8,
+            'leads': 597,
+            'percentual': 9.6,
             'cpl': 0.00,
             'investimento': 0,
             'roas': float('inf')
         },
         'youtube': {
-            'leads': 385,
-            'percentual': 6.9,
-            'cpl': 29.12,
-            'investimento': 11209.35,
-            'roas': 1.51
+            'leads': 405,
+            'percentual': 6.5,
+            'cpl': 28.95,
+            'investimento': 11725.04,
+            'roas': 1.52
         },
         'google': {
-            'leads': 46,
+            'leads': 47,
             'percentual': 0.8,
-            'cpl': 17.27,
-            'investimento': 794.34,
-            'roas': 2.55
+            'cpl': 17.11,
+            'investimento': 804.12,
+            'roas': 2.58
         },
         'email': {
             'leads': 28,
@@ -63,32 +65,32 @@ DADOS_DASHBOARD = {
     
     # Dados de profissões (atualizados da planilha - 12/09/2025)
     'profissoes': {
-        'dentista': {'total': 1235, 'percentual': 22},
-        'outra': {'total': 965, 'percentual': 17},
-        'psicologo': {'total': 858, 'percentual': 15},
-        'fisioterapeuta': {'total': 801, 'percentual': 14},
-        'medico': {'total': 707, 'percentual': 13},
-        'nutricionista': {'total': 429, 'percentual': 8},
-        'psicoterapeuta': {'total': 308, 'percentual': 6},
-        'fonoaudiologo': {'total': 134, 'percentual': 2},
-        'veterinario': {'total': 101, 'percentual': 2}
+        'dentista': {'total': 1375, 'percentual': 22},
+        'outra': {'total': 1057, 'percentual': 17},
+        'psicologo': {'total': 933, 'percentual': 15},
+        'fisioterapeuta': {'total': 870, 'percentual': 14},
+        'medico': {'total': 808, 'percentual': 13},
+        'nutricionista': {'total': 497, 'percentual': 8},
+        'psicoterapeuta': {'total': 373, 'percentual': 6},
+        'fonoaudiologo': {'total': 149, 'percentual': 2},
+        'veterinario': {'total': 124, 'percentual': 2}
     },
     
     # Projeções (atualizadas da planilha)
     'projecao': {
         'performance_real': {
-            'leads': 5585,
-            'cpl': 20.22,
-            'vendas_curso': 39,
-            'investimento': 112955.09,
-            'roas_curso': 2.18
+            'leads': 6218,
+            'cpl': 19.84,
+            'vendas_curso': 43,
+            'investimento': 123358.00,
+            'roas_curso': 2.13
         },
         'projecao_28_dias': {
-            'leads': 9199,
-            'cpl': 22.04,
-            'vendas_curso': 64,
-            'investimento': 202775.91,
-            'roas_curso': 2.00
+            'leads': 9700,
+            'cpl': 20.62,
+            'vendas_curso': 68,
+            'investimento': 200000.00,
+            'roas_curso': 2.14
         }
     }
 }
