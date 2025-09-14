@@ -13,13 +13,13 @@ SHEET_ID = "1f5qcPc4l0SYVQv3qhq8d17s_fTMPkyoT"
 BASE_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq"
 SYNC_INTERVAL = 300  # 5 minutos
 
-# Dados atualizados da planilha
+# Dados atualizados da planilha (13/09/2025 - 20:19)
 DADOS_DASHBOARD = {
-    'dias_campanha': 18,
-    'total_leads': 6218,
-    'cpl_medio': 16.62,
-    'investimento_total': 103321.41,
-    'roas_geral': 2.13,
+    'dias_campanha': 19,
+    'total_leads': 6715,
+    'cpl_medio': 16.20,
+    'investimento_total': 108807.59,
+    'roas_geral': 2.22,
     'meta_leads': 9000,
     'meta_cpl': 15.00,
     'orcamento_total': 140000.00,
@@ -27,70 +27,70 @@ DADOS_DASHBOARD = {
     # Dados por canal
     'canais': {
         'facebook': {
-            'leads': 5123,
-            'percentual': 82.4,
-            'cpl': 17.72,
-            'investimento': 90792.25,
-            'roas': 2.49
+            'leads': 5559,
+            'percentual': 82.8,
+            'cpl': 17.22,
+            'investimento': 95738.61,
+            'roas': 2.56
         },
         'instagram': {
-            'leads': 597,
-            'percentual': 9.6,
+            'leads': 636,
+            'percentual': 9.5,
             'cpl': 0.00,
             'investimento': 0,
             'roas': float('inf')
         },
         'youtube': {
-            'leads': 405,
-            'percentual': 6.5,
-            'cpl': 28.95,
-            'investimento': 11725.04,
-            'roas': 1.52
+            'leads': 426,
+            'percentual': 6.3,
+            'cpl': 28.76,
+            'investimento': 12252.17,
+            'roas': 1.53
         },
         'google': {
             'leads': 47,
-            'percentual': 0.8,
-            'cpl': 17.11,
-            'investimento': 804.12,
-            'roas': 2.58
+            'percentual': 0.7,
+            'cpl': 17.38,
+            'investimento': 816.81,
+            'roas': 2.54
         },
         'email': {
-            'leads': 28,
-            'percentual': 0.5,
+            'leads': 29,
+            'percentual': 0.4,
             'cpl': 0.00,
             'investimento': 0,
             'roas': float('inf')
         }
     },
     
-    # Dados de profissões (atualizados da planilha - 12/09/2025)
+    # Dados de profissões (atualizados da planilha - 13/09/2025)
     'profissoes': {
-        'dentista': {'total': 1375, 'percentual': 22},
-        'outra': {'total': 1057, 'percentual': 17},
-        'psicologo': {'total': 933, 'percentual': 15},
-        'fisioterapeuta': {'total': 870, 'percentual': 14},
-        'medico': {'total': 808, 'percentual': 13},
-        'nutricionista': {'total': 497, 'percentual': 8},
-        'psicoterapeuta': {'total': 373, 'percentual': 6},
-        'fonoaudiologo': {'total': 149, 'percentual': 2},
-        'veterinario': {'total': 124, 'percentual': 2}
+        'dentista': {'total': 1477, 'percentual': 22},
+        'outra': {'total': 1420, 'percentual': 21},
+        'psicologo': {'total': 1007, 'percentual': 15},
+        'fisioterapeuta': {'total': 872, 'percentual': 13},
+        'medico': {'total': 873, 'percentual': 13},
+        'nutricionista': {'total': 470, 'percentual': 7},
+        'psicoterapeuta': {'total': 338, 'percentual': 5},
+        'fonoaudiologo': {'total': 147, 'percentual': 2},
+        'veterinario': {'total': 111, 'percentual': 2}
     },
     
-    # Projeções (atualizadas da planilha)
+    # Projeções (atualizadas da planilha - 13/09/2025)
     'projecao': {
         'performance_real': {
-            'leads': 6218,
-            'cpl': 19.84,
-            'vendas_curso': 43,
-            'investimento': 123358.00,
-            'roas_curso': 2.13
+            'leads': 6715,
+            'cpl': 19.78,
+            'vendas_curso': 47,
+            'investimento': 132812.00,
+            'roas_curso': 2.22
         },
         'projecao_28_dias': {
-            'leads': 9700,
-            'cpl': 20.62,
-            'vendas_curso': 68,
-            'investimento': 200000.00,
-            'roas_curso': 2.14
+            'leads': 9896,
+            'cpl': 19.84,
+            'vendas_curso': 69,
+            'investimento': 196343.77,
+            'roas_curso': 2.22
         }
     }
 }
@@ -180,7 +180,8 @@ def visao_geral():
     return render_template('dashboard.html', 
                          aba_ativa='visao-geral', 
                          dados=DADOS_DASHBOARD,
-                         timestamp=datetime.now().strftime('%H:%M:%S'))
+                         timestamp=datetime.now().strftime('%H:%M:%S'),
+                         datetime=datetime)
 
 @app.route('/origem-conversao')
 def origem_conversao():

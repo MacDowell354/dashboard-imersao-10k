@@ -3,6 +3,41 @@
 
 <button style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 20px;">🔄 Atualizar Projeções</button>
 
+<h3>🤖 Análise Inteligente - IA</h3>
+<div class="insights-grid">
+    <div class="insight-card success">
+        <h4>💎 LUCRO: Acima do Cenário Otimista</h4>
+        <p><strong>Projeção 28 dias (R$ {{ "{:,.0f}".format((dados.projecao.projecao_28_dias.vendas_curso * 6300) - dados.projecao.projecao_28_dias.investimento) }}) vs Potencial Otimista (R$ 216.000)</strong><br>
+        Diferença: +R$ {{ "{:,.0f}".format(((dados.projecao.projecao_28_dias.vendas_curso * 6300) - dados.projecao.projecao_28_dias.investimento) - 216000) }}. Margem {{ "%.1f"|format((((dados.projecao.projecao_28_dias.vendas_curso * 6300) - dados.projecao.projecao_28_dias.investimento) / 216000 - 1) * 100) }}% acima do cenário otimista.</p>
+    </div>
+    
+    <div class="insight-card info">
+        <h4>🔍 CAUSA-RAIZ: Por que o lucro é maior?</h4>
+        <p><strong>Fatores específicos que explicam o melhor resultado:</strong><br>
+        1. CPL R$ 0,16 menor (R$ {{ "%.2f"|format(dados.projecao.projecao_28_dias.cpl) }} vs R$ 20,00)<br>
+        2. Investimento R$ 36.343 maior, mas gera R$ 22.356 a mais de lucro<br>
+        3. Eficiência: cada R$ 1,00 investido gera R$ {{ "%.2f"|format((dados.projecao.projecao_28_dias.vendas_curso * 6300) / dados.projecao.projecao_28_dias.investimento) }} vs R$ 2,76 (otimista)</p>
+    </div>
+    
+    <div class="insight-card success">
+        <h4>🚀 ROAS: Muito Superior ao Otimista</h4>
+        <p><strong>Projeção 28 dias ({{ "%.2f"|format(((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)) / dados.projecao.projecao_28_dias.investimento) }}) vs Potencial Otimista (3,82)</strong><br>
+        Diferença: +{{ "%.2f"|format(((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)) / dados.projecao.projecao_28_dias.investimento - 3.82) }}. ROAS {{ "%.0f"|format((((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)) / dados.projecao.projecao_28_dias.investimento / 3.82 - 1) * 100) }}% superior.</p>
+    </div>
+    
+    <div class="insight-card warning">
+        <h4>📊 Leads: Próximo do Otimista</h4>
+        <p><strong>Projeção 28 dias ({{ "{:,}".format(dados.projecao.projecao_28_dias.leads) }} leads) vs Potencial Otimista (10.000+ leads)</strong><br>
+        Diferença: -{{ "{:,}".format(10000 - dados.projecao.projecao_28_dias.leads) }} leads. Estamos 98,96% do cenário otimista.</p>
+    </div>
+    
+    <div class="insight-card warning">
+        <h4>💰 Vendas: Ligeiramente Abaixo</h4>
+        <p><strong>Projeção 28 dias ({{ dados.projecao.projecao_28_dias.vendas_curso }} vendas) vs Potencial Otimista (70 vendas)</strong><br>
+        Diferença: -{{ 70 - dados.projecao.projecao_28_dias.vendas_curso }} venda. Faturamento: R$ {{ "{:,.0f}".format((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)) }} vs R$ 861.390.</p>
+    </div>
+</div>
+
 <h3>⚙️ Premissas CHT22</h3>
 <div class="metrics-grid">
     <div class="metric-card">
