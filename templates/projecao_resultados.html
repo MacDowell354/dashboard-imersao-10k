@@ -7,7 +7,7 @@
 <div class="insights-grid">
     <div class="insight-card success">
         <h4>💎 LUCRO: Acima do Cenário Otimista</h4>
-        <p><strong>Projeção 28 dias (R$ {{ "{:,.0f}".format((dados.projecao.projecao_28_dias.vendas_curso * 6300) - dados.projecao.projecao_28_dias.investimento) }}) vs Potencial Otimista (R$ 216.000)</strong><br>
+        <p><strong>Projeção 28 dias ({{ ((dados.projecao.projecao_28_dias.vendas_curso * 6300) - dados.projecao.projecao_28_dias.investimento)|moeda_ptbr }}) vs Potencial Otimista (R$ 216.000)</strong><br>
         Diferença: +R$ 22.356. Margem 10,4% acima do cenário otimista.</p>
     </div>
     
@@ -41,7 +41,7 @@
 <h3>⚙️ Premissas CHT22</h3>
 <div class="metrics-grid">
     <div class="metric-card">
-        <div class="metric-value">{{ "{:,}".format(dados.meta_leads) }}</div>
+        <div class="metric-value">{{ dados.meta_leads|numero_ptbr }}</div>
         <div class="metric-label">Meta Captação LEADs</div>
     </div>
     
@@ -66,7 +66,7 @@
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">R$ {{ "{:,}".format(dados.orcamento_total) }}</div>
+        <div class="metric-value">{{ dados.orcamento_total|moeda_ptbr }}</div>
         <div class="metric-label">Meta Orçamento</div>
     </div>
 </div>
@@ -85,14 +85,14 @@
         <tbody>
             <tr>
                 <td><strong>🎯 Captação de Leads</strong></td>
-                <td>{{ "{:,}".format(dados.projecao.performance_real.leads) }} leads</td>
-                <td>{{ "{:,}".format(dados.projecao.projecao_28_dias.leads) }} leads</td>
+                <td>{{ dados.projecao.performance_real.leads|numero_ptbr }} leads</td>
+                <td>{{ dados.projecao.projecao_28_dias.leads|numero_ptbr }} leads</td>
                 <td>10.000+ leads</td>
             </tr>
             <tr>
                 <td><strong>💰 CPL Médio</strong></td>
-                <td>R$ {{ "%.2f"|format(dados.projecao.performance_real.cpl) }}</td>
-                <td>R$ {{ "%.2f"|format(dados.projecao.projecao_28_dias.cpl) }}</td>
+                <td>{{ dados.projecao.performance_real.cpl|moeda_ptbr }}</td>
+                <td>{{ dados.projecao.projecao_28_dias.cpl|moeda_ptbr }}</td>
                 <td>R$ 20,00</td>
             </tr>
             <tr>
@@ -115,44 +115,44 @@
             </tr>
             <tr>
                 <td><strong>💰 Faturamento Curso</strong></td>
-                <td>R$ {{ "{:,.2f}".format(dados.projecao.performance_real.vendas_curso * 6300) }}</td>
-                <td>R$ {{ "{:,.2f}".format(dados.projecao.projecao_28_dias.vendas_curso * 6300) }}</td>
+                <td>{{ (dados.projecao.performance_real.vendas_curso * 6300)|moeda_ptbr }}</td>
+                <td>{{ (dados.projecao.projecao_28_dias.vendas_curso * 6300)|moeda_ptbr }}</td>
                 <td>R$ 441.390,00</td>
             </tr>
             <tr>
                 <td><strong>💎 Faturamento Mentoria</strong></td>
-                <td>R$ {{ "{:,.2f}".format((dados.projecao.performance_real.vendas_curso * 0.3) * 20000) }}</td>
-                <td>R$ {{ "{:,.2f}".format((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000) }}</td>
+                <td>{{ ((dados.projecao.performance_real.vendas_curso * 0.3) * 20000)|moeda_ptbr }}</td>
+                <td>{{ ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)|moeda_ptbr }}</td>
                 <td>R$ 420.000,00</td>
             </tr>
             <tr>
                 <td><strong>💵 Faturamento Total</strong></td>
-                <td>R$ {{ "{:,.2f}".format((dados.projecao.performance_real.vendas_curso * 6300) + ((dados.projecao.performance_real.vendas_curso * 0.3) * 20000)) }}</td>
-                <td>R$ {{ "{:,.2f}".format((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)) }}</td>
+                <td>{{ ((dados.projecao.performance_real.vendas_curso * 6300) + ((dados.projecao.performance_real.vendas_curso * 0.3) * 20000))|moeda_ptbr }}</td>
+                <td>{{ ((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000))|moeda_ptbr }}</td>
                 <td>R$ 861.390,00</td>
             </tr>
             <tr>
                 <td><strong>📊 Investimento Tráfego</strong></td>
-                <td>R$ {{ "{:,.2f}".format(dados.projecao.performance_real.investimento) }}</td>
-                <td>R$ {{ "{:,.2f}".format(dados.projecao.projecao_28_dias.investimento) }}</td>
+                <td>{{ dados.projecao.performance_real.investimento|moeda_ptbr }}</td>
+                <td>{{ dados.projecao.projecao_28_dias.investimento|moeda_ptbr }}</td>
                 <td>R$ 160.000,00</td>
             </tr>
             <tr>
                 <td><strong>💰 Lucro Bruto (Apenas Curso)</strong></td>
-                <td>R$ {{ "{:,.2f}".format((dados.projecao.performance_real.vendas_curso * 6300) - dados.projecao.performance_real.investimento) }}</td>
-                <td>R$ {{ "{:,.2f}".format((dados.projecao.projecao_28_dias.vendas_curso * 6300) - dados.projecao.projecao_28_dias.investimento) }}</td>
+                <td>{{ ((dados.projecao.performance_real.vendas_curso * 6300) - dados.projecao.performance_real.investimento)|moeda_ptbr }}</td>
+                <td>{{ ((dados.projecao.projecao_28_dias.vendas_curso * 6300) - dados.projecao.projecao_28_dias.investimento)|moeda_ptbr }}</td>
                 <td>R$ 216.000,00</td>
             </tr>
             <tr>
                 <td><strong>🎯 ROAS (Curso)</strong></td>
-                <td>{{ "%.2f"|format(dados.projecao.performance_real.roas_curso) }}</td>
-                <td>{{ "%.2f"|format(dados.projecao.projecao_28_dias.roas_curso) }}</td>
+                <td>{{ ("%.2f"|format(dados.projecao.performance_real.roas_curso)).replace(".", ",") }}</td>
+                <td>{{ ("%.2f"|format(dados.projecao.projecao_28_dias.roas_curso)).replace(".", ",") }}</td>
                 <td>2,76</td>
             </tr>
             <tr>
                 <td><strong>🏆 ROAS Total (com Mentoria)</strong></td>
-                <td>{{ "%.2f"|format(((dados.projecao.performance_real.vendas_curso * 6300) + ((dados.projecao.performance_real.vendas_curso * 0.3) * 20000)) / dados.projecao.performance_real.investimento) }}</td>
-                <td>{{ "%.2f"|format(((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)) / dados.projecao.projecao_28_dias.investimento) }}</td>
+                <td>{{ ("%.2f"|format(((dados.projecao.performance_real.vendas_curso * 6300) + ((dados.projecao.performance_real.vendas_curso * 0.3) * 20000)) / dados.projecao.performance_real.investimento)).replace(".", ",") }}</td>
+                <td>{{ ("%.2f"|format(((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)) / dados.projecao.projecao_28_dias.investimento)).replace(".", ",") }}</td>
                 <td>3,82</td>
             </tr>
         </tbody>

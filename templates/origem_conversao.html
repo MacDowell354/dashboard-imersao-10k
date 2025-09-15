@@ -1,5 +1,5 @@
 <h2>📊 Origem e Conversão - Dados Atualizados - Captação de Leads</h2>
-<p>Análise detalhada de performance por canal com dados corretos da planilha. CPL R$ {{ "%.2f"|format(dados.cpl_medio) }}, investimento R$ {{ "{:,.2f}".format(dados.investimento_total) }} em {{ dados.dias_campanha }} dias de captação com {{ "{:,}".format(dados.total_leads) }} leads.</p>
+<p>Análise detalhada de performance por canal com dados corretos da planilha. CPL {{ dados.cpl_medio|moeda_ptbr }}, investimento {{ dados.investimento_total|moeda_ptbr }} em {{ dados.dias_campanha }} dias de captação com {{ dados.total_leads|numero_ptbr }} leads.</p>
 
 <div class="metrics-grid">
     <div class="metric-card">
@@ -21,7 +21,7 @@
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">{{ dados.roas_geral }}</div>
+        <div class="metric-value">{{ ("%.2f"|format(dados.roas_geral)).replace(".", ",") }}</div>
         <div class="metric-label">ROAS (S87)</div>
         <div class="metric-status status-success">Acima da meta</div>
     </div>

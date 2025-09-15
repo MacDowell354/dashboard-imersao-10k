@@ -9,19 +9,19 @@
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">{{ "%.0f"|format(((dados.cpl_medio / dados.meta_cpl - 1) * 100)) }}%</div>
+        <div class="metric-value">{{ extras.percentual_cpl_formatado }}</div>
         <div class="metric-label">Meta CPL Captação</div>
-        <div class="metric-status status-warning">R$ {{ "%.2f"|format(dados.cpl_medio) }} vs R$ {{ "%.2f"|format(dados.meta_cpl) }}</div>
+        <div class="metric-status status-warning">{{ dados.cpl_medio_formatado }} vs {{ dados.meta_cpl_formatado }}</div>
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">{{ "%.0f"|format((dados.investimento_total / dados.orcamento_total * 100)) }}%</div>
+        <div class="metric-value">{{ extras.percentual_orcamento_formatado }}</div>
         <div class="metric-label">Orçamento Captação</div>
-        <div class="metric-status status-info">R$ {{ "{:,.0f}".format(dados.investimento_total) }} / R$ {{ "{:,.0f}".format(dados.orcamento_total) }}</div>
+        <div class="metric-status status-info">{{ dados.investimento_total_formatado }} / {{ dados.orcamento_total_formatado }}</div>
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">{{ dados.roas_geral }}</div>
+        <div class="metric-value">{{ ("%.2f"|format(dados.roas_geral)).replace(".", ",") }}</div>
         <div class="metric-label">ROAS Geral</div>
         <div class="metric-status status-success">Acima da meta</div>
     </div>
@@ -31,17 +31,17 @@
 <div class="insights-grid">
     <div class="insight-card success">
         <h4>Facebook Dominante</h4>
-        <p>{{ dados.canais.facebook.percentual }}% dos leads com ROAS de {{ dados.canais.facebook.roas }}. Canal principal com excelente performance.</p>
+        <p>{{ dados.canais.facebook.percentual }}% dos leads com ROAS de {{ ("%.2f"|format(dados.canais.facebook.roas)).replace(".", ",") }}. Canal principal com excelente performance.</p>
     </div>
     
     <div class="insight-card info">
         <h4>Google Bom ROAS</h4>
-        <p>ROAS de {{ dados.canais.google.roas }} com excelente retorno. Otimizar volume de leads para escalar.</p>
+        <p>ROAS de {{ ("%.2f"|format(dados.canais.google.roas)).replace(".", ",") }} com excelente retorno. Otimizar volume de leads para escalar.</p>
     </div>
     
     <div class="insight-card warning">
         <h4>YouTube Precisa Otimizar</h4>
-        <p>CPL de R$ {{ dados.canais.youtube.cpl }} e ROAS de {{ dados.canais.youtube.roas }}. Requer otimização para melhorar retorno.</p>
+        <p>CPL de {{ dados.canais.youtube.cpl|moeda_ptbr }} e ROAS de {{ ("%.2f"|format(dados.canais.youtube.roas)).replace(".", ",") }}. Requer otimização para melhorar retorno.</p>
     </div>
 </div>
 
@@ -50,9 +50,9 @@
 
 <div class="metrics-grid">
     <div class="metric-card">
-        <div class="metric-value">{{ "{:,}".format(dados.meta_leads) }}</div>
+        <div class="metric-value">{{ dados.meta_leads_formatado }}</div>
         <div class="metric-label">Meta Captação LEADs</div>
-        <div class="metric-status status-info">Atual: {{ "{:,}".format(dados.total_leads) }} ({{ "%.1f"|format((dados.total_leads / dados.meta_leads * 100)) }}%)</div>
+        <div class="metric-status status-info">Atual: {{ dados.total_leads_formatado }} ({{ extras.percentual_leads_formatado }})</div>
     </div>
     
     <div class="metric-card">
@@ -62,7 +62,7 @@
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">R$ 6.300</div>
+        <div class="metric-value">R$ 6.300,00</div>
         <div class="metric-label">Ticket Médio Curso</div>
         <div class="metric-status status-info">Preço de Venda</div>
     </div>
@@ -74,21 +74,21 @@
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">R$ 20.000</div>
+        <div class="metric-value">R$ 20.000,00</div>
         <div class="metric-label">Ticket Médio Mentoria</div>
         <div class="metric-status status-info">Preço Premium</div>
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">R$ {{ "%.2f"|format(dados.meta_cpl) }}</div>
+        <div class="metric-value">{{ dados.meta_cpl_formatado }}</div>
         <div class="metric-label">Meta CPL Captação</div>
-        <div class="metric-status status-warning">Atual: R$ {{ "%.2f"|format(dados.cpl_medio) }} (+{{ "%.0f"|format(((dados.cpl_medio / dados.meta_cpl - 1) * 100)) }}%)</div>
+        <div class="metric-status status-warning">Atual: {{ dados.cpl_medio_formatado }} ({{ extras.percentual_cpl_formatado }})</div>
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">R$ {{ "{:,}".format(dados.orcamento_total) }}</div>
+        <div class="metric-value">{{ dados.orcamento_total_formatado }}</div>
         <div class="metric-label">Meta Orçamento Tráfego</div>
-        <div class="metric-status status-info">Usado: R$ {{ "{:,.0f}".format(dados.investimento_total) }} ({{ "%.1f"|format((dados.investimento_total / dados.orcamento_total * 100)) }}%)</div>
+        <div class="metric-status status-info">Usado: {{ dados.investimento_total_formatado }} ({{ extras.percentual_orcamento_formatado }})</div>
     </div>
     
     <div class="metric-card">
