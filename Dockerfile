@@ -14,5 +14,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia todo o projeto
 COPY . .
 
-# Comando de start (Render injeta a variável PORT automaticamente)
-CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:${PORT:-10000} --workers 2"]
+# Porta padrão (Render injeta $PORT automaticamente)
+ENV PORT=5002
+EXPOSE 5002
+
+# Start com Gunicorn apontando para app_full.py
+CMD ["sh", "-c", "gunicorn app_full:app --bind 0.0.0.0:${PORT:-10000} --workers 2"]
