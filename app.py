@@ -13,13 +13,13 @@ SHEET_ID = "1f5qcPc4l0SYVQv3qhq8d17s_fTMPkyoT"
 BASE_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq"
 SYNC_INTERVAL = 300  # 5 minutos
 
-# Dados atualizados da planilha (13/09/2025 - 20:19)
+# Dados atualizados da planilha (14/09/2025 - 21:40)
 DADOS_DASHBOARD = {
-    'dias_campanha': 19,
-    'total_leads': 6715,
-    'cpl_medio': 16.20,
+    'dias_campanha': 20,
+    'total_leads': 7195,
+    'cpl_medio': 15.13,
     'investimento_total': 108807.59,
-    'roas_geral': 2.22,
+    'roas_geral': 2.32,
     'meta_leads': 9000,
     'meta_cpl': 15.00,
     'orcamento_total': 140000.00,
@@ -27,32 +27,32 @@ DADOS_DASHBOARD = {
     # Dados por canal
     'canais': {
         'facebook': {
-            'leads': 5559,
-            'percentual': 82.8,
-            'cpl': 17.22,
+            'leads': 5974,
+            'percentual': 83.0,
+            'cpl': 16.03,
             'investimento': 95738.61,
-            'roas': 2.56
+            'roas': 2.75
         },
         'instagram': {
-            'leads': 636,
+            'leads': 683,
             'percentual': 9.5,
             'cpl': 0.00,
             'investimento': 0,
             'roas': float('inf')
         },
         'youtube': {
-            'leads': 426,
-            'percentual': 6.3,
-            'cpl': 28.76,
+            'leads': 440,
+            'percentual': 6.1,
+            'cpl': 27.85,
             'investimento': 12252.17,
-            'roas': 1.53
+            'roas': 1.58
         },
         'google': {
-            'leads': 47,
+            'leads': 49,
             'percentual': 0.7,
-            'cpl': 17.38,
+            'cpl': 16.67,
             'investimento': 816.81,
-            'roas': 2.54
+            'roas': 2.65
         },
         'email': {
             'leads': 29,
@@ -63,41 +63,41 @@ DADOS_DASHBOARD = {
         }
     },
     
-    # Dados de profissões (atualizados da planilha - 13/09/2025)
+    # Dados de profissões (atualizados com tabela exata - 14/09/2025)
     'profissoes': {
-        'dentista': {'total': 1477, 'percentual': 22},
-        'outra': {'total': 1420, 'percentual': 21},
-        'psicologo': {'total': 1007, 'percentual': 15},
-        'fisioterapeuta': {'total': 872, 'percentual': 13},
-        'medico': {'total': 873, 'percentual': 13},
-        'nutricionista': {'total': 470, 'percentual': 7},
-        'psicoterapeuta': {'total': 338, 'percentual': 5},
-        'fonoaudiologo': {'total': 147, 'percentual': 2},
-        'veterinario': {'total': 111, 'percentual': 2}
+        'dentista': {'total': 1628, 'percentual': 23},
+        'outra': {'total': 1335, 'percentual': 19},
+        'psicologo': {'total': 1020, 'percentual': 14},
+        'fisioterapeuta': {'total': 991, 'percentual': 14},
+        'medico': {'total': 932, 'percentual': 13},
+        'nutricionista': {'total': 622, 'percentual': 9},
+        'psicoterapeuta': {'total': 350, 'percentual': 5},
+        'fonoaudiologo': {'total': 180, 'percentual': 3},
+        'veterinario': {'total': 137, 'percentual': 2}
     },
     
-    # Projeções (atualizadas da planilha - 13/09/2025)
+    # Projeções (atualizadas da planilha - 14/09/2025)
     'projecao': {
         'performance_real': {
-            'leads': 6715,
-            'cpl': 19.78,
-            'vendas_curso': 47,
-            'investimento': 132812.00,
-            'roas_curso': 2.22
+            'leads': 7195,
+            'cpl': 19.04,
+            'vendas_curso': 50,
+            'investimento': 136969.17,
+            'roas_curso': 2.32
         },
         'projecao_28_dias': {
-            'leads': 9896,
-            'cpl': 19.84,
-            'vendas_curso': 69,
-            'investimento': 196343.77,
-            'roas_curso': 2.22
+            'leads': 10073,
+            'cpl': 19.04,
+            'vendas_curso': 71,
+            'investimento': 191756.84,
+            'roas_curso': 2.32
         }
     }
 }
 
 # Status da sincronização
 ultima_sincronizacao = datetime.now()
-sincronizacao_ativa = False
+sincronizacao_ativa = True
 
 def extrair_dados_planilha():
     """Extrai dados da planilha Google Sheets"""
