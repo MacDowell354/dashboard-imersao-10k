@@ -15,4 +15,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Comando de start (Render injeta a variável PORT automaticamente)
-CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:${PORT:-10000} --workers 2"]
+CMD ["sh", "-c", "gunicorn app_full:app --bind 0.0.0.0:${PORT:-10000} --workers 2"]
