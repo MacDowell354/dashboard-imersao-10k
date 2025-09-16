@@ -27,14 +27,14 @@
     
     <div class="insight-card success">
         <h4>📊 Leads: Acima do Otimista</h4>
-        <p><strong>Projeção 28 dias (10.073 leads) vs Potencial Otimista (10.000+ leads)</strong><br>
-        Diferença: +73 leads. Estamos 100,73% do cenário otimista.</p>
+        <p><strong>Projeção 28 dias ({{ dados.projecao.projecao_28_dias.leads|numero_ptbr }} leads) vs Potencial Otimista (10.000+ leads)</strong><br>
+        Diferença: +{{ (dados.projecao.projecao_28_dias.leads - 10000)|numero_ptbr }} leads. Estamos {{ ((dados.projecao.projecao_28_dias.leads / 10000) * 100)|round(1) }}% do cenário otimista.</p>
     </div>
     
     <div class="insight-card success">
         <h4>💰 Vendas: Ligeiramente Acima</h4>
-        <p><strong>Projeção 28 dias (71 vendas) vs Potencial Otimista (70 vendas)</strong><br>
-        Diferença: +1 venda. Faturamento: R$ 447.300 vs R$ 441.390.</p>
+        <p><strong>Projeção 28 dias ({{ dados.projecao.projecao_28_dias.vendas_curso }} vendas) vs Potencial Otimista (70 vendas)</strong><br>
+        Diferença: +{{ dados.projecao.projecao_28_dias.vendas_curso - 70 }} venda. Faturamento: {{ (dados.projecao.projecao_28_dias.vendas_curso * 6300)|moeda_ptbr }} vs R$ 441.390.</p>
     </div>
 </div>
 

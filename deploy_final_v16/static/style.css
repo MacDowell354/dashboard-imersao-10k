@@ -299,19 +299,22 @@ table {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    font-size: 0.85rem; /* Reduzido de padrão para 0.85rem */
 }
 
 th {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 15px;
+    padding: 8px 10px; /* Reduzido de 15px para 8px 10px */
     text-align: left;
     font-weight: 600;
+    font-size: 0.8rem; /* Fonte menor para cabeçalhos */
 }
 
 td {
-    padding: 15px;
+    padding: 6px 8px; /* Reduzido de 15px para 6px 8px */
     border-bottom: 1px solid #e2e8f0;
+    font-size: 0.8rem; /* Fonte menor para células */
 }
 
 tr:hover {

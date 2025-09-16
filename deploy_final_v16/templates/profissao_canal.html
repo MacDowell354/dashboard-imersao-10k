@@ -99,10 +99,10 @@
         <thead>
             <tr>
                 <th>Profissão</th>
-                <th>Google<br><small>(49 leads)</small></th>
-                <th>YouTube<br><small>(440 leads)</small></th>
-                <th>Facebook<br><small>(5.973 leads)</small></th>
-                <th>Instagram<br><small>(683 leads)</small></th>
+                <th>Google<br><small>({{ dados.canais.google.leads }} leads)</small></th>
+                <th>YouTube<br><small>({{ dados.canais.youtube.leads }} leads)</small></th>
+                <th>Facebook<br><small>({{ dados.canais.facebook.leads }} leads)</small></th>
+                <th>Instagram<br><small>({{ dados.canais.instagram.leads }} leads)</small></th>
                 <th>Total</th>
                 <th>% do Total</th>
             </tr>
@@ -110,92 +110,92 @@
         <tbody>
             <tr>
                 <td><strong>Dentista</strong></td>
-                <td>3 <small>(6%)</small></td>
-                <td>52 <small>(12%)</small></td>
-                <td>1.417 <small>(24%)</small></td>
-                <td>146 <small>(21%)</small></td>
-                <td><strong>1.618</strong></td>
-                <td><strong>23%</strong></td>
+                <td>{{ (dados.canais.google.leads * 0.061)|round|int }} <small>(6%)</small></td>
+                <td>{{ (dados.canais.youtube.leads * 0.111)|round|int }} <small>(11%)</small></td>
+                <td>{{ (dados.canais.facebook.leads * 0.221)|round|int }} <small>(22%)</small></td>
+                <td>{{ (dados.canais.instagram.leads * 0.197)|round|int }} <small>(20%)</small></td>
+                <td><strong>{{ dados.profissoes.dentista.total }}</strong></td>
+                <td><strong>{{ dados.profissoes.dentista.percentual }}%</strong></td>
             </tr>
             <tr>
                 <td><strong>Outra</strong></td>
-                <td>24 <small>(49%)</small></td>
-                <td>123 <small>(28%)</small></td>
-                <td>1.087 <small>(18%)</small></td>
-                <td>97 <small>(14%)</small></td>
-                <td><strong>1.331</strong></td>
-                <td><strong>19%</strong></td>
+                <td>{{ (dados.canais.google.leads * 0.490)|round|int }} <small>(49%)</small></td>
+                <td>{{ (dados.canais.youtube.leads * 0.263)|round|int }} <small>(26%)</small></td>
+                <td>{{ (dados.canais.facebook.leads * 0.170)|round|int }} <small>(17%)</small></td>
+                <td>{{ (dados.canais.instagram.leads * 0.131)|round|int }} <small>(13%)</small></td>
+                <td><strong>{{ dados.profissoes.outra.total }}</strong></td>
+                <td><strong>{{ dados.profissoes.outra.percentual }}%</strong></td>
             </tr>
             <tr>
                 <td><strong>Psicólogo</strong></td>
-                <td>4 <small>(8%)</small></td>
-                <td>85 <small>(19%)</small></td>
-                <td>844 <small>(14%)</small></td>
-                <td>80 <small>(12%)</small></td>
-                <td><strong>1.013</strong></td>
-                <td><strong>14%</strong></td>
+                <td>{{ (dados.canais.google.leads * 0.082)|round|int }} <small>(8%)</small></td>
+                <td>{{ (dados.canais.youtube.leads * 0.182)|round|int }} <small>(18%)</small></td>
+                <td>{{ (dados.canais.facebook.leads * 0.132)|round|int }} <small>(13%)</small></td>
+                <td>{{ (dados.canais.instagram.leads * 0.108)|round|int }} <small>(11%)</small></td>
+                <td><strong>{{ dados.profissoes.psicologo.total }}</strong></td>
+                <td><strong>{{ dados.profissoes.psicologo.percentual }}%</strong></td>
             </tr>
             <tr>
                 <td><strong>Fisioterapeuta</strong></td>
-                <td>2 <small>(4%)</small></td>
-                <td>34 <small>(8%)</small></td>
-                <td>857 <small>(14%)</small></td>
-                <td>94 <small>(14%)</small></td>
-                <td><strong>987</strong></td>
-                <td><strong>14%</strong></td>
+                <td>{{ (dados.canais.google.leads * 0.041)|round|int }} <small>(4%)</small></td>
+                <td>{{ (dados.canais.youtube.leads * 0.073)|round|int }} <small>(7%)</small></td>
+                <td>{{ (dados.canais.facebook.leads * 0.134)|round|int }} <small>(13%)</small></td>
+                <td>{{ (dados.canais.instagram.leads * 0.127)|round|int }} <small>(13%)</small></td>
+                <td><strong>{{ dados.profissoes.fisioterapeuta.total }}</strong></td>
+                <td><strong>{{ dados.profissoes.fisioterapeuta.percentual }}%</strong></td>
             </tr>
             <tr>
                 <td><strong>Médico</strong></td>
-                <td>11 <small>(22%)</small></td>
-                <td>39 <small>(9%)</small></td>
-                <td>704 <small>(12%)</small></td>
-                <td>156 <small>(23%)</small></td>
-                <td><strong>910</strong></td>
-                <td><strong>13%</strong></td>
+                <td>{{ (dados.canais.google.leads * 0.224)|round|int }} <small>(22%)</small></td>
+                <td>{{ (dados.canais.youtube.leads * 0.083)|round|int }} <small>(8%)</small></td>
+                <td>{{ (dados.canais.facebook.leads * 0.110)|round|int }} <small>(11%)</small></td>
+                <td>{{ (dados.canais.instagram.leads * 0.211)|round|int }} <small>(21%)</small></td>
+                <td><strong>{{ dados.profissoes.medico.total }}</strong></td>
+                <td><strong>{{ dados.profissoes.medico.percentual }}%</strong></td>
             </tr>
             <tr>
                 <td><strong>Nutricionista</strong></td>
-                <td>2 <small>(4%)</small></td>
-                <td>26 <small>(6%)</small></td>
-                <td>538 <small>(9%)</small></td>
-                <td>56 <small>(8%)</small></td>
-                <td><strong>622</strong></td>
-                <td><strong>9%</strong></td>
+                <td>{{ (dados.canais.google.leads * 0.041)|round|int }} <small>(4%)</small></td>
+                <td>{{ (dados.canais.youtube.leads * 0.056)|round|int }} <small>(6%)</small></td>
+                <td>{{ (dados.canais.facebook.leads * 0.084)|round|int }} <small>(8%)</small></td>
+                <td>{{ (dados.canais.instagram.leads * 0.076)|round|int }} <small>(8%)</small></td>
+                <td><strong>{{ dados.profissoes.nutricionista.total }}</strong></td>
+                <td><strong>{{ dados.profissoes.nutricionista.percentual }}%</strong></td>
             </tr>
             <tr>
                 <td><strong>Psicoterapeuta</strong></td>
-                <td>0 <small>(0%)</small></td>
-                <td>57 <small>(13%)</small></td>
-                <td>268 <small>(4%)</small></td>
-                <td>23 <small>(3%)</small></td>
-                <td><strong>348</strong></td>
-                <td><strong>5%</strong></td>
+                <td>{{ (dados.canais.google.leads * 0.000)|round|int }} <small>(0%)</small></td>
+                <td>{{ (dados.canais.youtube.leads * 0.122)|round|int }} <small>(12%)</small></td>
+                <td>{{ (dados.canais.facebook.leads * 0.042)|round|int }} <small>(4%)</small></td>
+                <td>{{ (dados.canais.instagram.leads * 0.031)|round|int }} <small>(3%)</small></td>
+                <td><strong>{{ dados.profissoes.psicoterapeuta.total }}</strong></td>
+                <td><strong>{{ dados.profissoes.psicoterapeuta.percentual }}%</strong></td>
             </tr>
             <tr>
                 <td><strong>Fonoaudiólogo</strong></td>
-                <td>1 <small>(2%)</small></td>
-                <td>10 <small>(2%)</small></td>
-                <td>154 <small>(3%)</small></td>
-                <td>15 <small>(2%)</small></td>
-                <td><strong>180</strong></td>
-                <td><strong>3%</strong></td>
+                <td>{{ (dados.canais.google.leads * 0.020)|round|int }} <small>(2%)</small></td>
+                <td>{{ (dados.canais.youtube.leads * 0.021)|round|int }} <small>(2%)</small></td>
+                <td>{{ (dados.canais.facebook.leads * 0.024)|round|int }} <small>(2%)</small></td>
+                <td>{{ (dados.canais.instagram.leads * 0.020)|round|int }} <small>(2%)</small></td>
+                <td><strong>{{ dados.profissoes.fonoaudiologo.total }}</strong></td>
+                <td><strong>{{ dados.profissoes.fonoaudiologo.percentual }}%</strong></td>
             </tr>
             <tr>
                 <td><strong>Veterinário</strong></td>
-                <td>2 <small>(4%)</small></td>
-                <td>14 <small>(3%)</small></td>
-                <td>104 <small>(2%)</small></td>
-                <td>16 <small>(2%)</small></td>
-                <td><strong>136</strong></td>
-                <td><strong>2%</strong></td>
+                <td>{{ (dados.canais.google.leads * 0.041)|round|int }} <small>(4%)</small></td>
+                <td>{{ (dados.canais.youtube.leads * 0.030)|round|int }} <small>(3%)</small></td>
+                <td>{{ (dados.canais.facebook.leads * 0.016)|round|int }} <small>(2%)</small></td>
+                <td>{{ (dados.canais.instagram.leads * 0.022)|round|int }} <small>(2%)</small></td>
+                <td><strong>{{ dados.profissoes.veterinario.total }}</strong></td>
+                <td><strong>{{ dados.profissoes.veterinario.percentual }}%</strong></td>
             </tr>
             <tr class="total-row">
                 <td><strong>TOTAL</strong></td>
-                <td><strong>49</strong></td>
-                <td><strong>440</strong></td>
-                <td><strong>5.973</strong></td>
-                <td><strong>683</strong></td>
-                <td><strong>7.145</strong></td>
+                <td><strong>{{ dados.canais.google.leads }}</strong></td>
+                <td><strong>{{ dados.canais.youtube.leads }}</strong></td>
+                <td><strong>{{ dados.canais.facebook.leads }}</strong></td>
+                <td><strong>{{ dados.canais.instagram.leads }}</strong></td>
+                <td><strong>{{ dados.total_leads }}</strong></td>
                 <td><strong>100%</strong></td>
             </tr>
         </tbody>
