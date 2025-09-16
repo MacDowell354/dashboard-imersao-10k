@@ -1,18 +1,10 @@
 services:
   - type: web
     name: dashboard-cht22
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
-    envVars:
-      - key: PORT
-        value: 5002
-      - key: FLASK_ENV
-        value: production
-      - key: SYNC_INTERVAL
-        value: 300
+    env: docker
+    dockerfilePath: ./Dockerfile
+    buildContext: .
     plan: free
     region: oregon
     branch: main
     autoDeploy: true
-
