@@ -1,0 +1,358 @@
+/* Dashboard CHT22 - Estilo Python */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #2d3748;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.header h1 {
+    color: #667eea;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.header p {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+.sync-status {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #48bb78;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+}
+
+.sync-status::before {
+    content: "🔄 ";
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.nav-tabs {
+    display: flex;
+    background: white;
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+.nav-tab {
+    flex: 1;
+    padding: 15px 20px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #718096;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    min-width: 150px;
+}
+
+.nav-tab:hover {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.nav-tab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.tab-content {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    min-height: 600px;
+}
+
+.tab-content h2 {
+    color: #2d3748;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.tab-content p {
+    color: #718096;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    border-left: 5px solid #667eea;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+
+.metric-label {
+    font-size: 1rem;
+    color: #718096;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.metric-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.status-success {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.status-warning {
+    background: #fef5e7;
+    color: #c05621;
+}
+
+.status-info {
+    background: #bee3f8;
+    color: #2c5282;
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.insight-card {
+    border-radius: 15px;
+    padding: 25px;
+    border-left: 5px solid;
+}
+
+.insight-card.success {
+    background: #f0fff4;
+    border-left-color: #48bb78;
+}
+
+.insight-card.warning {
+    background: #fffaf0;
+    border-left-color: #ed8936;
+}
+
+.insight-card.info {
+    background: #f7faff;
+    border-left-color: #4299e1;
+}
+
+.insight-card h4 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.insight-card p {
+    color: #4a5568;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.channel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.channel-card {
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    border-radius: 15px;
+    padding: 25px;
+    border-left: 5px solid;
+    transition: transform 0.3s ease;
+}
+
+.channel-card:hover {
+    transform: translateY(-3px);
+}
+
+.channel-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.channel-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    margin-right: 15px;
+    font-size: 1.2rem;
+}
+
+.channel-icon.facebook {
+    background: #1877f2;
+}
+
+.channel-icon.instagram {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.channel-icon.youtube {
+    background: #ff0000;
+}
+
+.channel-icon.google {
+    background: #4285f4;
+}
+
+.channel-icon.email {
+    background: #34d399;
+}
+
+.channel-header h4 {
+    color: #2d3748;
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+}
+
+.channel-header p {
+    color: #718096;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-bottom: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+tr:hover {
+    background: #f7fafc;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .nav-tabs {
+        flex-direction: column;
+    }
+    
+    .nav-tab {
+        margin-bottom: 5px;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .channel-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+    }
+}
+

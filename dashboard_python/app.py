@@ -1,114 +1,97 @@
 from flask import Flask, render_template, jsonify
-from datetime import datetime
 import requests
 import json
+from datetime import datetime
+import os
 import threading
 import time
-import os
-from utils import (validar_dados_dashboard, calcular_percentual_seguro, formatar_percentual, 
-                  log_dados_dashboard, formatar_moeda_ptbr, formatar_numero_ptbr, 
-                  formatar_percentual_ptbr, criar_filtros_jinja, aplicar_formatacao_ptbr)
 
 app = Flask(__name__)
-
-# Registrar filtros personalizados para formatação PT-BR
-filtros_ptbr = criar_filtros_jinja()
-for nome, filtro in filtros_ptbr.items():
-    app.jinja_env.filters[nome] = filtro
 
 # Configuração da sincronização
 SHEET_ID = "1f5qcPc4l0SYVQv3qhq8d17s_fTMPkyoT"
 BASE_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq"
 SYNC_INTERVAL = 300  # 5 minutos
 
-# Dados atualizados da planilha (16/09/2025 - 21 dias)
-DADOS_DASHBOARD_RAW = {
-    'dias_campanha': 21,
-    'total_leads': 7713,
-    'cpl_medio': 15.57,
-    'investimento_total': 120114.64,
-    'roas_geral': 2.24,  # Será formatado como 2,24 no template
+# Dados atualizados da planilha
+DADOS_DASHBOARD = {
+    'dias_campanha': 17,
+    'total_leads': 5585,    'cpl_medio': 17.30,    'investimento_total': 96609.49,
+    'roas_geral': 2.00,
     'meta_leads': 9000,
-    'meta_cpl': 15.00,  # Atualizado conforme planilha
+    'meta_cpl': 15.00,
     'orcamento_total': 140000.00,
     
-    # Dados por canal (atualizados 16/09/2025)
+    # Dados por canal
     'canais': {
         'facebook': {
-            'leads': 6404,
-            'percentual': 83.0,
-            'cpl': 16.56,
-            'investimento': 106081.73,
-            'roas': 2.66
+            'leads': 4563,
+            'percentual': 81.7,
+            'cpl': 18.54,
+            'investimento': 84605.80,
+            'roas': 2.38
         },
         'instagram': {
-            'leads': 740,
-            'percentual': 9.6,
+            'leads': 545,
+            'percentual': 9.8,
             'cpl': 0.00,
             'investimento': 0,
             'roas': float('inf')
         },
         'youtube': {
-            'leads': 468,
-            'percentual': 6.1,
-            'cpl': 28.15,
-            'investimento': 13175.36,
-            'roas': 1.57
+            'leads': 385,
+            'percentual': 6.9,
+            'cpl': 29.12,
+            'investimento': 11209.35,
+            'roas': 1.51
         },
         'google': {
-            'leads': 49,
-            'percentual': 0.6,
-            'cpl': 17.50,
-            'investimento': 857.55,
-            'roas': 2.52
+            'leads': 46,
+            'percentual': 0.8,
+            'cpl': 17.27,
+            'investimento': 794.34,
+            'roas': 2.55
         },
         'email': {
-            'leads': 32,
-            'percentual': 0.4,
+            'leads': 28,
+            'percentual': 0.5,
             'cpl': 0.00,
             'investimento': 0,
             'roas': float('inf')
         }
     },
     
-    # Dados de profissões (atualizados 16/09/2025 - soma de todos os canais)
+    # Dados de profissões (atualizados da planilha - 12/09/2025)
     'profissoes': {
-        'dentista': {'total': 1754, 'percentual': 23},  # 3+56+1536+159 = 1754
-        'outra': {'total': 1417, 'percentual': 18},     # 24+130+1155+108 = 1417
-        'psicologo': {'total': 1058, 'percentual': 14}, # 4+86+882+86 = 1058
-        'fisioterapeuta': {'total': 1046, 'percentual': 14}, # 2+38+897+99 = 1036
-        'medico': {'total': 1009, 'percentual': 13},    # 11+42+784+172 = 1009
-        'nutricionista': {'total': 686, 'percentual': 9}, # 2+30+595+59 = 686
-        'psicoterapeuta': {'total': 367, 'percentual': 5}, # 0+62+282+23 = 367
-        'fonoaudiologo': {'total': 190, 'percentual': 2}, # 1+10+162+17 = 190
-        'veterinario': {'total': 143, 'percentual': 2}  # 2+14+110+17 = 143
+        'dentista': {'total': 1235, 'percentual': 22},
+        'outra': {'total': 965, 'percentual': 17},
+        'psicologo': {'total': 858, 'percentual': 15},
+        'fisioterapeuta': {'total': 801, 'percentual': 14},
+        'medico': {'total': 707, 'percentual': 13},
+        'nutricionista': {'total': 429, 'percentual': 8},
+        'psicoterapeuta': {'total': 308, 'percentual': 6},
+        'fonoaudiologo': {'total': 134, 'percentual': 2},
+        'veterinario': {'total': 101, 'percentual': 2}
     },
     
-    # Projeções (atualizadas da planilha - 16/09/2025)
+    # Projeções (atualizadas da planilha)
     'projecao': {
         'performance_real': {
-            'leads': 7713,
-            'cpl': 15.57,
-            'vendas_curso': 54,
-            'investimento': 151920.54,
-            'roas_curso': 2.24
+            'leads': 5585,
+            'cpl': 20.22,
+            'vendas_curso': 39,
+            'investimento': 112955.09,
+            'roas_curso': 2.18
         },
         'projecao_28_dias': {
-            'leads': 10284,
-            'cpl': 19.70,
-            'vendas_curso': 72,
-            'investimento': 202560.72,
-            'roas_curso': 2.24
+            'leads': 9199,
+            'cpl': 22.04,
+            'vendas_curso': 64,
+            'investimento': 202775.91,
+            'roas_curso': 2.00
         }
     }
 }
-
-# Validar e aplicar dados seguros
-DADOS_DASHBOARD = validar_dados_dashboard(DADOS_DASHBOARD_RAW)
-
-# Log dos dados validados para debug
-print("🔧 INICIALIZAÇÃO DO DASHBOARD:")
-log_dados_dashboard(DADOS_DASHBOARD)
 
 # Status da sincronização
 ultima_sincronizacao = datetime.now()
@@ -151,10 +134,7 @@ def extrair_dados_planilha():
                 # Atualizar apenas se temos dados suficientes
                 if len(valores) >= 5:
                     global DADOS_DASHBOARD
-                    
-                    # Criar dados temporários para validação
-                    dados_temp = DADOS_DASHBOARD.copy()
-                    dados_temp.update({
+                    DADOS_DASHBOARD.update({
                         'dias_campanha': int(valores[0]) if valores[0] > 0 else DADOS_DASHBOARD['dias_campanha'],
                         'total_leads': int(valores[1]) if valores[1] > 0 else DADOS_DASHBOARD['total_leads'],
                         'cpl_medio': float(valores[2]) if valores[2] > 0 else DADOS_DASHBOARD['cpl_medio'],
@@ -162,12 +142,7 @@ def extrair_dados_planilha():
                         'roas_geral': float(valores[4]) if valores[4] > 0 else DADOS_DASHBOARD['roas_geral']
                     })
                     
-                    # Validar dados antes de aplicar
-                    dados_validados = validar_dados_dashboard(dados_temp)
-                    DADOS_DASHBOARD.update(dados_validados)
-                    
-                    print("✅ SINCRONIZAÇÃO CONCLUÍDA:")
-                    log_dados_dashboard(DADOS_DASHBOARD)
+                    print(f"✅ Dados sincronizados: {DADOS_DASHBOARD['total_leads']} leads, CPL R$ {DADOS_DASHBOARD['cpl_medio']:.2f}")
                     return True
                 
     except Exception as e:
@@ -200,83 +175,44 @@ iniciar_sincronizacao()
 
 @app.route('/')
 def visao_geral():
-    # Calcular percentuais seguros
-    percentual_cpl = calcular_percentual_seguro(
-        DADOS_DASHBOARD['cpl_medio'], 
-        DADOS_DASHBOARD['meta_cpl'], 
-        "CPL"
-    )
-    
-    percentual_orcamento = calcular_percentual_seguro(
-        DADOS_DASHBOARD['investimento_total'], 
-        DADOS_DASHBOARD['orcamento_total'], 
-        "Orçamento"
-    )
-    
-    percentual_leads = calcular_percentual_seguro(
-        DADOS_DASHBOARD['total_leads'], 
-        DADOS_DASHBOARD['meta_leads'], 
-        "Leads"
-    )
-    
-    # Aplicar formatação PT-BR aos dados
-    dados_formatados = aplicar_formatacao_ptbr(DADOS_DASHBOARD)
-    
-    # Dados extras para o template
-    dados_extras = {
-        'percentual_cpl': percentual_cpl,
-        'percentual_cpl_formatado': formatar_percentual_ptbr(percentual_cpl),
-        'percentual_orcamento': percentual_orcamento,
-        'percentual_orcamento_formatado': formatar_percentual_ptbr(percentual_orcamento),
-        'percentual_leads': percentual_leads,
-        'percentual_leads_formatado': formatar_percentual_ptbr(percentual_leads)
-    }
-    
     return render_template('dashboard.html', 
                          aba_ativa='visao-geral', 
-                         dados=dados_formatados,
-                         extras=dados_extras,
-                         timestamp=datetime.now().strftime('%H:%M:%S'),
-                         datetime=datetime)
+                         dados=DADOS_DASHBOARD,
+                         timestamp=datetime.now().strftime('%H:%M:%S'))
 
 @app.route('/origem-conversao')
 def origem_conversao():
-    dados_formatados = aplicar_formatacao_ptbr(DADOS_DASHBOARD)
     return render_template('dashboard.html', 
                          aba_ativa='origem-conversao', 
-                         dados=dados_formatados,
+                         dados=DADOS_DASHBOARD,
                          timestamp=datetime.now().strftime('%H:%M:%S'))
 
 @app.route('/profissao-canal')
 def profissao_canal():
-    dados_formatados = aplicar_formatacao_ptbr(DADOS_DASHBOARD)
     return render_template('dashboard.html', 
                          aba_ativa='profissao-canal', 
-                         dados=dados_formatados,
+                         dados=DADOS_DASHBOARD,
                          timestamp=datetime.now().strftime('%H:%M:%S'))
 
 @app.route('/analise-regional')
 def analise_regional():
-    dados_formatados = aplicar_formatacao_ptbr(DADOS_DASHBOARD)
     return render_template('dashboard.html', 
                          aba_ativa='analise-regional', 
-                         dados=dados_formatados,
+                         dados=DADOS_DASHBOARD,
                          timestamp=datetime.now().strftime('%H:%M:%S'))
 
 @app.route('/insights-ia')
 def insights_ia():
-    dados_formatados = aplicar_formatacao_ptbr(DADOS_DASHBOARD)
     return render_template('dashboard.html', 
                          aba_ativa='insights-ia', 
-                         dados=dados_formatados,
+                         dados=DADOS_DASHBOARD,
                          timestamp=datetime.now().strftime('%H:%M:%S'))
 
 @app.route('/projecao-resultados')
 def projecao_resultados():
-    dados_formatados = aplicar_formatacao_ptbr(DADOS_DASHBOARD)
     return render_template('dashboard.html', 
                          aba_ativa='projecao-resultados', 
-                         dados=dados_formatados,
+                         dados=DADOS_DASHBOARD,
                          timestamp=datetime.now().strftime('%H:%M:%S'))
 
 @app.route('/api/dados')
