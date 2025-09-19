@@ -7,8 +7,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Copia requirements da raiz
-COPY requirements.txt ./requirements.txt
+# deps
+COPY deploy_final_render/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia todo o projeto
