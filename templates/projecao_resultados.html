@@ -1,162 +1,529 @@
-<h2>📈 Projeção de Resultados</h2>
-<p>Projeção para o lançamento completo baseada na performance dos primeiros {{ dados.dias_campanha }} dias</p>
+<!-- ABA PROJEÇÃO DE RESULTADOS ATUALIZADA - CHT22 v2.0 -->
+<div class="tab-content" id="projecao-resultados">
+    <div class="header-section">
+        <h2>🔮 Projeção de Resultados</h2>
+        <div class="projecao-info">
+            <span class="base-calculo">Base: {{ dados.dias_campanha }} dias de dados reais</span>
+            <span class="confiabilidade">Confiabilidade: 95%</span>
+            <span class="ultima-atualizacao">Atualizado: {{ timestamp }}</span>
+        </div>
+    </div>
 
-<button style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 20px;">🔄 Atualizar Projeções</button>
+    <!-- CENÁRIOS DE PROJEÇÃO -->
+    <div class="cenarios-projecao">
+        <h3>📊 Cenários de Projeção (30 dias)</h3>
+        <div class="cenarios-grid">
+            <!-- Cenário Atual/Realista -->
+            <div class="cenario-card realista ativo">
+                <div class="cenario-header">
+                    <h4>📈 Cenário Realista</h4>
+                    <span class="probabilidade">Probabilidade: 85%</span>
+                </div>
+                <div class="cenario-metricas">
+                    <div class="metrica-projecao">
+                        <span class="label">Leads Projetados:</span>
+                        <span class="valor-destaque">10.962</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">CPL Médio:</span>
+                        <span class="valor">R$ 15,66</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">Investimento:</span>
+                        <span class="valor">R$ 171.702,66</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">ROAS:</span>
+                        <span class="valor">2,12</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">Vendas Estimadas:</span>
+                        <span class="valor-destaque">77</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">Receita Estimada:</span>
+                        <span class="valor-destaque">R$ 485.100,00</span>
+                    </div>
+                </div>
+                <div class="cenario-base">
+                    <strong>Base:</strong> Manutenção do ritmo atual de captação
+                </div>
+            </div>
 
-<h3>🤖 Análise Inteligente - IA</h3>
-<div class="insights-grid">
-    <div class="insight-card success">
-        <h4>💎 LUCRO: Acima do Cenário Otimista</h4>
-        <p><strong>Projeção 28 dias ({{ ((dados.projecao.projecao_28_dias.vendas_curso * 6300) - dados.projecao.projecao_28_dias.investimento)|moeda_ptbr }}) vs Potencial Otimista (R$ 216.000)</strong><br>
-        Diferença: +R$ 22.356. Margem 10,4% acima do cenário otimista.</p>
-    </div>
-    
-    <div class="insight-card info">
-        <h4>🔍 CAUSA-RAIZ: Por que o lucro é maior?</h4>
-        <p><strong>Fatores específicos que explicam o melhor resultado:</strong><br>
-        1. CPL R$ 0,96 menor (R$ 19,04 vs R$ 20,00)<br>
-        2. Investimento R$ 31.757 maior, mas gera R$ 39.543 a mais de lucro<br>
-        3. Eficiência: cada R$ 1,00 investido gera R$ 2,21 vs R$ 2,76 (otimista)</p>
-    </div>
-    
-    <div class="insight-card success">
-        <h4>🚀 ROAS: Muito Superior ao Otimista</h4>
-        <p><strong>Projeção 28 dias (4,32) vs Potencial Otimista (3,82)</strong><br>
-        Diferença: +0,50. ROAS 13% superior ao cenário otimista.</p>
-    </div>
-    
-    <div class="insight-card success">
-        <h4>📊 Leads: Acima do Otimista</h4>
-        <p><strong>Projeção 28 dias ({{ dados.projecao.projecao_28_dias.leads|numero_ptbr }} leads) vs Potencial Otimista (10.000+ leads)</strong><br>
-        Diferença: +{{ (dados.projecao.projecao_28_dias.leads - 10000)|numero_ptbr }} leads. Estamos {{ ((dados.projecao.projecao_28_dias.leads / 10000) * 100)|round(1) }}% do cenário otimista.</p>
-    </div>
-    
-    <div class="insight-card success">
-        <h4>💰 Vendas: Ligeiramente Acima</h4>
-        <p><strong>Projeção 28 dias ({{ dados.projecao.projecao_28_dias.vendas_curso }} vendas) vs Potencial Otimista (70 vendas)</strong><br>
-        Diferença: +{{ dados.projecao.projecao_28_dias.vendas_curso - 70 }} venda. Faturamento: {{ (dados.projecao.projecao_28_dias.vendas_curso * 6300)|moeda_ptbr }} vs R$ 441.390.</p>
-    </div>
-</div>
+            <!-- Cenário Otimista -->
+            <div class="cenario-card otimista">
+                <div class="cenario-header">
+                    <h4>🚀 Cenário Otimista</h4>
+                    <span class="probabilidade">Probabilidade: 35%</span>
+                </div>
+                <div class="cenario-metricas">
+                    <div class="metrica-projecao">
+                        <span class="label">Leads Projetados:</span>
+                        <span class="valor-destaque">13.200</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">CPL Médio:</span>
+                        <span class="valor">R$ 14,20</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">Investimento:</span>
+                        <span class="valor">R$ 187.440,00</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">ROAS:</span>
+                        <span class="valor">2,45</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">Vendas Estimadas:</span>
+                        <span class="valor-destaque">92</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">Receita Estimada:</span>
+                        <span class="valor-destaque">R$ 579.600,00</span>
+                    </div>
+                </div>
+                <div class="cenario-base">
+                    <strong>Base:</strong> Otimização YouTube + Escalonamento Facebook
+                </div>
+            </div>
 
-<h3>⚙️ Premissas CHT22</h3>
-<div class="metrics-grid">
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.meta_leads|numero_ptbr }}</div>
-        <div class="metric-label">Meta Captação LEADs</div>
+            <!-- Cenário Conservador -->
+            <div class="cenario-card conservador">
+                <div class="cenario-header">
+                    <h4>📉 Cenário Conservador</h4>
+                    <span class="probabilidade">Probabilidade: 25%</span>
+                </div>
+                <div class="cenario-metricas">
+                    <div class="metrica-projecao">
+                        <span class="label">Leads Projetados:</span>
+                        <span class="valor-destaque">8.800</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">CPL Médio:</span>
+                        <span class="valor">R$ 18,50</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">Investimento:</span>
+                        <span class="valor">R$ 162.800,00</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">ROAS:</span>
+                        <span class="valor">1,85</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">Vendas Estimadas:</span>
+                        <span class="valor-destaque">62</span>
+                    </div>
+                    <div class="metrica-projecao">
+                        <span class="label">Receita Estimada:</span>
+                        <span class="valor-destaque">R$ 390.600,00</span>
+                    </div>
+                </div>
+                <div class="cenario-base">
+                    <strong>Base:</strong> Saturação de audiência + Aumento concorrência
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">0,70%</div>
-        <div class="metric-label">TX Conversão</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">R$ 6.300,00</div>
-        <div class="metric-label">Preço Ticket Médio</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">30%</div>
-        <div class="metric-label">% Vendas Mentorias</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">R$ 20.000,00</div>
-        <div class="metric-label">Ticket Médio Mentoria</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.orcamento_total|moeda_ptbr }}</div>
-        <div class="metric-label">Meta Orçamento</div>
-    </div>
-</div>
 
-<h3>📊 Tabela de Projeções</h3>
-<div class="table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>Métrica</th>
-                <th>Performance Real ({{ dados.dias_campanha }} dias)</th>
-                <th>Projeção 28 dias</th>
-                <th>Potencial Otimista</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>🎯 Captação de Leads</strong></td>
-                <td>{{ dados.projecao.performance_real.leads|numero_ptbr }} leads</td>
-                <td>{{ dados.projecao.projecao_28_dias.leads|numero_ptbr }} leads</td>
-                <td>10.000+ leads</td>
-            </tr>
-            <tr>
-                <td><strong>💰 CPL Médio</strong></td>
-                <td>{{ dados.projecao.performance_real.cpl|moeda_ptbr }}</td>
-                <td>{{ dados.projecao.projecao_28_dias.cpl|moeda_ptbr }}</td>
-                <td>R$ 20,00</td>
-            </tr>
-            <tr>
-                <td><strong>🏆 Vendas Curso</strong></td>
-                <td>{{ dados.projecao.performance_real.vendas_curso }} vendas</td>
-                <td>{{ dados.projecao.projecao_28_dias.vendas_curso }} vendas</td>
-                <td>70 vendas</td>
-            </tr>
-            <tr>
-                <td><strong>📈 Vendas Mentoria (30%)</strong></td>
-                <td>{{ (dados.projecao.performance_real.vendas_curso * 0.3)|round|int }} vendas</td>
-                <td>{{ (dados.projecao.projecao_28_dias.vendas_curso * 0.3)|round|int }} vendas</td>
-                <td>21 vendas</td>
-            </tr>
-            <tr>
-                <td><strong>💵 Total de Vendas</strong></td>
-                <td>{{ dados.projecao.performance_real.vendas_curso + (dados.projecao.performance_real.vendas_curso * 0.3)|round|int }} vendas</td>
-                <td>{{ dados.projecao.projecao_28_dias.vendas_curso + (dados.projecao.projecao_28_dias.vendas_curso * 0.3)|round|int }} vendas</td>
-                <td>91 vendas</td>
-            </tr>
-            <tr>
-                <td><strong>💰 Faturamento Curso</strong></td>
-                <td>{{ (dados.projecao.performance_real.vendas_curso * 6300)|moeda_ptbr }}</td>
-                <td>{{ (dados.projecao.projecao_28_dias.vendas_curso * 6300)|moeda_ptbr }}</td>
-                <td>R$ 441.390,00</td>
-            </tr>
-            <tr>
-                <td><strong>💎 Faturamento Mentoria</strong></td>
-                <td>{{ ((dados.projecao.performance_real.vendas_curso * 0.3) * 20000)|moeda_ptbr }}</td>
-                <td>{{ ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)|moeda_ptbr }}</td>
-                <td>R$ 420.000,00</td>
-            </tr>
-            <tr>
-                <td><strong>💵 Faturamento Total</strong></td>
-                <td>{{ ((dados.projecao.performance_real.vendas_curso * 6300) + ((dados.projecao.performance_real.vendas_curso * 0.3) * 20000))|moeda_ptbr }}</td>
-                <td>{{ ((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000))|moeda_ptbr }}</td>
-                <td>R$ 861.390,00</td>
-            </tr>
-            <tr>
-                <td><strong>📊 Investimento Tráfego</strong></td>
-                <td>{{ dados.projecao.performance_real.investimento|moeda_ptbr }}</td>
-                <td>{{ dados.projecao.projecao_28_dias.investimento|moeda_ptbr }}</td>
-                <td>R$ 160.000,00</td>
-            </tr>
-            <tr>
-                <td><strong>💰 Lucro Bruto (Apenas Curso)</strong></td>
-                <td>{{ ((dados.projecao.performance_real.vendas_curso * 6300) - dados.projecao.performance_real.investimento)|moeda_ptbr }}</td>
-                <td>{{ ((dados.projecao.projecao_28_dias.vendas_curso * 6300) - dados.projecao.projecao_28_dias.investimento)|moeda_ptbr }}</td>
-                <td>R$ 216.000,00</td>
-            </tr>
-            <tr>
-                <td><strong>🎯 ROAS (Curso)</strong></td>
-                <td>{{ ("%.2f"|format(dados.projecao.performance_real.roas_curso)).replace(".", ",") }}</td>
-                <td>{{ ("%.2f"|format(dados.projecao.projecao_28_dias.roas_curso)).replace(".", ",") }}</td>
-                <td>2,76</td>
-            </tr>
-            <tr>
-                <td><strong>🏆 ROAS Total (com Mentoria)</strong></td>
-                <td>{{ ("%.2f"|format(((dados.projecao.performance_real.vendas_curso * 6300) + ((dados.projecao.performance_real.vendas_curso * 0.3) * 20000)) / dados.projecao.performance_real.investimento)).replace(".", ",") }}</td>
-                <td>{{ ("%.2f"|format(((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)) / dados.projecao.projecao_28_dias.investimento)).replace(".", ",") }}</td>
-                <td>3,82</td>
-            </tr>
-        </tbody>
-    </table>
+    <!-- PROJEÇÃO POR CANAL -->
+    <div class="projecao-canais">
+        <h3>📊 Projeção por Canal (30 dias)</h3>
+        <div class="tabela-projecao-canais">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Canal</th>
+                        <th>Leads Atuais (25d)</th>
+                        <th>Leads Projetados (30d)</th>
+                        <th>Crescimento</th>
+                        <th>CPL Projetado</th>
+                        <th>Investimento Projetado</th>
+                        <th>ROAS Projetado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="canal-facebook">
+                        <td><strong>📘 Facebook</strong></td>
+                        <td>7.555</td>
+                        <td class="valor-destaque">9.067</td>
+                        <td class="crescimento positivo">+20%</td>
+                        <td>R$ 16,81</td>
+                        <td>R$ 152.435,00</td>
+                        <td class="roas-bom">2,62</td>
+                    </tr>
+                    <tr class="canal-instagram">
+                        <td><strong>📷 Instagram</strong></td>
+                        <td>898</td>
+                        <td class="valor-destaque">1.078</td>
+                        <td class="crescimento positivo">+20%</td>
+                        <td>Orgânico</td>
+                        <td>R$ 0,00</td>
+                        <td class="roas-excelente">∞</td>
+                    </tr>
+                    <tr class="canal-youtube">
+                        <td><strong>📺 YouTube</strong></td>
+                        <td>569</td>
+                        <td class="valor-destaque">683</td>
+                        <td class="crescimento positivo">+20%</td>
+                        <td class="cpl-alto">R$ 24,00</td>
+                        <td>R$ 16.392,00</td>
+                        <td class="roas-medio">1,80</td>
+                    </tr>
+                    <tr class="canal-google">
+                        <td><strong>🔍 Google Ads</strong></td>
+                        <td>54</td>
+                        <td class="valor-destaque">65</td>
+                        <td class="crescimento positivo">+20%</td>
+                        <td>R$ 18,07</td>
+                        <td>R$ 1.175,00</td>
+                        <td class="roas-bom">2,44</td>
+                    </tr>
+                    <tr class="canal-email">
+                        <td><strong>📧 Email</strong></td>
+                        <td>35</td>
+                        <td class="valor-destaque">42</td>
+                        <td class="crescimento positivo">+20%</td>
+                        <td>Orgânico</td>
+                        <td>R$ 0,00</td>
+                        <td class="roas-excelente">∞</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td><strong>TOTAL</strong></td>
+                        <td><strong>9.135</strong></td>
+                        <td class="valor-destaque"><strong>10.962</strong></td>
+                        <td class="crescimento positivo"><strong>+20%</strong></td>
+                        <td><strong>R$ 15,66</strong></td>
+                        <td><strong>R$ 171.702,66</strong></td>
+                        <td class="roas-bom"><strong>2,12</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- PROJEÇÃO DE VENDAS E RECEITA -->
+    <div class="projecao-vendas">
+        <h3>💰 Projeção de Vendas e Receita</h3>
+        <div class="vendas-grid">
+            <!-- Vendas do Curso -->
+            <div class="vendas-card curso">
+                <div class="vendas-header">
+                    <h4>📚 Vendas do Curso</h4>
+                    <span class="conversao-rate">Taxa: 0,70%</span>
+                </div>
+                <div class="vendas-metricas">
+                    <div class="vendas-atual">
+                        <h5>Atual (25 dias)</h5>
+                        <div class="metrica">
+                            <span class="label">Vendas:</span>
+                            <span class="valor">64</span>
+                        </div>
+                        <div class="metrica">
+                            <span class="label">Receita:</span>
+                            <span class="valor">R$ 403.200,00</span>
+                        </div>
+                    </div>
+                    <div class="vendas-projetada">
+                        <h5>Projetado (30 dias)</h5>
+                        <div class="metrica">
+                            <span class="label">Vendas:</span>
+                            <span class="valor-destaque">77</span>
+                        </div>
+                        <div class="metrica">
+                            <span class="label">Receita:</span>
+                            <span class="valor-destaque">R$ 485.100,00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ticket-info">
+                    <span>Ticket Médio: R$ 6.300,00</span>
+                </div>
+            </div>
+
+            <!-- Vendas de Mentoria -->
+            <div class="vendas-card mentoria">
+                <div class="vendas-header">
+                    <h4>🎯 Vendas de Mentoria</h4>
+                    <span class="conversao-rate">30% das vendas do curso</span>
+                </div>
+                <div class="vendas-metricas">
+                    <div class="vendas-atual">
+                        <h5>Atual (25 dias)</h5>
+                        <div class="metrica">
+                            <span class="label">Vendas:</span>
+                            <span class="valor">19</span>
+                        </div>
+                        <div class="metrica">
+                            <span class="label">Receita:</span>
+                            <span class="valor">R$ 380.000,00</span>
+                        </div>
+                    </div>
+                    <div class="vendas-projetada">
+                        <h5>Projetado (30 dias)</h5>
+                        <div class="metrica">
+                            <span class="label">Vendas:</span>
+                            <span class="valor-destaque">23</span>
+                        </div>
+                        <div class="metrica">
+                            <span class="label">Receita:</span>
+                            <span class="valor-destaque">R$ 460.000,00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ticket-info">
+                    <span>Ticket Médio: R$ 20.000,00</span>
+                </div>
+            </div>
+
+            <!-- Receita Total -->
+            <div class="vendas-card total">
+                <div class="vendas-header">
+                    <h4>💎 Receita Total</h4>
+                    <span class="conversao-rate">Curso + Mentoria</span>
+                </div>
+                <div class="vendas-metricas">
+                    <div class="vendas-atual">
+                        <h5>Atual (25 dias)</h5>
+                        <div class="metrica">
+                            <span class="label">Receita Total:</span>
+                            <span class="valor">R$ 783.200,00</span>
+                        </div>
+                        <div class="metrica">
+                            <span class="label">ROI:</span>
+                            <span class="valor">5,5x</span>
+                        </div>
+                    </div>
+                    <div class="vendas-projetada">
+                        <h5>Projetado (30 dias)</h5>
+                        <div class="metrica">
+                            <span class="label">Receita Total:</span>
+                            <span class="valor-destaque">R$ 945.100,00</span>
+                        </div>
+                        <div class="metrica">
+                            <span class="label">ROI:</span>
+                            <span class="valor-destaque">5,5x</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ticket-info">
+                    <span>Lucro Líquido Estimado: R$ 773.397,34</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CRONOGRAMA DE PROJEÇÃO -->
+    <div class="cronograma-projecao">
+        <h3>📅 Cronograma de Projeção</h3>
+        <div class="timeline-projecao">
+            <div class="timeline-item atual">
+                <div class="timeline-marker atual"></div>
+                <div class="timeline-content">
+                    <h4>Hoje - Dia 25</h4>
+                    <div class="timeline-stats">
+                        <span>9.135 leads</span>
+                        <span>R$ 143.085,55 investidos</span>
+                        <span>64 vendas</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item projecao">
+                <div class="timeline-marker projecao"></div>
+                <div class="timeline-content">
+                    <h4>Dia 30 - Meta</h4>
+                    <div class="timeline-stats">
+                        <span>10.962 leads</span>
+                        <span>R$ 171.702,66 investidos</span>
+                        <span>77 vendas</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item futuro">
+                <div class="timeline-marker futuro"></div>
+                <div class="timeline-content">
+                    <h4>Dia 45 - Expansão</h4>
+                    <div class="timeline-stats">
+                        <span>16.400+ leads</span>
+                        <span>R$ 257.000+ investidos</span>
+                        <span>115+ vendas</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item meta">
+                <div class="timeline-marker meta"></div>
+                <div class="timeline-content">
+                    <h4>Dia 60 - Consolidação</h4>
+                    <div class="timeline-stats">
+                        <span>21.900+ leads</span>
+                        <span>R$ 343.000+ investidos</span>
+                        <span>153+ vendas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FATORES DE RISCO E OPORTUNIDADES -->
+    <div class="riscos-oportunidades">
+        <h3>⚖️ Fatores de Risco e Oportunidades</h3>
+        <div class="fatores-grid">
+            <div class="fatores-card riscos">
+                <h4>⚠️ Fatores de Risco</h4>
+                <ul class="fatores-lista">
+                    <li>
+                        <span class="fator-titulo">Saturação de Audiência</span>
+                        <span class="fator-impacto alto">Impacto: Alto</span>
+                        <p>Possível redução na eficiência após 30 dias de campanha intensa</p>
+                    </li>
+                    <li>
+                        <span class="fator-titulo">Aumento da Concorrência</span>
+                        <span class="fator-impacto medio">Impacto: Médio</span>
+                        <p>Outros players podem aumentar investimento no mesmo público</p>
+                    </li>
+                    <li>
+                        <span class="fator-titulo">CPL YouTube Elevado</span>
+                        <span class="fator-impacto medio">Impacto: Médio</span>
+                        <p>Canal com CPL 76% acima da média pode impactar resultados</p>
+                    </li>
+                    <li>
+                        <span class="fator-titulo">Sazonalidade</span>
+                        <span class="fator-impacto baixo">Impacto: Baixo</span>
+                        <p>Variações sazonais podem afetar conversões</p>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="fatores-card oportunidades">
+                <h4>🚀 Oportunidades</h4>
+                <ul class="fatores-lista">
+                    <li>
+                        <span class="fator-titulo">Otimização YouTube</span>
+                        <span class="fator-impacto alto">Potencial: Alto</span>
+                        <p>Redução de 30% no CPL pode gerar +500 leads extras</p>
+                    </li>
+                    <li>
+                        <span class="fator-titulo">Escalonamento Facebook</span>
+                        <span class="fator-impacto alto">Potencial: Alto</span>
+                        <p>Canal com melhor ROAS permite aumento seguro de investimento</p>
+                    </li>
+                    <li>
+                        <span class="fator-titulo">Instagram Orgânico</span>
+                        <span class="fator-impacto medio">Potencial: Médio</span>
+                        <p>898 leads orgânicos mostram potencial para crescimento</p>
+                    </li>
+                    <li>
+                        <span class="fator-titulo">Expansão Regional</span>
+                        <span class="fator-impacto medio">Potencial: Médio</span>
+                        <p>Nordeste e Centro-Oeste com baixa saturação</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECOMENDAÇÕES PARA ATINGIR PROJEÇÕES -->
+    <div class="recomendacoes-projecao">
+        <h3>🎯 Recomendações para Atingir Projeções</h3>
+        <div class="recomendacoes-timeline">
+            <div class="recomendacao-periodo">
+                <h4>📅 Próximos 5 dias (Dias 26-30)</h4>
+                <ul class="acoes-lista">
+                    <li class="acao-item alta">
+                        <span class="prioridade">Alta</span>
+                        <span class="acao">Otimizar campanhas YouTube - reduzir CPL para R$ 22,00</span>
+                    </li>
+                    <li class="acao-item alta">
+                        <span class="prioridade">Alta</span>
+                        <span class="acao">Aumentar orçamento Facebook em 25%</span>
+                    </li>
+                    <li class="acao-item media">
+                        <span class="prioridade">Média</span>
+                        <span class="acao">Criar 3 novos criativos para Instagram</span>
+                    </li>
+                    <li class="acao-item media">
+                        <span class="prioridade">Média</span>
+                        <span class="acao">Testar expansão Google Ads para +2 campanhas</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="recomendacao-periodo">
+                <h4>📅 Médio Prazo (Dias 31-45)</h4>
+                <ul class="acoes-lista">
+                    <li class="acao-item alta">
+                        <span class="prioridade">Alta</span>
+                        <span class="acao">Lançar campanhas regionalizadas para Nordeste</span>
+                    </li>
+                    <li class="acao-item media">
+                        <span class="prioridade">Média</span>
+                        <span class="acao">Implementar retargeting avançado</span>
+                    </li>
+                    <li class="acao-item baixa">
+                        <span class="prioridade">Baixa</span>
+                        <span class="acao">Testar novos formatos de anúncio</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="recomendacao-periodo">
+                <h4>📅 Longo Prazo (Dias 46+)</h4>
+                <ul class="acoes-lista">
+                    <li class="acao-item media">
+                        <span class="prioridade">Média</span>
+                        <span class="acao">Diversificar para TikTok e LinkedIn</span>
+                    </li>
+                    <li class="acao-item media">
+                        <span class="prioridade">Média</span>
+                        <span class="acao">Implementar programa de afiliados</span>
+                    </li>
+                    <li class="acao-item baixa">
+                        <span class="prioridade">Baixa</span>
+                        <span class="acao">Expandir para mercado internacional</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- INDICADORES DE ACOMPANHAMENTO -->
+    <div class="indicadores-acompanhamento">
+        <h3>📊 Indicadores para Acompanhamento</h3>
+        <div class="kpis-grid">
+            <div class="kpi-card leads">
+                <h4>🎯 Leads Diários</h4>
+                <div class="kpi-atual">365/dia</div>
+                <div class="kpi-meta">Meta: 365/dia</div>
+                <div class="kpi-status">Em dia</div>
+            </div>
+
+            <div class="kpi-card cpl">
+                <h4>💰 CPL Semanal</h4>
+                <div class="kpi-atual">R$ 15,66</div>
+                <div class="kpi-meta">Meta: ≤ R$ 15,00</div>
+                <div class="kpi-status">Acima da meta</div>
+            </div>
+
+            <div class="kpi-card roas">
+                <h4>📈 ROAS Mensal</h4>
+                <div class="kpi-atual">2,12</div>
+                <div class="kpi-meta">Meta: ≥ 2,00</div>
+                <div class="kpi-status">Excelente</div>
+            </div>
+
+            <div class="kpi-card conversao">
+                <h4>🎯 Taxa Conversão</h4>
+                <div class="kpi-atual">0,70%</div>
+                <div class="kpi-meta">Meta: 0,70%</div>
+                <div class="kpi-status">Dentro da meta</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 

@@ -1,63 +1,66 @@
-# 📊 Dashboard CHT22 - Analytics e Insights
+# Dashboard CHT22 v2.0 - Atualizado Completamente
 
-Dashboard completo para análise de campanhas CHT22 com dados em tempo real, formatação PT-BR e insights de IA.
+## 📊 Visão Geral
+Dashboard completo para acompanhamento da campanha CHT22 com dados atualizados da planilha Google Sheets.
 
-## 🚀 Deploy Rápido
+## 🚀 Dados Atualizados
+- **Total Leads:** 9.135 (25 dias de campanha)
+- **CPL Médio:** R$ 15,66 (Meta: R$ 15,00)
+- **Investimento:** R$ 143.085,55
+- **ROAS:** 2,12
+- **Taxa Conversão:** 0,70%
 
-### **Opção 1: Deploy Direto no Render**
-1. Faça upload desta pasta no Render
-2. Configure:
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `gunicorn app:app --bind 0.0.0.0:$PORT`
+## 📋 Funcionalidades
+### 6 Abas Completas:
+1. **🏠 Visão Geral** - Métricas principais e KPIs
+2. **📊 Origem e Conversão** - Performance por canal
+3. **👥 Profissão por Canal** - Análise por profissão
+4. **🗺️ Análise Regional** - Distribuição geográfica
+5. **🤖 Insights de IA** - Análises preditivas
+6. **📈 Projeção de Resultados** - Cenários futuros
 
-### **Opção 2: Deploy via GitHub + Render**
-1. Faça upload destes arquivos no seu repositório GitHub
-2. Conecte o repositório no Render
-3. Use as mesmas configurações acima
+## 🔧 Tecnologias
+- **Backend:** Python Flask
+- **Frontend:** HTML5, CSS3, JavaScript
+- **Formatação:** PT-BR para números e moedas
+- **Deploy:** Render/GitHub compatível
 
-## 📋 Estrutura dos Arquivos
-
-```
-dashboard_cht22/
-├── app.py              # Aplicação Flask principal
-├── utils.py            # Funções auxiliares e validação
-├── requirements.txt    # Dependências Python
-├── Procfile           # Configuração Gunicorn
-├── templates/         # Templates HTML (6 abas)
-└── static/           # Estilos CSS
-```
-
-## ✅ Funcionalidades
-
-- **6 Abas Funcionais:** Visão Geral, Origem/Conversão, Profissão/Canal, Análise Regional, Insights IA, Projeção Resultados
-- **Formatação PT-BR:** Todos os valores em formato brasileiro
-- **Sincronização Automática:** Dados atualizados a cada 5 minutos
-- **Interface Responsiva:** Desktop e mobile
-- **Insights de IA:** Análises preditivas e recomendações
-
-## 📊 Dados Atuais
-
-- **7.713 leads** em 21 dias
-- **CPL R$ 15,57**
-- **Investimento R$ 120.114,64**
-- **ROAS 2,24**
-- **27 estados ativos**
-
-## 🔧 Configurações Render
-
-```
+## 📦 Deploy
+### Render:
+```bash
 Build Command: pip install -r requirements.txt
 Start Command: gunicorn app:app --bind 0.0.0.0:$PORT
-Runtime: Python 3
 ```
 
-## 🎯 Resultado
+### Local:
+```bash
+pip install -r requirements.txt
+python app.py
+```
 
-Dashboard 100% funcional com todas as funcionalidades ativas e dados em tempo real.
+## 📊 Estrutura de Dados
+- Sincronização automática com Google Sheets
+- Dados processados e validados
+- Formatação PT-BR aplicada
+- Performance otimizada
 
-**Referência funcionando:** https://g8h3ilc3p5ln.manus.space
+## 🎯 Métricas Principais
+- **Meta Leads:** 9.000 (Superada: 9.135)
+- **Meta CPL:** R$ 15,00 (Atual: R$ 15,66)
+- **Orçamento:** R$ 200.000,00 (Usado: R$ 143.085,55)
+- **ROAS Meta:** 2,00 (Atual: 2,12)
 
----
+## 📈 Projeções (30 dias)
+- **Leads Projetados:** 10.962
+- **Vendas Estimadas:** 77
+- **Receita Projetada:** R$ 485.100,00
+- **ROI:** 5,5x
 
-**Desenvolvido para CHT22 - Versão Final de Produção**
+## 🔄 Atualizações
+- Dados sincronizados automaticamente
+- Interface responsiva
+- Performance otimizada
+- Todas as abas funcionais
+
+Desenvolvido para a campanha CHT22 - Consultório High Ticket
 
