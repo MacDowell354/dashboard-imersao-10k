@@ -38,8 +38,29 @@ DADOS_DASHBOARD_RAW = {
     'projecao': {}
 }
 
+# ---- DEFAULTS PARA EVITAR ERROS NO TEMPLATE ----
+DEFAULT_CANAIS = {
+    'facebook':   {'leads': 0, 'percentual': 0.0, 'cpl': 0.0, 'investimento': 0.0, 'roas': 0.0},
+    'instagram':  {'leads': 0, 'percentual': 0.0, 'cpl': 0.0, 'investimento': 0.0, 'roas': 0.0},
+    'youtube':    {'leads': 0, 'percentual': 0.0, 'cpl': 0.0, 'investimento': 0.0, 'roas': 0.0},
+    'google':     {'leads': 0, 'percentual': 0.0, 'cpl': 0.0, 'investimento': 0.0, 'roas': 0.0},
+    'email':      {'leads': 0, 'percentual': 0.0, 'cpl': 0.0, 'investimento': 0.0, 'roas': 0.0},
+}
+
+def garantir_estrutura(d: dict) -> dict:
+    """Garante que as chaves esperadas existam com valores padrão."""
+    d.setdefault('canais', {})
+    for canal, defaults in DEFAULT_CANAIS.items():
+        d['canais'].setdefault(canal, {})
+        d['canais'][canal] = {**defaults, **d['canais'][canal]}
+    d.setdefault('profissoes', {})
+    d.setdefault('projecao', {})
+    return d
+# -------------------------------------------------
+
 # Validar e aplicar dados seguros
 DADOS_DASHBOARD = validar_dados_dashboard(DADOS_DASHBOARD_RAW)
+garantir_estrutura(DADOS_DASHBOARD)
 
 print("🔧 INICIALIZAÇÃO DO DASHBOARD:")
 log_dados_dashboard(DADOS_DASHBOARD)
@@ -82,6 +103,7 @@ def extrair_dados_planilha():
                     })
                     dados_validados = validar_dados_dashboard(dados_temp)
                     DADOS_DASHBOARD.update(dados_validados)
+                    garantir_estrutura(DADOS_DASHBOARD)
                     print("✅ SINCRONIZAÇÃO CONCLUÍDA:")
                     log_dados_dashboard(DADOS_DASHBOARD)
                     return True
@@ -122,7 +144,14 @@ def visao_geral():
         'percentual_leads': percentual_leads,
         'percentual_leads_formatado': formatar_percentual_ptbr(percentual_leads)
     }
-    return render_template('dashboard.html', aba_ativa='visao-geral', dados=dados_formatados, extras=dados_extras, timestamp=datetime.now().strftime('%H:%M:%S'), datetime=datetime)
+    return render_template(
+        'dashboard.html',
+        aba_ativa='visao-geral',
+        dados=dados_formatados,
+        extras=dados_extras,
+        timestamp=datetime.now().strftime('%H:%M:%S'),
+        datetime=datetime
+    )
 
 @app.route('/origem-conversao')
 def origem_conversao():
