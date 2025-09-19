@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 ENV PYTHONPATH=/app
 
-# deps (pega o requirements da pasta do app oficial)
+# deps (usa o requirements da pasta do app oficial)
 COPY deploy_final_render/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
