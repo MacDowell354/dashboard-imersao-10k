@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: dashboard-cht22
+    env: docker
+    dockerfilePath: ./Dockerfile
+    buildContext: .
+    plan: free
+    region: oregon
+    branch: main
+    autoDeploy: true
