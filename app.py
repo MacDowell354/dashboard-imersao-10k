@@ -26,11 +26,11 @@ DADOS_DASHBOARD_RAW = {
     'dias_campanha': 21,
     'total_leads': 7713,
     'cpl_medio': 15.57,
-    'investimento_total': 120114.64,
+    'investimento_total': 202306.58,
     'roas_geral': 2.24,  # Será formatado como 2,24 no template
     'meta_leads': 9000,
     'meta_cpl': 15.00,  # Atualizado conforme planilha
-    'orcamento_total': 140000.00,
+    'orcamento_total': 200000.00,
     
     # Dados por canal (atualizados 16/09/2025)
     'canais': {
