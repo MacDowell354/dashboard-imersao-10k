@@ -24,8 +24,8 @@ SYNC_INTERVAL = 300  # 5 minutos
 # Dados atualizados da planilha (16/09/2025 - 21 dias)
 DADOS_DASHBOARD_RAW = {
     'dias_campanha': 21,
-    'total_leads': 7713,
-    'cpl_medio': 15.57,
+    'total_leads': 9474,
+    'cpl_medio': 15.81,
     'investimento_total': 202306.58,
     'roas_geral': 2.24,  # Será formatado como 2,24 no template
     'meta_leads': 9000,
@@ -35,35 +35,35 @@ DADOS_DASHBOARD_RAW = {
     # Dados por canal (atualizados 16/09/2025)
     'canais': {
         'facebook': {
-            'leads': 6404,
-            'percentual': 83.0,
-            'cpl': 16.56,
-            'investimento': 106081.73,
-            'roas': 2.66
+            'leads': 7802,
+            'percentual': 82.3,
+            'cpl': 17.01,
+            'investimento': 132722.78,
+            'roas': 2.59
         },
         'instagram': {
-            'leads': 740,
-            'percentual': 9.6,
+            'leads': 930,
+            'percentual': 9.8,
             'cpl': 0.00,
             'investimento': 0,
             'roas': float('inf')
         },
         'youtube': {
-            'leads': 468,
-            'percentual': 6.1,
-            'cpl': 28.15,
-            'investimento': 13175.36,
-            'roas': 1.57
+            'leads': 628,
+            'percentual': 6.6,
+            'cpl': 25.50,
+            'investimento': 16012.37,
+            'roas': 1.73
         },
         'google': {
-            'leads': 49,
+            'leads': 55,
             'percentual': 0.6,
-            'cpl': 17.50,
-            'investimento': 857.55,
-            'roas': 2.52
+            'cpl': 18.63,
+            'investimento': 1024.56,
+            'roas': 2.37
         },
         'email': {
-            'leads': 32,
+            'leads': 35,
             'percentual': 0.4,
             'cpl': 0.00,
             'investimento': 0,

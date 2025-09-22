@@ -114,7 +114,7 @@ def validar_dados_dashboard(dados):
     # Validações específicas para cada campo
     validacoes = {
         'total_leads': {'min': 0, 'max': 50000, 'default': 7713},
-        'cpl_medio': {'min': 1, 'max': 200, 'default': 15.57},  # Corrigido para valor atual
+        'cpl_medio': {'min': 1, 'max': 200, 'default': 15.81},  # Corrigido para valor atual
         'meta_cpl': {'min': 1, 'max': 200, 'default': 15.00},   # Corrigido para meta atual
         'investimento_total': {'min': 0, 'max': 1000000, 'default': 120114.64},
         'roas_geral': {'min': 0.1, 'max': 50, 'default': 2.24},
