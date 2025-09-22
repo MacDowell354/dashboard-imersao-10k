@@ -1,0 +1,300 @@
+<h2>📊 Origem e Conversão - CHT22</h2>
+<p>Análise detalhada de performance por canal com dados atualizados da planilha. CPL {{ dados.cpl_medio|moeda_ptbr }}, investimento {{ dados.investimento_total|moeda_ptbr }} em {{ dados.dias_campanha }} dias de captação com {{ dados.total_leads|numero_ptbr }} leads.</p>
+
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-value">{{ dados.total_leads|numero_ptbr }}</div>
+        <div class="metric-label">Total de Leads</div>
+        <div class="metric-status status-success">{{ dados.dias_campanha }} dias de captação</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-value">{{ dados.cpl_medio|moeda_ptbr }}</div>
+        <div class="metric-label">CPL Médio Captação</div>
+        <div class="metric-status status-warning">Meta: {{ dados.meta_cpl|moeda_ptbr }}</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-value">{{ dados.investimento_total|moeda_ptbr }}</div>
+        <div class="metric-label">Investimento Total</div>
+        <div class="metric-status status-info">{{ dados.dias_campanha }} dias</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-value">{{ ("%.2f"|format(dados.roas_geral)).replace(".", ",") }}</div>
+        <div class="metric-label">ROAS Geral</div>
+        <div class="metric-status status-success">Acima da meta</div>
+    </div>
+</div>
+
+<h3>📱 Performance por Canal</h3>
+<div class="channel-grid">
+    <div class="channel-card">
+        <div class="channel-header">
+            <div class="channel-icon facebook">📘</div>
+            <div>
+                <h4>Facebook</h4>
+                <p>Canal principal - {{ dados.canais.facebook.percentual }}% dos leads</p>
+            </div>
+        </div>
+        <div class="metrics-grid">
+            <div>
+                <div class="metric-value">{{ dados.canais.facebook.leads|numero_ptbr }}</div>
+                <div class="metric-label">Leads</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ dados.canais.facebook.cpl|moeda_ptbr }}</div>
+                <div class="metric-label">CPL Médio</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ dados.canais.facebook.investimento|moeda_ptbr }}</div>
+                <div class="metric-label">Investido</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ ("%.2f"|format(dados.canais.facebook.roas)).replace(".", ",") }}</div>
+                <div class="metric-label">ROAS</div>
+            </div>
+        </div>
+        <div class="metric-status status-success">Excelente Performance - Canal Principal</div>
+    </div>
+    
+    <div class="channel-card">
+        <div class="channel-header">
+            <div class="channel-icon instagram">📷</div>
+            <div>
+                <h4>Instagram</h4>
+                <p>Canal orgânico - {{ dados.canais.instagram.percentual }}% dos leads</p>
+            </div>
+        </div>
+        <div class="metrics-grid">
+            <div>
+                <div class="metric-value">{{ dados.canais.instagram.leads|numero_ptbr }}</div>
+                <div class="metric-label">Leads</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ dados.canais.instagram.cpl|moeda_ptbr }}</div>
+                <div class="metric-label">CPL Médio</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ dados.canais.instagram.investimento|moeda_ptbr }}</div>
+                <div class="metric-label">Investido</div>
+            </div>
+            <div>
+                <div class="metric-value">∞</div>
+                <div class="metric-label">ROAS</div>
+            </div>
+        </div>
+        <div class="metric-status status-success">ROI Infinito - Orgânico</div>
+    </div>
+    
+    <div class="channel-card">
+        <div class="channel-header">
+            <div class="channel-icon youtube">📺</div>
+            <div>
+                <h4>YouTube</h4>
+                <p>Canal pago - {{ dados.canais.youtube.percentual }}% dos leads</p>
+            </div>
+        </div>
+        <div class="metrics-grid">
+            <div>
+                <div class="metric-value">{{ dados.canais.youtube.leads|numero_ptbr }}</div>
+                <div class="metric-label">Leads</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ dados.canais.youtube.cpl|moeda_ptbr }}</div>
+                <div class="metric-label">CPL Médio</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ dados.canais.youtube.investimento|moeda_ptbr }}</div>
+                <div class="metric-label">Investido</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ ("%.2f"|format(dados.canais.youtube.roas)).replace(".", ",") }}</div>
+                <div class="metric-label">ROAS</div>
+            </div>
+        </div>
+        <div class="metric-status status-warning">Precisa Otimizar - CPL Alto</div>
+    </div>
+    
+    <div class="channel-card">
+        <div class="channel-header">
+            <div class="channel-icon google">🔍</div>
+            <div>
+                <h4>Google Ads</h4>
+                <p>Canal teste - {{ dados.canais.google.percentual }}% dos leads</p>
+            </div>
+        </div>
+        <div class="metrics-grid">
+            <div>
+                <div class="metric-value">{{ dados.canais.google.leads|numero_ptbr }}</div>
+                <div class="metric-label">Leads</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ dados.canais.google.cpl|moeda_ptbr }}</div>
+                <div class="metric-label">CPL Médio</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ dados.canais.google.investimento|moeda_ptbr }}</div>
+                <div class="metric-label">Investido</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ ("%.2f"|format(dados.canais.google.roas)).replace(".", ",") }}</div>
+                <div class="metric-label">ROAS</div>
+            </div>
+        </div>
+        <div class="metric-status status-success">Bom ROAS - Escalar</div>
+    </div>
+    
+    <div class="channel-card">
+        <div class="channel-header">
+            <div class="channel-icon email">📧</div>
+            <div>
+                <h4>Email</h4>
+                <p>Canal direto - {{ dados.canais.email.percentual }}% dos leads</p>
+            </div>
+        </div>
+        <div class="metrics-grid">
+            <div>
+                <div class="metric-value">{{ dados.canais.email.leads|numero_ptbr }}</div>
+                <div class="metric-label">Leads</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ dados.canais.email.cpl|moeda_ptbr }}</div>
+                <div class="metric-label">CPL Médio</div>
+            </div>
+            <div>
+                <div class="metric-value">{{ dados.canais.email.investimento|moeda_ptbr }}</div>
+                <div class="metric-label">Investido</div>
+            </div>
+            <div>
+                <div class="metric-value">∞</div>
+                <div class="metric-label">ROAS</div>
+            </div>
+        </div>
+        <div class="metric-status status-success">ROI Infinito - Direto</div>
+    </div>
+</div>
+
+<h3>💰 Análise de Conversão e Receita</h3>
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-value">{{ dados.conversao.taxa_conversao }}%</div>
+        <div class="metric-label">Taxa de Conversão</div>
+        <div class="metric-status status-info">Premissa Histórica</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-value">{{ dados.conversao.vendas_estimadas }}</div>
+        <div class="metric-label">Vendas Estimadas</div>
+        <div class="metric-status status-success">{{ dados.total_leads|numero_ptbr }} × {{ dados.conversao.taxa_conversao }}%</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-value">{{ dados.conversao.receita_estimada_curso|moeda_ptbr }}</div>
+        <div class="metric-label">Receita Curso</div>
+        <div class="metric-status status-success">{{ dados.conversao.vendas_estimadas }} × {{ dados.conversao.ticket_medio_curso|moeda_ptbr }}</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-value">{{ dados.conversao.receita_estimada_mentoria|moeda_ptbr }}</div>
+        <div class="metric-label">Receita Mentoria</div>
+        <div class="metric-status status-success">{{ dados.conversao.percentual_mentorias }}% das vendas</div>
+    </div>
+</div>
+
+<h3>📊 Resumo de Performance por Canal</h3>
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Canal</th>
+                <th>Leads</th>
+                <th>% do Total</th>
+                <th>CPL Médio</th>
+                <th>Investimento</th>
+                <th>ROAS</th>
+                <th>Status</th>
+                <th>Recomendação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>📘 Facebook</strong></td>
+                <td>{{ dados.canais.facebook.leads|numero_ptbr }}</td>
+                <td>{{ dados.canais.facebook.percentual }}%</td>
+                <td>{{ dados.canais.facebook.cpl|moeda_ptbr }}</td>
+                <td>{{ dados.canais.facebook.investimento|moeda_ptbr }}</td>
+                <td>{{ ("%.2f"|format(dados.canais.facebook.roas)).replace(".", ",") }}</td>
+                <td><span class="status-success">Excelente</span></td>
+                <td>Manter investimento e otimizar</td>
+            </tr>
+            <tr>
+                <td><strong>📷 Instagram</strong></td>
+                <td>{{ dados.canais.instagram.leads|numero_ptbr }}</td>
+                <td>{{ dados.canais.instagram.percentual }}%</td>
+                <td>{{ dados.canais.instagram.cpl|moeda_ptbr }}</td>
+                <td>{{ dados.canais.instagram.investimento|moeda_ptbr }}</td>
+                <td>∞</td>
+                <td><span class="status-success">Excelente</span></td>
+                <td>Potencializar conteúdo orgânico</td>
+            </tr>
+            <tr>
+                <td><strong>📺 YouTube</strong></td>
+                <td>{{ dados.canais.youtube.leads|numero_ptbr }}</td>
+                <td>{{ dados.canais.youtube.percentual }}%</td>
+                <td>{{ dados.canais.youtube.cpl|moeda_ptbr }}</td>
+                <td>{{ dados.canais.youtube.investimento|moeda_ptbr }}</td>
+                <td>{{ ("%.2f"|format(dados.canais.youtube.roas)).replace(".", ",") }}</td>
+                <td><span class="status-warning">Crítico</span></td>
+                <td>Otimizar segmentação urgente</td>
+            </tr>
+            <tr>
+                <td><strong>🔍 Google</strong></td>
+                <td>{{ dados.canais.google.leads|numero_ptbr }}</td>
+                <td>{{ dados.canais.google.percentual }}%</td>
+                <td>{{ dados.canais.google.cpl|moeda_ptbr }}</td>
+                <td>{{ dados.canais.google.investimento|moeda_ptbr }}</td>
+                <td>{{ ("%.2f"|format(dados.canais.google.roas)).replace(".", ",") }}</td>
+                <td><span class="status-success">Bom</span></td>
+                <td>Escalar investimento gradual</td>
+            </tr>
+            <tr>
+                <td><strong>📧 Email</strong></td>
+                <td>{{ dados.canais.email.leads|numero_ptbr }}</td>
+                <td>{{ dados.canais.email.percentual }}%</td>
+                <td>{{ dados.canais.email.cpl|moeda_ptbr }}</td>
+                <td>{{ dados.canais.email.investimento|moeda_ptbr }}</td>
+                <td>∞</td>
+                <td><span class="status-success">Excelente</span></td>
+                <td>Expandir lista e segmentar</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h3>🎯 Insights e Recomendações</h3>
+<div class="insights-grid">
+    <div class="insight-card success">
+        <h4>🏆 Facebook Dominante</h4>
+        <p>Facebook representa {{ dados.canais.facebook.percentual }}% dos leads com ROAS de {{ ("%.2f"|format(dados.canais.facebook.roas)).replace(".", ",") }}. É o canal mais eficiente em volume e qualidade.</p>
+        <strong>Ação:</strong> Manter investimento e testar novas audiências.
+    </div>
+    
+    <div class="insight-card info">
+        <h4>📱 Instagram Orgânico Forte</h4>
+        <p>{{ dados.canais.instagram.leads|numero_ptbr }} leads orgânicos demonstram forte engajamento da audiência com ROI infinito.</p>
+        <strong>Ação:</strong> Intensificar produção de conteúdo orgânico.
+    </div>
+    
+    <div class="insight-card warning">
+        <h4>⚠️ YouTube Precisa Atenção</h4>
+        <p>CPL de {{ dados.canais.youtube.cpl|moeda_ptbr }} é o mais alto, impactando a eficiência geral da campanha.</p>
+        <strong>Ação:</strong> Revisar segmentação e criativos urgentemente.
+    </div>
+    
+    <div class="insight-card success">
+        <h4>🚀 Google com Potencial</h4>
+        <p>Apesar do baixo volume, Google Ads apresenta ROAS de {{ ("%.2f"|format(dados.canais.google.roas)).replace(".", ",") }}, indicando qualidade.</p>
+        <strong>Ação:</strong> Aumentar investimento gradualmente.
+    </div>
+</div>

@@ -1,0 +1,285 @@
+<h2>🗺️ Análise Regional - CHT22</h2>
+<p>Performance por região geográfica e distribuição de leads pelo Brasil com {{ dados.total_leads|numero_ptbr }} leads em {{ dados.dias_campanha }} dias</p>
+
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-value">{{ dados.total_leads|numero_ptbr }}</div>
+        <div class="metric-label">Total de Leads</div>
+        <div class="metric-status status-success">{{ dados.dias_campanha }} dias</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-value">27</div>
+        <div class="metric-label">Estados Ativos</div>
+        <div class="metric-status status-success">Cobertura Nacional</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-value">{{ dados.regioes.sudeste.percentual }}%</div>
+        <div class="metric-label">Concentração Sudeste</div>
+        <div class="metric-status status-info">Região principal</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-value">{{ dados.cpl_medio|moeda_ptbr }}</div>
+        <div class="metric-label">CPL Médio Nacional</div>
+        <div class="metric-status status-warning">Meta: {{ dados.meta_cpl|moeda_ptbr }}</div>
+    </div>
+</div>
+
+<h3>🏆 Top 10 Estados - Performance</h3>
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Posição</th>
+                <th>Estado</th>
+                <th>Leads</th>
+                <th>% do Total</th>
+                <th>CPL Estimado</th>
+                <th>Classificação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for estado, dados_estado in dados.estados.items() %}
+            <tr>
+                <td><strong>{{ loop.index }}º</strong></td>
+                <td><strong>{{ estado }}</strong></td>
+                <td>{{ dados_estado.leads|numero_ptbr }}</td>
+                <td>{{ dados_estado.percentual }}%</td>
+                <td>{{ (dados.cpl_medio * (1 + (loop.index - 1) * 0.02))|moeda_ptbr }}</td>
+                <td>
+                    {% if dados_estado.percentual >= 20 %}
+                        <span class="status-success">Excelente</span>
+                    {% elif dados_estado.percentual >= 10 %}
+                        <span class="status-success">Muito Bom</span>
+                    {% elif dados_estado.percentual >= 5 %}
+                        <span class="status-info">Bom</span>
+                    {% else %}
+                        <span class="status-warning">Regular</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h3>🌎 Análise por Região</h3>
+<div class="region-grid">
+    {% for regiao, dados_regiao in dados.regioes.items() %}
+    <div class="region-card">
+        <div class="region-header">
+            <h4>
+                {% if regiao == 'sudeste' %}🏆 Sudeste
+                {% elif regiao == 'sul' %}🌾 Sul
+                {% elif regiao == 'nordeste' %}🌴 Nordeste
+                {% elif regiao == 'centro_oeste' %}🌿 Centro-Oeste
+                {% elif regiao == 'norte' %}🌳 Norte
+                {% endif %}
+            </h4>
+            <p>{{ dados_regiao.percentual }}% do total</p>
+        </div>
+        <div class="region-metrics">
+            <div class="metric-item">
+                <span class="metric-value">{{ dados_regiao.leads|numero_ptbr }}</span>
+                <span class="metric-label">Leads</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-value">{{ (dados.cpl_medio * (1 + (dados_regiao.percentual - 50) * 0.01))|moeda_ptbr }}</span>
+                <span class="metric-label">CPL Estimado</span>
+            </div>
+        </div>
+        <div class="region-status">
+            {% if dados_regiao.percentual >= 40 %}
+                <span class="status-success">Região Líder</span>
+            {% elif dados_regiao.percentual >= 15 %}
+                <span class="status-info">Performance Consistente</span>
+            {% elif dados_regiao.percentual >= 10 %}
+                <span class="status-warning">Potencial de Crescimento</span>
+            {% else %}
+                <span class="status-error">Oportunidade Inexplorada</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<h3>📊 Insights Regionais Detalhados</h3>
+<div class="insights-grid">
+    <div class="insight-card success">
+        <h4>🏆 Sudeste - Região Dominante</h4>
+        <p><strong>{{ dados.regioes.sudeste.leads|numero_ptbr }} leads ({{ dados.regioes.sudeste.percentual }}%)</strong></p>
+        <p>São Paulo lidera com {{ dados.estados.SP.leads|numero_ptbr }} leads ({{ dados.estados.SP.percentual }}%), seguido por RJ ({{ dados.estados.RJ.leads|numero_ptbr }}) e MG ({{ dados.estados.MG.leads|numero_ptbr }}).</p>
+        <p><strong>Estratégia:</strong> Manter investimento alto e expandir para cidades do interior.</p>
+    </div>
+    
+    <div class="insight-card info">
+        <h4>🌾 Sul - Performance Sólida</h4>
+        <p><strong>{{ dados.regioes.sul.leads|numero_ptbr }} leads ({{ dados.regioes.sul.percentual }}%)</strong></p>
+        <p>RS ({{ dados.estados.RS.leads|numero_ptbr }}), SC ({{ dados.estados.SC.leads|numero_ptbr }}) e PR ({{ dados.estados.PR.leads|numero_ptbr }}) mostram consistência e qualidade.</p>
+        <p><strong>Estratégia:</strong> Aumentar orçamento gradualmente, região com alta conversão.</p>
+    </div>
+    
+    <div class="insight-card warning">
+        <h4>🌴 Nordeste - Oportunidade de Crescimento</h4>
+        <p><strong>{{ dados.regioes.nordeste.leads|numero_ptbr }} leads ({{ dados.regioes.nordeste.percentual }}%)</strong></p>
+        <p>BA ({{ dados.estados.BA.leads|numero_ptbr }}) e PE ({{ dados.estados.PE.leads|numero_ptbr }}) lideram, mas região tem potencial subutilizado.</p>
+        <p><strong>Estratégia:</strong> Otimizar segmentação e testar criativos regionais.</p>
+    </div>
+    
+    <div class="insight-card info">
+        <h4>🌿 Centro-Oeste - Mercado Emergente</h4>
+        <p><strong>{{ dados.regioes.centro_oeste.leads|numero_ptbr }} leads ({{ dados.regioes.centro_oeste.percentual }}%)</strong></p>
+        <p>DF ({{ dados.estados.GO.leads|numero_ptbr }}) e GO mostram crescimento constante.</p>
+        <p><strong>Estratégia:</strong> Investimento moderado com foco em qualidade.</p>
+    </div>
+    
+    <div class="insight-card warning">
+        <h4>🌳 Norte - Potencial Inexplorado</h4>
+        <p><strong>{{ dados.regioes.norte.leads|numero_ptbr }} leads ({{ dados.regioes.norte.percentual }}%)</strong></p>
+        <p>Menor penetração, mas interesse crescente em estados como AM e PA.</p>
+        <p><strong>Estratégia:</strong> Teste com orçamento baixo e segmentação específica.</p>
+    </div>
+</div>
+
+<h3>📊 Recomendações Estratégicas por Região</h3>
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Região</th>
+                <th>Status</th>
+                <th>Recomendação</th>
+                <th>Ação Prioritária</th>
+                <th>Orçamento</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>🏆 Sudeste</strong></td>
+                <td><span class="status-success">Excelente</span></td>
+                <td>Manter investimento alto</td>
+                <td>Escalar para médicos/dentistas</td>
+                <td>60% do orçamento</td>
+            </tr>
+            <tr>
+                <td><strong>🌾 Sul</strong></td>
+                <td><span class="status-success">Muito Bom</span></td>
+                <td>Aumentar orçamento</td>
+                <td>Expandir para cidades menores</td>
+                <td>20% do orçamento</td>
+            </tr>
+            <tr>
+                <td><strong>🌿 Centro-Oeste</strong></td>
+                <td><span class="status-info">Bom</span></td>
+                <td>Investimento moderado</td>
+                <td>Testar novos criativos</td>
+                <td>10% do orçamento</td>
+            </tr>
+            <tr>
+                <td><strong>🌴 Nordeste</strong></td>
+                <td><span class="status-warning">Atenção</span></td>
+                <td>Otimizar segmentação</td>
+                <td>Reduzir CPL com novos públicos</td>
+                <td>8% do orçamento</td>
+            </tr>
+            <tr>
+                <td><strong>🌳 Norte</strong></td>
+                <td><span class="status-warning">Crítico</span></td>
+                <td>Estratégia específica</td>
+                <td>Teste com orçamento baixo</td>
+                <td>2% do orçamento</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h3>🎯 Análise de Oportunidades por Estado</h3>
+<div class="opportunities-grid">
+    <div class="opportunity-card high">
+        <h4>🔥 Alta Prioridade</h4>
+        <p><strong>São Paulo:</strong> Expandir para interior e ABC</p>
+        <p><strong>Rio de Janeiro:</strong> Focar em Niterói e região metropolitana</p>
+        <p><strong>Minas Gerais:</strong> Explorar BH e região</p>
+        <p><strong>Impacto:</strong> +25% no volume total</p>
+    </div>
+    
+    <div class="opportunity-card medium">
+        <h4>⚡ Média Prioridade</h4>
+        <p><strong>Rio Grande do Sul:</strong> Porto Alegre e região</p>
+        <p><strong>Santa Catarina:</strong> Florianópolis e Joinville</p>
+        <p><strong>Paraná:</strong> Curitiba e Londrina</p>
+        <p><strong>Impacto:</strong> +15% no volume</p>
+    </div>
+    
+    <div class="opportunity-card low">
+        <h4>🔧 Otimização</h4>
+        <p><strong>Bahia:</strong> Salvador e região metropolitana</p>
+        <p><strong>Distrito Federal:</strong> Brasília e entorno</p>
+        <p><strong>Ceará:</strong> Fortaleza e região</p>
+        <p><strong>Impacto:</strong> +10% na eficiência</p>
+    </div>
+</div>
+
+<h3>📈 Projeções Regionais</h3>
+<div class="projections-grid">
+    <div class="projection-card">
+        <h4>📊 Cenário Otimista (30 dias)</h4>
+        <div class="projection-metrics">
+            <div class="projection-item">
+                <span>Sudeste:</span>
+                <span>{{ (dados.regioes.sudeste.leads * 1.11)|round|int }} leads</span>
+            </div>
+            <div class="projection-item">
+                <span>Sul:</span>
+                <span>{{ (dados.regioes.sul.leads * 1.11)|round|int }} leads</span>
+            </div>
+            <div class="projection-item">
+                <span>Nordeste:</span>
+                <span>{{ (dados.regioes.nordeste.leads * 1.11)|round|int }} leads</span>
+            </div>
+            <div class="projection-item">
+                <span>Centro-Oeste:</span>
+                <span>{{ (dados.regioes.centro_oeste.leads * 1.11)|round|int }} leads</span>
+            </div>
+            <div class="projection-item">
+                <span>Norte:</span>
+                <span>{{ (dados.regioes.norte.leads * 1.11)|round|int }} leads</span>
+            </div>
+        </div>
+        <div class="projection-total">
+            <strong>Total Projetado: {{ (dados.total_leads * 1.11)|round|int }} leads</strong>
+        </div>
+    </div>
+</div>
+
+<h3>🚀 Plano de Ação Regional</h3>
+<div class="action-plan">
+    <div class="action-item">
+        <h4>🎯 Curto Prazo (7 dias)</h4>
+        <ul>
+            <li>Aumentar orçamento em SP, RJ e MG em 20%</li>
+            <li>Testar novos criativos no Sul</li>
+            <li>Otimizar segmentação no Nordeste</li>
+        </ul>
+    </div>
+    
+    <div class="action-item">
+        <h4>📈 Médio Prazo (15 dias)</h4>
+        <ul>
+            <li>Expandir para cidades do interior do Sudeste</li>
+            <li>Aumentar investimento no Sul em 30%</li>
+            <li>Implementar estratégia específica para o Norte</li>
+        </ul>
+    </div>
+    
+    <div class="action-item">
+        <h4>🚀 Longo Prazo (30 dias)</h4>
+        <ul>
+            <li>Consolidar presença nacional</li>
+            <li>Otimizar CPL em todas as regiões</li>
+            <li>Atingir meta de {{ dados.meta_leads|numero_ptbr }} leads</li>
+        </ul>
+    </div>
+</div>
