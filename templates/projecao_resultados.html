@@ -1,83 +1,57 @@
-<h2>📈 Projeção de Resultados</h2>
-<p>Projeção para o lançamento completo baseada na performance dos primeiros {{ dados.dias_campanha }} dias</p>
+<h2>📈 Projeção de Resultados - CHT22</h2>
+<p>Projeção para o lançamento completo baseada na performance dos primeiros 27 dias com 9.474 leads captados</p>
 
-<button style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 20px;">🔄 Atualizar Projeções</button>
-
-<h3>🤖 Análise Inteligente - IA</h3>
-<div class="insights-grid">
-    <div class="insight-card success">
-        <h4>💎 LUCRO: Acima do Cenário Otimista</h4>
-        <p><strong>Projeção 28 dias ({{ ((dados.projecao.projecao_28_dias.vendas_curso * 6300) - dados.projecao.projecao_28_dias.investimento)|moeda_ptbr }}) vs Potencial Otimista (R$ 216.000)</strong><br>
-        Diferença: +R$ 22.356. Margem 10,4% acima do cenário otimista.</p>
-    </div>
-    
-    <div class="insight-card info">
-        <h4>🔍 CAUSA-RAIZ: Por que o lucro é maior?</h4>
-        <p><strong>Fatores específicos que explicam o melhor resultado:</strong><br>
-        1. CPL R$ 0,96 menor (R$ 19,04 vs R$ 20,00)<br>
-        2. Investimento R$ 31.757 maior, mas gera R$ 39.543 a mais de lucro<br>
-        3. Eficiência: cada R$ 1,00 investido gera R$ 2,21 vs R$ 2,76 (otimista)</p>
-    </div>
-    
-    <div class="insight-card success">
-        <h4>🚀 ROAS: Muito Superior ao Otimista</h4>
-        <p><strong>Projeção 28 dias (4,32) vs Potencial Otimista (3,82)</strong><br>
-        Diferença: +0,50. ROAS 13% superior ao cenário otimista.</p>
-    </div>
-    
-    <div class="insight-card success">
-        <h4>📊 Leads: Acima do Otimista</h4>
-        <p><strong>Projeção 28 dias ({{ dados.projecao.projecao_28_dias.leads|numero_ptbr }} leads) vs Potencial Otimista (10.000+ leads)</strong><br>
-        Diferença: +{{ (dados.projecao.projecao_28_dias.leads - 10000)|numero_ptbr }} leads. Estamos {{ ((dados.projecao.projecao_28_dias.leads / 10000) * 100)|round(1) }}% do cenário otimista.</p>
-    </div>
-    
-    <div class="insight-card success">
-        <h4>💰 Vendas: Ligeiramente Acima</h4>
-        <p><strong>Projeção 28 dias ({{ dados.projecao.projecao_28_dias.vendas_curso }} vendas) vs Potencial Otimista (70 vendas)</strong><br>
-        Diferença: +{{ dados.projecao.projecao_28_dias.vendas_curso - 70 }} venda. Faturamento: {{ (dados.projecao.projecao_28_dias.vendas_curso * 6300)|moeda_ptbr }} vs R$ 441.390.</p>
-    </div>
-</div>
+<h3>🎯 Status Atual</h3>
+<p><strong>21 dias de campanha</strong><br>
+Meta de leads: <strong>SUPERADA</strong> (105,3%)<br>
+Performance: <strong>ACIMA DO ESPERADO</strong></p>
 
 <h3>⚙️ Premissas CHT22</h3>
 <div class="metrics-grid">
     <div class="metric-card">
-        <div class="metric-value">{{ dados.meta_leads|numero_ptbr }}</div>
+        <div class="metric-value">9.000</div>
         <div class="metric-label">Meta Captação LEADs</div>
+        <div class="metric-status">Superada: 9.474</div>
     </div>
     
     <div class="metric-card">
         <div class="metric-value">0,70%</div>
         <div class="metric-label">TX Conversão</div>
+        <div class="metric-status">Premissa Histórica</div>
     </div>
     
     <div class="metric-card">
         <div class="metric-value">R$ 6.300,00</div>
         <div class="metric-label">Preço Ticket Médio</div>
+        <div class="metric-status">Curso CHT22</div>
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">30%</div>
+        <div class="metric-value">30,0%</div>
         <div class="metric-label">% Vendas Mentorias</div>
+        <div class="metric-status">Upsell Premium</div>
     </div>
     
     <div class="metric-card">
         <div class="metric-value">R$ 20.000,00</div>
         <div class="metric-label">Ticket Médio Mentoria</div>
+        <div class="metric-status">High Ticket</div>
     </div>
     
     <div class="metric-card">
-        <div class="metric-value">{{ dados.orcamento_total|moeda_ptbr }}</div>
+        <div class="metric-value">R$ 200.000,00</div>
         <div class="metric-label">Meta Orçamento</div>
+        <div class="metric-status">Usado: 101.2%</div>
     </div>
 </div>
 
-<h3>📊 Tabela de Projeções</h3>
+<h3>📊 Tabela de Projeções Detalhada</h3>
 <div class="table-container">
-    <table>
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Métrica</th>
-                <th>Performance Real ({{ dados.dias_campanha }} dias)</th>
+                <th>Performance Real (27 dias)</th>
                 <th>Projeção 28 dias</th>
                 <th>Potencial Otimista</th>
             </tr>
@@ -85,83 +59,130 @@
         <tbody>
             <tr>
                 <td><strong>🎯 Captação de Leads</strong></td>
-                <td>{{ dados.projecao.performance_real.leads|numero_ptbr }} leads</td>
-                <td>{{ dados.projecao.projecao_28_dias.leads|numero_ptbr }} leads</td>
+                <td>9.474</td>
+                <td>9.825</td>
                 <td>10.000+ leads</td>
             </tr>
             <tr>
-                <td><strong>💰 CPL Médio</strong></td>
-                <td>{{ dados.projecao.performance_real.cpl|moeda_ptbr }}</td>
-                <td>{{ dados.projecao.projecao_28_dias.cpl|moeda_ptbr }}</td>
+                <td><strong>💰 CPL Médio Captação</strong></td>
+                <td>R$ 15,81</td>
+                <td>R$ 15,81</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td><strong>💰 CPL Médio Captação + Dist. + Aquec.</strong></td>
+                <td>R$ 21,35</td>
+                <td>R$ 21,35</td>
                 <td>R$ 20,00</td>
             </tr>
             <tr>
                 <td><strong>🏆 Vendas Curso</strong></td>
-                <td>{{ dados.projecao.performance_real.vendas_curso }} vendas</td>
-                <td>{{ dados.projecao.projecao_28_dias.vendas_curso }} vendas</td>
-                <td>70 vendas</td>
+                <td>66</td>
+                <td>69</td>
+                <td>70</td>
             </tr>
             <tr>
                 <td><strong>📈 Vendas Mentoria (30%)</strong></td>
-                <td>{{ (dados.projecao.performance_real.vendas_curso * 0.3)|round|int }} vendas</td>
-                <td>{{ (dados.projecao.projecao_28_dias.vendas_curso * 0.3)|round|int }} vendas</td>
-                <td>21 vendas</td>
+                <td>20</td>
+                <td>21</td>
+                <td>21</td>
             </tr>
             <tr>
                 <td><strong>💵 Total de Vendas</strong></td>
-                <td>{{ dados.projecao.performance_real.vendas_curso + (dados.projecao.performance_real.vendas_curso * 0.3)|round|int }} vendas</td>
-                <td>{{ dados.projecao.projecao_28_dias.vendas_curso + (dados.projecao.projecao_28_dias.vendas_curso * 0.3)|round|int }} vendas</td>
-                <td>91 vendas</td>
+                <td>86</td>
+                <td>89</td>
+                <td>91</td>
             </tr>
             <tr>
                 <td><strong>💰 Faturamento Curso</strong></td>
-                <td>{{ (dados.projecao.performance_real.vendas_curso * 6300)|moeda_ptbr }}</td>
-                <td>{{ (dados.projecao.projecao_28_dias.vendas_curso * 6300)|moeda_ptbr }}</td>
-                <td>R$ 441.390,00</td>
+                <td>R$ 417.803,40</td>
+                <td>R$ 433.277,60</td>
+                <td>R$ 434.000,00</td>
             </tr>
             <tr>
                 <td><strong>💎 Faturamento Mentoria</strong></td>
-                <td>{{ ((dados.projecao.performance_real.vendas_curso * 0.3) * 20000)|moeda_ptbr }}</td>
-                <td>{{ ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)|moeda_ptbr }}</td>
+                <td>R$ 397.908,00</td>
+                <td>R$ 412.645,33</td>
                 <td>R$ 420.000,00</td>
             </tr>
             <tr>
                 <td><strong>💵 Faturamento Total</strong></td>
-                <td>{{ ((dados.projecao.performance_real.vendas_curso * 6300) + ((dados.projecao.performance_real.vendas_curso * 0.3) * 20000))|moeda_ptbr }}</td>
-                <td>{{ ((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000))|moeda_ptbr }}</td>
-                <td>R$ 861.390,00</td>
+                <td>R$ 815.711,40</td>
+                <td>R$ 845.922,93</td>
+                <td>R$ 854.000,00</td>
             </tr>
             <tr>
-                <td><strong>📊 Investimento Tráfego</strong></td>
-                <td>{{ dados.projecao.performance_real.investimento|moeda_ptbr }}</td>
-                <td>{{ dados.projecao.projecao_28_dias.investimento|moeda_ptbr }}</td>
-                <td>R$ 160.000,00</td>
+                <td><strong>📊 Investimento Tráfego Captação</strong></td>
+                <td>149.759,71</td>
+                <td>149.759,71</td>
+                <td>140.000,00</td>
+            </tr>
+            <tr>
+                <td><strong>📊 Investimento Tráfego Captação + Dist + Aquec.</strong></td>
+                <td>202.306,58</td>
+                <td>R$ 209.799,42</td>
+                <td>R$ 200.000,00</td>
             </tr>
             <tr>
                 <td><strong>💰 Lucro Bruto (Apenas Curso)</strong></td>
-                <td>{{ ((dados.projecao.performance_real.vendas_curso * 6300) - dados.projecao.performance_real.investimento)|moeda_ptbr }}</td>
-                <td>{{ ((dados.projecao.projecao_28_dias.vendas_curso * 6300) - dados.projecao.projecao_28_dias.investimento)|moeda_ptbr }}</td>
-                <td>R$ 216.000,00</td>
+                <td>R$ 215.496,82</td>
+                <td>R$ 223.478,18</td>
+                <td>R$ 234.000,00</td>
+            </tr>
+            <tr>
+                <td><strong>💎 Lucro Bruto Curso + Mentoria</strong></td>
+                <td>R$ 613.404,82</td>
+                <td>R$ 636.123,52</td>
+                <td>R$ 654.000,00</td>
             </tr>
             <tr>
                 <td><strong>🎯 ROAS (Curso)</strong></td>
-                <td>{{ ("%.2f"|format(dados.projecao.performance_real.roas_curso)).replace(".", ",") }}</td>
-                <td>{{ ("%.2f"|format(dados.projecao.projecao_28_dias.roas_curso)).replace(".", ",") }}</td>
-                <td>2,76</td>
+                <td>2,07</td>
+                <td>2,07</td>
+                <td>2,17</td>
             </tr>
             <tr>
                 <td><strong>🏆 ROAS Total (com Mentoria)</strong></td>
-                <td>{{ ("%.2f"|format(((dados.projecao.performance_real.vendas_curso * 6300) + ((dados.projecao.performance_real.vendas_curso * 0.3) * 20000)) / dados.projecao.performance_real.investimento)).replace(".", ",") }}</td>
-                <td>{{ ("%.2f"|format(((dados.projecao.projecao_28_dias.vendas_curso * 6300) + ((dados.projecao.projecao_28_dias.vendas_curso * 0.3) * 20000)) / dados.projecao.projecao_28_dias.investimento)).replace(".", ",") }}</td>
-                <td>3,82</td>
+                <td>4,03</td>
+                <td>3,79</td>
+                <td>4,27</td>
+            </tr>
+            <tr style="border-top: 2px solid #667eea;">
+                <td><strong>📊 QT Vendas Realizadas CHT22 22/09 16:30</strong></td>
+                <td>26</td>
+                <td>26</td>
+                <td>26</td>
+            </tr>
+            <tr>
+                <td><strong>📊 QT Vendas Mentoria 22/09 16:30</strong></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td><strong>💰 Valor Vendas Realizadas CHT22 22/09 16:30</strong></td>
+                <td>R$ 150.368,08</td>
+                <td>R$ 150.368,08</td>
+                <td>R$ 150.368,08</td>
+            </tr>
+            <tr>
+                <td><strong>💰 Valor Vendas Realizadas Mentoria 22/09 16:30</strong></td>
+                <td>R$ 0,00</td>
+                <td>R$ 0,00</td>
+                <td>R$ 0,00</td>
+            </tr>
+            <tr style="color: #dc3545;">
+                <td><strong>⚠️ Lucro Bruto (Apenas Curso) Realizado</strong></td>
+                <td>-R$ 51.938,50</td>
+                <td>-R$ 59.431,34</td>
+                <td>-R$ 49.631,92</td>
+            </tr>
+            <tr style="color: #6c757d;">
+                <td><strong>⚠️ Lucro Bruto (Curso + Mentoria) Realizado</strong></td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
             </tr>
         </tbody>
     </table>
 </div>
-
-
-
-
-
-
-

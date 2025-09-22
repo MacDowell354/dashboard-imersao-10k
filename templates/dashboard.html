@@ -270,6 +270,9 @@
             <a href="/projecao-resultados" class="nav-tab {% if aba_ativa == 'projecao-resultados' %}active{% endif %}">
                 📈 Projeção de Resultados
             </a>
+            <a href="/vendas" class="nav-tab {% if aba_ativa == 'vendas' %}active{% endif %}">
+                🛒 Vendas
+            </a>
         </nav>
         
         <div class="content">
@@ -285,6 +288,8 @@
                 {% include 'insights_ia.html' %}
             {% elif aba_ativa == 'projecao-resultados' %}
                 {% include 'projecao_resultados_atualizada.html' %}
+            {% elif aba_ativa == 'vendas' %}
+                {% include 'vendas_content.html' %}
             {% endif %}
         </div>
         

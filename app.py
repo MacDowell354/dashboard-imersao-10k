@@ -279,6 +279,14 @@ def projecao_resultados():
                          dados=dados_formatados,
                          timestamp=datetime.now().strftime('%H:%M:%S'))
 
+@app.route('/vendas')
+def vendas():
+    dados_formatados = aplicar_formatacao_ptbr(DADOS_DASHBOARD)
+    return render_template('dashboard.html', 
+                         aba_ativa='vendas', 
+                         dados=dados_formatados,
+                         timestamp=datetime.now().strftime('%H:%M:%S'))
+
 @app.route('/api/dados')
 def api_dados():
     return jsonify(DADOS_DASHBOARD)
