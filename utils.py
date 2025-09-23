@@ -1,117 +1,133 @@
 # -*- coding: utf-8 -*-
-import os, io, time, requests
-import pandas as pd
-from datetime import datetime
+import os
+from datetime import date, timedelta
+from flask import Flask, render_template, jsonify, request, redirect, url_for
+from utils import (
+    get_dataframes, compute_kpis, compute_origem_conversao, compute_profissao_canal,
+    compute_analise_regional, compute_insights_ia, compute_projecao_resultados,
+    last_sync_info, format_currency, format_number, format_percent
+)
 
-SHEET_ID = os.getenv("CHT22_SHEET_ID", "1f5qcPc4l0SYVQv3qhq8d17s_fTMPkyoT")
-GVIZ_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={{sheet}}"
-CACHE_SECONDS = int(os.getenv("CHT22_CACHE_SECONDS", "300"))
+app = Flask(__name__)
 
-_tab_map = {
-    "visao_geral": ["RESULTADOS"],
-    "origem_conversao": ["BASE"],
-    "profissao_canal": [" Base Prof Estado"],
-    "analise_regional_regiao": ["Regiao"],
-    "analise_regional_estado": ["Estado"],
-}
+# -------------------- Filtros Jinja --------------------
+@app.template_filter("moeda_ptbr")
+def moeda_ptbr(v):
+    return format_currency(v)
 
-_cache = {"dfs": None, "ts": 0, "last_ok": None}
+@app.template_filter("numero_ptbr")
+def numero_ptbr(v):
+    return format_number(v)
 
-def last_sync_info():
-    if _cache["last_ok"]:
-        return _cache["last_ok"].strftime("%d/%m/%Y %H:%M")
-    return "—"
+@app.template_filter("percentual_ptbr")
+def percentual_ptbr(v):
+    return format_percent(v)
 
-def _download_sheet(sheet_name: str) -> pd.DataFrame:
-    try:
-        url = GVIZ_URL.format(sheet=sheet_name)
-        resp = requests.get(url, timeout=30)
-        resp.raise_for_status()
-        df = pd.read_csv(io.BytesIO(resp.content))
-        return df
-    except Exception:
-        return pd.DataFrame()
+# -------------------- Safe namespace para 'dados'/'extras' --------------------
+class SafeNS(dict):
+    def __getattr__(self, name):
+        if name.startswith("__") and name.endswith("__"):
+            raise AttributeError
+        val = self.get(name, "")
+        if isinstance(val, dict):
+            val = SafeNS(val)
+        return val
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+    def __html__(self):
+        return ""
 
-def get_dataframes(force_refresh=False):
-    now = time.time()
-    if not force_refresh and _cache["dfs"] is not None and now - _cache["ts"] < CACHE_SECONDS:
-        return _cache["dfs"]
+# -------------------- Rotas --------------------
+@app.route("/")
+def home():
+    return redirect(url_for("visao_geral"))
 
-    dfs = {}
-    for slug, names in _tab_map.items():
-        for n in names:
-            df = _download_sheet(n)
-            if not df.empty:
-                dfs[slug] = df
-                break
-    _cache["dfs"] = dfs
-    _cache["ts"] = now
-    _cache["last_ok"] = datetime.now()
-    return dfs
+@app.route("/visao-geral")
+def visao_geral():
+    dfs = get_dataframes(force_refresh=bool(request.args.get("refresh")))
+    kpis = compute_kpis(dfs)
 
-# Helpers de formatação robustos
-def format_number(v):
-    if pd.isnull(v):
-        return "0"
-    try:
-        if isinstance(v, str):
-            v = v.replace(".", "").replace(",", ".")
-        return f"{int(float(v)):,}".replace(",", ".")
-    except Exception:
-        return str(v)
+    # Período padrão: últimos 28 dias
+    fim = date.today()
+    ini = fim - timedelta(days=27)
 
-def format_currency(v):
-    if pd.isnull(v):
-        return "R$ —"
-    try:
-        if isinstance(v, str):
-            v = v.replace(".", "").replace(",", ".")
-        v = float(v)
-        return "R$ " + f"{v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-    except Exception:
-        return f"R$ {v}"
+    dados = SafeNS({
+        "data_inicio": ini.strftime("%d/%m/%Y"),
+        "data_fim": fim.strftime("%d/%m/%Y"),
+        "dias_campanha": 28,
+        "conversao": {
+            "receita_estimada_curso": 0
+        }
+    })
 
-def format_percent(v):
-    if pd.isnull(v):
-        return "—"
-    try:
-        if isinstance(v, str):
-            v = v.replace(".", "").replace(",", ".")
-        v = float(v)
-        return f"{100*v:.1f}%".replace(".", ",")
-    except Exception:
-        return f"{v}%"
+    # <<< NOVO: objeto 'extras' esperado pelo template >>>
+    extras = SafeNS({
+        "percentual_orcamento_formatado": "0,0%",
+        "orcamento_total_formatado": "R$ —",
+        "orcamento_utilizado_formatado": "R$ —",
+        "orcamento_restante_formatado": "R$ —",
+    })
 
-# Cálculos simplificados
-def compute_kpis(dfs):
-    df = dfs.get("visao_geral")
-    if df is None or df.empty:
-        return {"leads_total": "0", "cpl": "R$ —", "investimento": "R$ —", "roas": "—"}
-    leads = df.iloc[0,1] if len(df.columns) > 1 else 0
-    cpl = df.iloc[1,1] if len(df) > 1 else 0
-    investimento = df.iloc[2,1] if len(df) > 2 else 0
-    return {
-        "leads_total": format_number(leads),
-        "cpl": format_currency(cpl),
-        "investimento": format_currency(investimento),
-        "roas": "2.24"  # Placeholder até integrar coluna correta
-    }
+    return render_template(
+        "visao_geral_atualizada.html",
+        kpis=kpis,
+        dados=dados,
+        extras=extras,          # <<< passa 'extras' para o template
+        last_sync=last_sync_info()
+    )
 
-def compute_origem_conversao(dfs):
-    df = dfs.get("origem_conversao", pd.DataFrame())
-    return df, {"leads": 0, "conversoes": 0, "taxa": "—"}
+@app.route("/origem-conversao")
+def origem_conversao():
+    dfs = get_dataframes(force_refresh=bool(request.args.get("refresh")))
+    tabela, funil = compute_origem_conversao(dfs)
+    return render_template(
+        "origem_conversao_atualizada.html",
+        tabela=tabela.to_dict(orient="records"),
+        funil=funil,
+        last_sync=last_sync_info()
+    )
 
-def compute_profissao_canal(dfs):
-    df = dfs.get("profissao_canal", pd.DataFrame())
-    return df if not df.empty else pd.DataFrame()
+@app.route("/profissao-canal")
+def profissao_canal():
+    dfs = get_dataframes(force_refresh=bool(request.args.get("refresh")))
+    tabela = compute_profissao_canal(dfs)
+    return render_template(
+        "profissao_canal_atualizada.html",
+        tabela=tabela.to_dict(orient="records"),
+        last_sync=last_sync_info()
+    )
 
-def compute_analise_regional(dfs):
-    return dfs.get("analise_regional_estado", pd.DataFrame()), dfs.get("analise_regional_regiao", pd.DataFrame())
+@app.route("/analise-regional")
+def analise_regional():
+    dfs = get_dataframes(force_refresh=bool(request.args.get("refresh")))
+    estados, regioes = compute_analise_regional(dfs)
+    return render_template(
+        "analise_regional_atualizada.html",
+        estados=estados.to_dict(orient="records"),
+        regioes=regioes.to_dict(orient="records"),
+        last_sync=last_sync_info()
+    )
 
-def compute_insights_ia(dfs):
-    return ["Insights automáticos baseados nos dados processados."]
+@app.route("/insights-ia")
+def insights_ia():
+    dfs = get_dataframes(force_refresh=bool(request.args.get("refresh")))
+    insights = compute_insights_ia(dfs)
+    return render_template("insights_ia_atualizada.html", insights=insights, last_sync=last_sync_info())
 
-def compute_projecao_resultados(dfs):
-    proj = pd.DataFrame([{"mes": "M+1", "leads": "1000", "conversoes": "200", "receita": "R$ 50.000"}])
-    premissas = {"crescimento_leads": "10%", "ticket_medio": "R$ 250"}
-    return proj, premissas
+@app.route("/projecao-resultados")
+def projecao_resultados():
+    dfs = get_dataframes(force_refresh=bool(request.args.get("refresh")))
+    projecao, premissas = compute_projecao_resultados(dfs)
+    return render_template(
+        "projecao_resultados_atualizada.html",
+        projecao=projecao.to_dict(orient="records"),
+        premissas=premissas,
+        last_sync=last_sync_info()
+    )
+
+@app.route("/health")
+def health():
+    return jsonify({"status": "ok", "last_sync": last_sync_info()})
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
