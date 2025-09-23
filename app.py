@@ -1,157 +1,135 @@
-<h2>🏠 Visão Geral - CHT22</h2>
-<p>Resumo executivo do lançamento CHT22 com métricas principais e status atual da campanha.</p>
+# -*- coding: utf-8 -*-
+from __future__ import annotations
 
-<div class="metrics-grid">
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.dias_campanha }} DIAS</div>
-        <div class="metric-label">Lançamento Ativo</div>
-        <div class="metric-status status-success">{{ dados.data_inicio }} - {{ dados.data_fim }}</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">R$ 15,00</div>
-        <div class="metric-label">Meta CPL Captação</div>
-        <div class="metric-status status-warning">Atual: R$ 15,81 (+5,4%)</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ extras.percentual_orcamento_formatado }}</div>
-        <div class="metric-label">Orçamento Captação</div>
-        <div class="metric-status status-info">{{ dados.investimento_total_formatado }} / {{ dados.orcamento_total_formatado }}</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ ("%.2f"|format(dados.roas_geral)).replace(".", ",") }}</div>
-        <div class="metric-label">ROAS Geral</div>
-        <div class="metric-status status-success">Acima da meta</div>
-    </div>
-</div>
+from datetime import date, datetime
+from calendar import monthrange
+from flask import Flask, render_template, redirect, url_for, request
 
-<h3>📊 Performance Atual vs Meta</h3>
-<div class="metrics-grid">
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.total_leads_formatado }}</div>
-        <div class="metric-label">Total de Leads</div>
-        <div class="metric-status status-success">Meta: {{ dados.meta_leads_formatado }} ({{ extras.percentual_leads_formatado }})</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.conversao.vendas_estimadas }}</div>
-        <div class="metric-label">Vendas Estimadas</div>
-        <div class="metric-status status-info">Taxa: {{ dados.conversao.taxa_conversao }}%</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.conversao.receita_estimada_curso|moeda_ptbr }}</div>
-        <div class="metric-label">Receita Curso</div>
-        <div class="metric-status status-success">Ticket: {{ dados.conversao.ticket_medio_curso|moeda_ptbr }}</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.conversao.receita_estimada_mentoria|moeda_ptbr }}</div>
-        <div class="metric-label">Receita Mentoria</div>
-        <div class="metric-status status-success">{{ dados.conversao.percentual_mentorias }}% das vendas</div>
-    </div>
-</div>
+from utils import (
+    get_dataframes,
+    compute_kpis,
+    last_sync_info,
+    format_currency,
+    format_number,
+    format_percent,
+    _to_float_safe,
+)
 
-<h3>📈 Principais Insights</h3>
-<div class="insights-grid">
-    <div class="insight-card success">
-        <h4>🎯 Meta de Leads Superada</h4>
-        <p>Captação de {{ dados.total_leads_formatado }} leads superou a meta de {{ dados.meta_leads_formatado }} em {{ (extras.percentual_leads - 100)|round(1) }}%, demonstrando excelente performance da campanha.</p>
-    </div>
-    
-    <div class="insight-card info">
-        <h4>📘 Facebook Dominante</h4>
-        <p>{{ dados.canais.facebook.percentual }}% dos leads com ROAS de {{ ("%.2f"|format(dados.canais.facebook.roas)).replace(".", ",") }}. Canal principal com {{ dados.canais.facebook.leads_formatado }} leads captados.</p>
-    </div>
-    
-    <div class="insight-card warning">
-        <h4>📺 YouTube Precisa Otimizar</h4>
-        <p>CPL de {{ dados.canais.youtube.cpl|moeda_ptbr }} e ROAS de {{ ("%.2f"|format(dados.canais.youtube.roas)).replace(".", ",") }}. Requer otimização para melhorar retorno.</p>
-    </div>
-    
-    <div class="insight-card success">
-        <h4>📱 Instagram Orgânico Forte</h4>
-        <p>{{ dados.canais.instagram.leads_formatado }} leads orgânicos ({{ dados.canais.instagram.percentual }}%), demonstrando forte engajamento da audiência.</p>
-    </div>
-</div>
+app = Flask(__name__)
 
-<h3>🎯 KPIs e Premissas CHT22</h3>
-<p>Métricas-chave e premissas baseadas no histórico para o lançamento</p>
+# ---------- Filtros Jinja (pt-BR) ----------
+@app.template_filter("moeda_ptbr")
+def jinja_moeda_ptbr(v): return format_currency(v)
 
-<div class="metrics-grid">
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.meta_leads_formatado }}</div>
-        <div class="metric-label">Meta Captação LEADs</div>
-        <div class="metric-status status-success">Atual: {{ dados.total_leads_formatado }} ({{ extras.percentual_leads_formatado }})</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.conversao.taxa_conversao }}%</div>
-        <div class="metric-label">Taxa de Conversão</div>
-        <div class="metric-status status-info">Premissa Histórica</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.conversao.ticket_medio_curso|moeda_ptbr }}</div>
-        <div class="metric-label">Ticket Médio Curso</div>
-        <div class="metric-status status-info">Preço de Venda</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.conversao.percentual_mentorias }}%</div>
-        <div class="metric-label">% Vendas Mentorias</div>
-        <div class="metric-status status-info">Upsell sobre Curso</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.conversao.ticket_medio_mentoria|moeda_ptbr }}</div>
-        <div class="metric-label">Ticket Médio Mentoria</div>
-        <div class="metric-status status-info">Preço Premium</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.meta_cpl_formatado }}</div>
-        <div class="metric-label">Meta CPL Captação</div>
-        <div class="metric-status status-warning">Atual: {{ dados.cpl_medio_formatado }} ({{ extras.percentual_cpl_formatado }})</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.orcamento_total_formatado }}</div>
-        <div class="metric-label">Meta Orçamento Tráfego</div>
-        <div class="metric-status status-info">Usado: {{ dados.investimento_total_formatado }} ({{ extras.percentual_orcamento_formatado }})</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.engajamento.seguidores_instagram|numero_ptbr }}</div>
-        <div class="metric-label">Seguidores Instagram</div>
-        <div class="metric-status status-info">Crescimento: +{{ dados.engajamento.taxa_crescimento_instagram }}% mês</div>
-    </div>
-    
-    <div class="metric-card">
-        <div class="metric-value">{{ dados.engajamento.seguidores_youtube|numero_ptbr }}</div>
-        <div class="metric-label">Seguidores YouTube</div>
-        <div class="metric-status status-info">Crescimento: +{{ dados.engajamento.taxa_crescimento_youtube }}% mês</div>
-    </div>
-</div>
+@app.template_filter("numero_ptbr")
+def jinja_numero_ptbr(v): return format_number(v)
 
-<h3>⏰ Status da Campanha</h3>
-<div class="status-grid">
-    <div class="status-item">
-        <span class="status-label">Período:</span>
-        <span class="status-value">{{ dados.data_inicio }} a {{ dados.data_fim }}</span>
-    </div>
-    <div class="status-item">
-        <span class="status-label">Duração:</span>
-        <span class="status-value">{{ dados.dias_campanha }} dias corridos</span>
-    </div>
-    <div class="status-item">
-        <span class="status-label">Última Atualização:</span>
-        <span class="status-value">{{ timestamp }}</span>
-    </div>
-    <div class="status-item">
-        <span class="status-label">Status:</span>
-        <span class="status-value status-success">Campanha Ativa</span>
-    </div>
-</div>
+@app.template_filter("percentual_ptbr")
+def jinja_percentual_ptbr(v): return format_percent(v, with_sign=False)
+
+# ---------- Montagem de contexto único para todas as páginas ----------
+def _build_context(refresh_flag: bool = False):
+    dfs = get_dataframes(force_refresh=refresh_flag)
+    kpis = compute_kpis(dfs)
+
+    hoje = date.today()
+    inicio = hoje.replace(day=1)
+    dias_mes = monthrange(hoje.year, hoje.month)[1]
+    dias_passados = (hoje - inicio).days + 1
+    frac_mes = (dias_passados / dias_mes) if dias_mes else 0.0
+
+    leads_total = int(round(_to_float_safe(kpis.get("leads_total", 0))))
+    investimento_total = _to_float_safe(kpis.get("investimento_total", 0.0))
+    cpl_medio = _to_float_safe(kpis.get("cpl_medio", 0.0))
+    cpl_meta = _to_float_safe(kpis.get("cpl_meta", 15.0))
+    roas_geral = _to_float_safe(kpis.get("roas", 0.0))
+
+    meta_leads = int(round(leads_total / frac_mes)) if frac_mes > 0 else leads_total
+    perc_leads = (leads_total / meta_leads * 100.0) if meta_leads > 0 else 100.0
+    orcamento_estimado = (investimento_total / frac_mes) if frac_mes > 0 else investimento_total
+
+    # Premissas (ajuste se desejar)
+    taxa_conv = 2.0        # %
+    ticket_curso = 297.0
+    perc_mentoria = 10.0   # %
+    ticket_mentoria = 1500.0
+
+    vendas_estimadas = int(round(leads_total * (taxa_conv / 100.0)))
+    receita_curso = vendas_estimadas * ticket_curso
+    receita_mentoria = vendas_estimadas * (perc_mentoria / 100.0) * ticket_mentoria
+
+    dados = {
+        "data_inicio": inicio.strftime("%d/%m/%Y"),
+        "data_fim": hoje.strftime("%d/%m/%Y"),
+        "dias_campanha": dias_passados,
+        "roas_geral": roas_geral,
+        "total_leads_formatado": format_number(leads_total),
+        "meta_leads_formatado": format_number(meta_leads),
+        "investimento_total_formatado": format_currency(investimento_total),
+        "orcamento_total_formatado": format_currency(orcamento_estimado),
+        "cpl_medio_formatado": format_currency(cpl_medio),
+        "meta_cpl_formatado": format_currency(cpl_meta),
+        "conversao": {
+            "taxa_conversao": f"{taxa_conv:.1f}",
+            "ticket_medio_curso": ticket_curso,
+            "percentual_mentorias": f"{perc_mentoria:.0f}",
+            "ticket_medio_mentoria": ticket_mentoria,
+            "vendas_estimadas": format_number(vendas_estimadas),
+            "receita_estimada_curso": receita_curso,
+            "receita_estimada_mentoria": receita_mentoria,
+        },
+        # Placeholders seguros (edite quando tiver dados por canal)
+        "canais": {
+            "facebook": {"percentual": 0, "roas": 0.0, "leads_formatado": format_number(0)},
+            "youtube": {"cpl": 0.0, "roas": 0.0},
+            "instagram": {"leads_formatado": format_number(0), "percentual": 0},
+        },
+        "engajamento": {
+            "seguidores_instagram": 0, "taxa_crescimento_instagram": 0,
+            "seguidores_youtube": 0, "taxa_crescimento_youtube": 0
+        },
+    }
+
+    extras = {
+        "percentual_orcamento_formatado": format_percent(frac_mes, with_sign=False),
+        "percentual_leads": perc_leads,
+        "percentual_leads_formatado": format_percent(perc_leads, with_sign=False),
+        "percentual_cpl_formatado": kpis.get("perc_cpl", "0%"),
+    }
+
+    return dict(
+        kpis=kpis,
+        dados=dados,
+        extras=extras,
+        timestamp=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        last_sync=last_sync_info(),
+    )
+
+# ---------- Rotas ----------
+@app.route("/")
+def home():
+    return redirect(url_for("visao_geral"))
+
+@app.route("/visao-geral", methods=["GET", "HEAD"])
+def visao_geral():
+    if request.method == "HEAD":
+        return "", 200  # para UptimeRobot
+    refresh_flag = str(request.args.get("refresh", "")).lower() in ("1","true","t","yes","y")
+    ctx = _build_context(refresh_flag=refresh_flag)
+    return render_template("visao_geral_atualizada.html", **ctx)
+
+# Rota genérica para QUALQUER aba/template em templates/<page>.html
+@app.route("/p/<page>", methods=["GET", "HEAD"])
+def pagina(page: str):
+    if request.method == "HEAD":
+        return "", 200
+    refresh_flag = str(request.args.get("refresh", "")).lower() in ("1","true","t","yes","y")
+    ctx = _build_context(refresh_flag=refresh_flag)
+    return render_template(f"{page}.html", **ctx)
+
+@app.route("/healthz")
+def healthz():
+    return "ok", 200
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000, debug=False)
