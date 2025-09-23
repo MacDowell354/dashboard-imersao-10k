@@ -1,18 +1,18 @@
-
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 from datetime import datetime
 from utils import (
     get_dataframes, compute_kpis, compute_origem_conversao, compute_profissao_canal,
     compute_analise_regional, compute_insights_ia, compute_projecao_resultados,
-    format_number_ptbr, format_percent_ptbr, format_currency_ptbr, last_sync_info
+    last_sync_info
 )
 
 app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("dashboard_atualizado.html")
+    # Redireciona direto para a aba Visão Geral
+    return redirect(url_for("visao_geral"))
 
 @app.route("/visao-geral")
 def visao_geral():
