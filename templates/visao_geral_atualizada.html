@@ -1,171 +1,40 @@
-{% extends "base.html" %}
-
-{% macro moeda(v) -%}
-  R$ {{ ("{:,.2f}".format((v or 0)|float)).replace(",", "X").replace(".", ",").replace("X", ".") }}
-{%- endmacro %}
-{% macro numero(v) -%}
-  {{ ("{:,.0f}".format((v or 0)|float)).replace(",", ".") }}
-{%- endmacro %}
-
-{% set leads_tot = (dados.total_leads or 0)|float %}
-{% set leads_meta = (dados.meta_leads or 0)|float %}
-{% set perc_leads = (100*leads_tot/leads_meta) if leads_meta else 100 %}
-{% set perc_leads_fmt = ("{:,.1f}%".format(perc_leads)).replace(".", ",") %}
-
-{% set inv_total = (dados.investimento_total or 0)|float %}
-{% set orc_total = (dados.orcamento_total or 0)|float %}
-{% set perc_orc = (100*inv_total/orc_total) if orc_total else 0 %}
-{% set perc_orc_fmt = ("{:,.1f}%".format(perc_orc)).replace(".", ",") %}
-
-{% block content %}
-<h2>🏠 Visão Geral - CHT22</h2>
-<p>Resumo executivo do lançamento CHT22 com métricas principais e status atual da campanha.</p>
-
-<div class="metrics-grid">
-  <div class="metric-card">
-    <div class="metric-value">{{ dados.dias_campanha }} DIAS</div>
-    <div class="metric-label">Lançamento Ativo</div>
-    <div class="metric-status status-success">{{ dados.data_inicio }} - {{ dados.data_fim }}</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">R$ 15,00</div>
-    <div class="metric-label">Meta CPL Captação</div>
-    <div class="metric-status status-warning">Atual: {{ dados.cpl_medio_formatado or "R$ 0,00" }}</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ perc_orc_fmt }}</div>
-    <div class="metric-label">Orçamento Captação</div>
-    <div class="metric-status status-info">{{ dados.investimento_total_formatado }} / {{ dados.orcamento_total_formatado }}</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ ("%.2f"|format(dados.roas_geral or 0)).replace(".", ",") }}</div>
-    <div class="metric-label">ROAS Geral</div>
-    <div class="metric-status status-success">Acima da meta</div>
-  </div>
-</div>
-
-<h3>📊 Performance Atual vs Meta</h3>
-<div class="metrics-grid">
-  <div class="metric-card">
-    <div class="metric-value">{{ dados.total_leads_formatado }}</div>
-    <div class="metric-label">Total de Leads</div>
-    <div class="metric-status status-success">Meta: {{ dados.meta_leads_formatado }} ({{ perc_leads_fmt }})</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ numero(dados.conversao.vendas_estimadas) }}</div>
-    <div class="metric-label">Vendas Estimadas</div>
-    <div class="metric-status status-info">Taxa: {{ dados.conversao.taxa_conversao }}%</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ moeda(dados.conversao.receita_estimada_curso) }}</div>
-    <div class="metric-label">Receita Curso</div>
-    <div class="metric-status status-success">Ticket: {{ moeda(dados.conversao.ticket_medio_curso) }}</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ moeda(dados.conversao.receita_estimada_mentoria) }}</div>
-    <div class="metric-label">Receita Mentoria</div>
-    <div class="metric-status status-success">{{ dados.conversao.percentual_mentorias }}% das vendas</div>
-  </div>
-</div>
-
-<h3>📈 Principais Insights</h3>
-<div class="insights-grid">
-  <div class="insight-card">
-    <h4>🎯 Meta de Leads Superada</h4>
-    <p>Captação de {{ dados.total_leads_formatado }} leads superou a meta de
-       {{ dados.meta_leads_formatado }} em {{ ("{:,.1f}%".format(perc_leads-100)).replace(".", ",") }}.</p>
-  </div>
-
-  <div class="insight-card">
-    <h4>📘 Facebook Dominante</h4>
-    <p>{{ dados.canais.facebook.percentual or 0 }}% dos leads com ROAS de
-       {{ ("%.2f"|format(dados.canais.facebook.roas or 0)).replace(".", ",") }}.
-       Canal principal com {{ dados.canais.facebook.leads_formatado or "0" }} leads captados.</p>
-  </div>
-
-  <div class="insight-card">
-    <h4>📺 YouTube Precisa Otimizar</h4>
-    <p>CPL de {{ moeda(dados.canais.youtube.cpl) }} e ROAS de
-       {{ ("%.2f"|format(dados.canais.youtube.roas or 0)).replace(".", ",") }}.</p>
-  </div>
-
-  <div class="insight-card">
-    <h4>📱 Instagram Orgânico Forte</h4>
-    <p>{{ dados.canais.instagram.leads_formatado or "0" }} leads orgânicos
-       ({{ dados.canais.instagram.percentual or 0 }}%).</p>
-  </div>
-</div>
-
-<h3>🎯 KPIs e Premissas CHT22</h3>
-<p>Métricas-chave e premissas baseadas no histórico para o lançamento</p>
-
-<div class="metrics-grid">
-  <div class="metric-card">
-    <div class="metric-value">{{ dados.meta_leads_formatado }}</div>
-    <div class="metric-label">Meta Captação LEADs</div>
-    <div class="metric-status status-success">Atual: {{ dados.total_leads_formatado }} ({{ perc_leads_fmt }})</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ dados.conversao.taxa_conversao }}%</div>
-    <div class="metric-label">Taxa de Conversão</div>
-    <div class="metric-status status-info">Premissa Histórica</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ moeda(dados.conversao.ticket_medio_curso) }}</div>
-    <div class="metric-label">Ticket Médio Curso</div>
-    <div class="metric-status status-info">Preço de Venda</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ dados.conversao.percentual_mentorias }}%</div>
-    <div class="metric-label">% Vendas Mentorias</div>
-    <div class="metric-status status-info">Upsell sobre Curso</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ moeda(dados.conversao.ticket_medio_mentoria) }}</div>
-    <div class="metric-label">Ticket Médio Mentoria</div>
-    <div class="metric-status status-info">Preço Premium</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ dados.meta_cpl_formatado }}</div>
-    <div class="metric-label">Meta CPL Captação</div>
-    <div class="metric-status status-warning">Atual: {{ dados.cpl_medio_formatado }}</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ dados.orcamento_total_formatado }}</div>
-    <div class="metric-label">Meta Orçamento Tráfego</div>
-    <div class="metric-status status-info">Usado: {{ dados.investimento_total_formatado }} ({{ perc_orc_fmt }})</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ numero(dados.engajamento.seguidores_instagram) }}</div>
-    <div class="metric-label">Seguidores Instagram</div>
-    <div class="metric-status status-info">Crescimento: +{{ dados.engajamento.taxa_crescimento_instagram }}% mês</div>
-  </div>
-
-  <div class="metric-card">
-    <div class="metric-value">{{ numero(dados.engajamento.seguidores_youtube) }}</div>
-    <div class="metric-label">Seguidores YouTube</div>
-    <div class="metric-status status-info">Crescimento: +{{ dados.engajamento.taxa_crescimento_youtube }}% mês</div>
-  </div>
-</div>
-
-<h3>⏰ Status da Campanha</h3>
-<div class="status-grid">
-  <div class="status-item"><span class="status-label">Período:</span> <span>{{ dados.data_inicio }} a {{ dados.data_fim }}</span></div>
-  <div class="status-item"><span class="status-label">Duração:</span> <span>{{ dados.dias_campanha }} dias corridos</span></div>
-  <div class="status-item"><span class="status-label">Última Atualização:</span> <span>{{ timestamp }}</span></div>
-  <div class="status-item"><span class="status-label">Status:</span> <span class="status-success">Campanha Ativa</span></div>
-</div>
-{% endblock %}
+<!-- templates/base.html -->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CHT22</title>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#0f172a; --muted:#94a3b8; --text:#e2e8f0; --bd:#233045;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+    main{max-width:1200px;margin:20px auto;padding:0 16px}
+    h1,h2,h3{margin:10px 0 8px}
+    .metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    @media (max-width:1100px){.metrics-grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){.metrics-grid{grid-template-columns:1fr}}
+    .metric-card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+    .metric-value{font-size:20px;font-weight:800;margin-bottom:4px}
+    .metric-label{color:var(--muted);font-size:12px}
+    .metric-status{margin-top:6px;font-size:12px;padding:6px 8px;border-radius:8px;border:1px dashed var(--bd);display:inline-block}
+    .status-success{color:#86efac;border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.08)}
+    .status-warning{color:#fde68a;border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08)}
+    .status-info{color:#7dd3fc;border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.08)}
+    .insights-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    @media (max-width:900px){.insights-grid{grid-template-columns:1fr}}
+    .insight-card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+    .status-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .status-item{background:var(--card);border:1px dashed var(--bd);border-radius:10px;padding:10px}
+    .status-label{color:var(--muted);margin-right:6px}
+  </style>
+</head>
+<body>
+  {% include "_nav.html" %}
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
