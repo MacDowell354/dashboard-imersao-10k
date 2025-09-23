@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from flask import Flask, render_template, request
 
-# Tenta usar utils reais; se algo faltar, não derruba o app.
+# Tenta usar utils reais; se algo faltar, seguimos com defaults e não quebramos.
 try:
     from utils import get_dataframes, last_sync_info  # type: ignore
 except Exception:
@@ -15,11 +15,20 @@ except Exception:
 
 app = Flask(__name__)
 
-# Disponibiliza datetime no Jinja: {{ datetime.now()... }}
+# Disponibiliza datetime para usar nos templates: {{ datetime.now()... }}
 app.jinja_env.globals["datetime"] = datetime
 
+# >>> CORREÇÃO: injeta current_path em TODOS os templates (resolve o erro do _nav.html)
+@app.context_processor
+def inject_current_path():
+    try:
+        cp = request.path or "/"
+    except Exception:
+        cp = "/"
+    return dict(current_path=cp)
+
 # ----------------- helpers de formatação -----------------
-def moeda_ptbr(valor: float | int | None) -> str:
+def moeda_ptbr(valor):
     try:
         v = float(valor or 0)
     except Exception:
@@ -27,24 +36,21 @@ def moeda_ptbr(valor: float | int | None) -> str:
     s = f"{v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     return f"R$ {s}"
 
-def numero_ptbr(valor: float | int | None) -> str:
+def numero_ptbr(valor):
     try:
         v = int(round(float(valor or 0)))
     except Exception:
         v = 0
-    s = f"{v:,}".replace(",", ".")
-    return s
+    return f"{v:,}".replace(",", ".")
 
-def pct_ptbr(valor: float | int | None) -> str:
+def pct_ptbr(valor):
     try:
         v = float(valor or 0)
     except Exception:
         v = 0.0
-    s = f"{v:.1f}".replace(".", ",")
-    return f"{s}%"
+    return f"{v:.1f}".replace(".", ",") + "%"
 
 def _ensure(d: dict, path: list[str], default):
-    """Garante que d[path] exista; cria dicts intermediários."""
     cur = d
     for k in path[:-1]:
         if k not in cur or not isinstance(cur[k], dict):
@@ -54,11 +60,6 @@ def _ensure(d: dict, path: list[str], default):
     return cur[path[-1]]
 
 def _defaults(dados: dict) -> tuple[dict, dict]:
-    """
-    Preenche todas as chaves que os templates usam, com defaults.
-    Mantém valores existentes.
-    Retorna (dados, extras).
-    """
     if not isinstance(dados, dict):
         dados = {}
 
@@ -71,7 +72,6 @@ def _defaults(dados: dict) -> tuple[dict, dict]:
     _ensure(dados, ["investimento_total"], 0.0)
     _ensure(dados, ["roas_geral"], 0.0)
 
-    # formatados
     dados["cpl_medio_formatado"] = moeda_ptbr(dados.get("cpl_medio"))
     dados["meta_cpl_formatado"] = moeda_ptbr(dados.get("meta_cpl"))
     dados["total_leads_formatado"] = numero_ptbr(dados.get("total_leads"))
@@ -84,7 +84,7 @@ def _defaults(dados: dict) -> tuple[dict, dict]:
     _ensure(dados, ["data_fim"], "30/09/2025")
     _ensure(dados, ["dias_campanha"], 0)
 
-    # --- conversão (sub-bloco) ---
+    # --- conversão ---
     conv = _ensure(dados, ["conversao"], {})
     conv.setdefault("taxa_conversao", 2.0)
     conv.setdefault("vendas_estimadas", 0)
@@ -94,7 +94,7 @@ def _defaults(dados: dict) -> tuple[dict, dict]:
     conv.setdefault("ticket_medio_mentoria", 1500.0)
     conv.setdefault("receita_estimada_mentoria", 0.0)
 
-    # --- canais usados nos templates ---
+    # --- canais ---
     canais = _ensure(dados, ["canais"], {})
     for canal in ("facebook", "instagram", "youtube", "google"):
         c = canais.setdefault(canal, {})
@@ -104,34 +104,31 @@ def _defaults(dados: dict) -> tuple[dict, dict]:
         c.setdefault("leads", 0)
         c.setdefault("leads_formatado", numero_ptbr(c.get("leads", 0)))
 
-    # --- engajamento (para cartões de seguidores) ---
+    # --- engajamento ---
     eng = _ensure(dados, ["engajamento"], {})
     eng.setdefault("seguidores_instagram", 0)
     eng.setdefault("taxa_crescimento_instagram", 0)
     eng.setdefault("seguidores_youtube", 0)
     eng.setdefault("taxa_crescimento_youtube", 0)
 
-    # --- regiões/estados (para análise regional) ---
+    # --- regiões/estados ---
     regioes = _ensure(dados, ["regioes"], {})
     for r in ("sudeste", "sul", "nordeste", "norte", "centro_oeste"):
         rr = regioes.setdefault(r, {})
         rr.setdefault("percentual", 0)
         rr.setdefault("leads", 0)
-    _ensure(dados, ["estados"], {})  # pode ficar vazio; o template só itera
+    _ensure(dados, ["estados"], {})
 
-    # --- profissoes (usadas em insights e profissão x canal) ---
+    # --- profissoes ---
     profs = _ensure(dados, ["profissoes"], {})
     for p in ("dentista", "medico", "advogado", "outra"):
         pp = profs.setdefault(p, {})
         pp.setdefault("total", 0)
         pp.setdefault("percentual", 0)
 
-    # --- strings “formatado” que alguns templates exibem diretamente ---
-    dados.setdefault("roas_geral", dados.get("roas_geral", 0.0))
-    dados["roas_geral_formatado"] = f"{float(dados['roas_geral']):.2f}".replace(".", ",")
+    dados["roas_geral_formatado"] = f"{float(dados.get('roas_geral', 0.0)):.2f}".replace(".", ",")
 
-    # --- calcula extras (percentuais exibidos como texto) ---
-    extras = {}
+    # --- extras ---
     inv = float(dados.get("investimento_total") or 0)
     orc = float(dados.get("orcamento_total") or 0)
     leads = int(dados.get("total_leads") or 0)
@@ -139,49 +136,33 @@ def _defaults(dados: dict) -> tuple[dict, dict]:
     cpl = float(dados.get("cpl_medio") or 0)
     meta_cpl = float(dados.get("meta_cpl") or 0)
 
-    # % orçamento usado
+    extras = {}
     extras["percentual_orcamento"] = (inv / orc * 100) if orc > 0 else 0.0
     extras["percentual_orcamento_formatado"] = pct_ptbr(extras["percentual_orcamento"]).replace(".0", "")
-
-    # % de leads vs meta
     extras["percentual_leads"] = (leads / meta_leads * 100) if meta_leads > 0 else 100.0
     extras["percentual_leads_formatado"] = pct_ptbr(extras["percentual_leads"]).replace(".0", "")
-
-    # % do CPL vs meta (quanto acima/abaixo)
     extras["percentual_cpl"] = ((cpl / meta_cpl * 100) if meta_cpl > 0 else 0.0) - 100.0
-    # exemplo: +5,4% / –3,2%
     sinal = "+" if extras["percentual_cpl"] >= 0 else "–"
-    extras["percentual_cpl_formatado"] = f"{sinal}{pct_ptbr(abs(extras['percentual_cpl'])).replace('%','%')}"
+    extras["percentual_cpl_formatado"] = f"{sinal}{pct_ptbr(abs(extras['percentual_cpl']))}"
 
-    # Também devolvemos os “formatado” que já existem nos templates
     dados.setdefault("orcamento_total_formatado", moeda_ptbr(orc))
     dados.setdefault("investimento_total_formatado", moeda_ptbr(inv))
 
     return dados, extras
 
 def _ctx():
-    """
-    Monta o contexto único usado em TODAS as rotas.
-    Mantém dados reais que vierem do utils e completa o resto com defaults.
-    """
-    # Se o utils devolver algo estruturado, ótimo; se não, seguimos com dict vazio.
     raw = get_dataframes() or {}
-    # Permite tanto {'dados': {...}, 'extras': {...}} quanto já vir direto em {...}
     maybe_dados = raw.get("dados") if isinstance(raw, dict) else {}
     dados_in = maybe_dados if isinstance(maybe_dados, dict) else (raw if isinstance(raw, dict) else {})
     dados, extras = _defaults(dados_in)
-
-    timestamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    sync = last_sync_info() if callable(last_sync_info) else "n/d"
-
     return dict(
         dados=dados,
         extras=extras,
-        timestamp=timestamp,
-        last_sync=sync,
+        timestamp=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        last_sync=(last_sync_info() if callable(last_sync_info) else "n/d"),
     )
 
-# ----------------- ROTAS -----------------
+# ----------------- Rotas -----------------
 @app.route("/")
 def home():
     return render_template("visao_geral_atualizada.html", **_ctx())
@@ -216,9 +197,7 @@ def analise_regional():
 
 @app.route("/vendas")
 def vendas():
-    # Seu template de vendas é um wrapper que inclui vendas_content.html
     return render_template("vendas.html", **_ctx())
 
-# ----------------- WSGI -----------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, debug=True)
