@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+from datetime import date, timedelta
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from utils import (
     get_dataframes, compute_kpis, compute_origem_conversao, compute_profissao_canal,
@@ -9,7 +10,7 @@ from utils import (
 
 app = Flask(__name__)
 
-# ---------- Filtros Jinja (usados nos templates)
+# -------------------- Filtros Jinja --------------------
 @app.template_filter("moeda_ptbr")
 def moeda_ptbr(v):
     return format_currency(v)
@@ -22,16 +23,24 @@ def numero_ptbr(v):
 def percentual_ptbr(v):
     return format_percent(v)
 
-# ---------- Namespace seguro para evitar KeyError em dados.*
+# -------------------- Safe namespace para 'dados' --------------------
 class SafeNS(dict):
     def __getattr__(self, name):
-        val = self.get(name, SafeNS())
-        if isinstance(val, dict) and not isinstance(val, SafeNS):
+        # Não intercepta dunder attributes como __html__, __str__, etc.
+        if name.startswith("__") and name.endswith("__"):
+            raise AttributeError
+        val = self.get(name, "")
+        if isinstance(val, dict):
             val = SafeNS(val)
         return val
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
 
+    # Se alguém tentar usar como HTML, devolve string vazia (seguro)
+    def __html__(self):
+        return ""
+
+# -------------------- Rotas --------------------
 @app.route("/")
 def home():
     # Evita quebrar na home antiga -> manda para a Visão Geral
@@ -42,11 +51,16 @@ def visao_geral():
     dfs = get_dataframes(force_refresh=bool(request.args.get("refresh")))
     kpis = compute_kpis(dfs)
 
-    # Fornece um "dados" mínimo/seguro, pois o template usa dados.conversao.receita_estimada_curso|moeda_ptbr
+    # Período padrão: últimos 28 dias (ajuste se quiser ler da planilha)
+    fim = date.today()
+    ini = fim - timedelta(days=27)
+
     dados = SafeNS({
+        "data_inicio": ini.strftime("%d/%m/%Y"),
+        "data_fim": fim.strftime("%d/%m/%Y"),
         "dias_campanha": 28,
         "conversao": {
-            "receita_estimada_curso": 0  # substitua por valor real quando integrar
+            "receita_estimada_curso": 0  # troque quando integrar a coluna real
         }
     })
 
