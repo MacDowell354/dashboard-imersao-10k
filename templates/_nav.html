@@ -1,15 +1,12 @@
-<nav style="
-  display:flex; gap:.75rem; flex-wrap:wrap; align-items:center;
-  background:#0f172a; color:#fff; padding:.75rem 1rem; border-bottom:1px solid #1f2937;">
-  <a href="/visao-geral" style="color:#fff; text-decoration:none; font-weight:600;">🏠 Visão Geral</a>
-  <a href="/dashboard" style="color:#cbd5e1; text-decoration:none;">📊 Dashboard</a>
-  <a href="/insights-ia" style="color:#cbd5e1; text-decoration:none;">🤖 Insights IA</a>
-  <a href="/origem-conversao" style="color:#cbd5e1; text-decoration:none;">🔁 Origem & Conversão</a>
-  <a href="/profissao-canal" style="color:#cbd5e1; text-decoration:none;">🧑‍💼 Profissão x Canal</a>
-  <a href="/projecao-resultados" style="color:#cbd5e1; text-decoration:none;">📈 Projeção</a>
-  <a href="/analise-regional" style="color:#cbd5e1; text-decoration:none;">🗺️ Análise Regional</a>
-  <a href="/vendas" style="color:#cbd5e1; text-decoration:none;">🛒 Vendas</a>
-  <span style="margin-left:auto; font-size:.85rem; color:#94a3b8;">
-    <a href="/visao-geral?refresh=1" style="color:#94a3b8; text-decoration:none;">↻ Recarregar dados</a>
-  </span>
+<nav style="background:#0f172a;border-bottom:1px solid #233045">
+  <div style="max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap">
+    <a href="{{ url_for('visao_geral') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Visão Geral</a>
+    <a href="{{ url_for('dashboard') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Dashboard</a>
+    <a href="{{ url_for('origem_conversao') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Origem & Conversão</a>
+    <a href="{{ url_for('profissao_canal') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Profissão & Canal</a>
+    <a href="{{ url_for('projecao_resultados') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Projeção</a>
+    <a href="{{ url_for('analise_regional') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Análise Regional</a>
+    <a href="{{ url_for('insights_ia') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Insights IA</a>
+    <a href="{{ url_for('vendas') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Vendas</a>
+  </div>
 </nav>
