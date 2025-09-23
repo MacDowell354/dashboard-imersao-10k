@@ -1,169 +1,174 @@
 # utils.py
-from datetime import datetime, date
-from math import isfinite
+from datetime import datetime, timedelta, timezone
 
-# -----------------------------
-# Filtros Jinja (PT-BR)
-# -----------------------------
-def _to_float_ptbr(v):
-    """
-    Converte strings tipo '9.500', '1.234,56' em float.
-    Aceita também números já numéricos. Retorna 0.0 em caso de erro.
-    """
-    if v is None:
-        return 0.0
+# ============
+# Filtros Jinja
+# ============
+def _to_float(v):
     try:
+        if v is None:
+            return 0.0
         if isinstance(v, (int, float)):
             return float(v)
+        # normaliza '9.500' -> 9500 e '9,50' -> 9.50
         s = str(v).strip()
-        # primeiro remove separador de milhar ".", depois troca "," por "."
+        if s.count(".") > 1 and "," not in s:
+            # muitos pontos (thousands). remove todos os pontos
+            s = s.replace(".", "")
         s = s.replace(".", "").replace(",", ".")
         return float(s)
     except Exception:
         return 0.0
 
-def _to_int_ptbr(v):
-    try:
-        return int(round(_to_float_ptbr(v)))
-    except Exception:
-        return 0
-
 def moeda_ptbr(v):
-    f = _to_float_ptbr(v)
-    return ("R$ {:,.2f}".format(f)).replace(",", "X").replace(".", ",").replace("X", ".")
+    n = _to_float(v)
+    s = f"{n:,.2f}"
+    # 1,234,567.89 -> 1.234.567,89
+    s = s.replace(",", "X").replace(".", ",").replace("X", ".")
+    return f"R$ {s}"
 
 def numero_ptbr(v):
-    i = _to_int_ptbr(v)
-    return ("{:,}".format(i)).replace(",", ".")
+    try:
+        n = int(_to_float(v))
+    except Exception:
+        n = 0
+    s = f"{n:,}"
+    return s.replace(",", ".")
 
-# -----------------------------
-# Dados e cálculos
-# -----------------------------
+# ============
+# Dados / KPIs
+# ============
 def get_dataframes(force_refresh: bool = False):
     """
-    Ponto único para carregar dados (CSV, GSheet, DB...). 
-    Mantemos stub seguro para não quebrar o app sem fonte de dados.
+    Deixe essa função pronta para, no futuro, carregar CSV/Sheets.
+    Por enquanto retornamos um dicionário vazio para manter o app estável.
     """
-    # TODO: plugar sua leitura real aqui (e cache, se quiser).
-    # Ex.: ler CSVs e retornar dict de DataFrames.
     return {}
 
-def _fmt_pct(v):
-    try:
-        f = float(v)
-    except Exception:
-        f = 0.0
-    if not isfinite(f):
-        f = 0.0
-    return ("{:.1f}%".format(f)).replace(".", ",")
-
-def last_sync_info():
-    return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-def compute_context(dfs: dict):
-    """
-    Cria os dicionários esperados pelos templates:
-    - dados  (tudo que você acessa como {{ dados.* }})
-    - extras (percentuais/mensagens já formatadas)
-    Deixa tudo com valores seguros (zero/strings) se não houver dados.
-    """
-    # Exemplos de valores padrão para não explodir a UI:
-    hoje = date.today()
-    data_inicio = hoje.replace(day=1)
-    data_fim = hoje
-
-    dias = (data_fim - data_inicio).days + 1
-    meta_cpl = 15.0
-    meta_leads = 0  # ajuste quando tiver dados
-    total_leads = 0
-    investimento_total = 0.0
-    orcamento_total = 0.0
-
-    # CPL médio defensivo
-    cpl_medio = (investimento_total / total_leads) if total_leads else 0.0
-    roas_geral = 0.00
-
-    # Conversão defensiva
-    taxa_conv = 2.0  # %
-    vendas_estimadas = int(round(total_leads * (taxa_conv / 100.0)))
-    ticket_curso = 297.0
-    ticket_mentoria = 1500.0
-    pct_mentorias = 10  # % das vendas
-
-    receita_curso = vendas_estimadas * ticket_curso * (1 - pct_mentorias/100.0)
-    receita_mentoria = vendas_estimadas * ticket_mentoria * (pct_mentorias/100.0)
-
-    # Monta estrutura exatamente como os templates usam (dicts acessáveis via ponto)
+def _defaults():
+    """Estrutura padrão para evitar UndefinedError nos templates."""
     dados = {
-        "dias_campanha": dias,
-        "data_inicio": data_inicio.strftime("%d/%m/%Y"),
-        "data_fim": data_fim.strftime("%d/%m/%Y"),
+        "dias_campanha": 23,
+        "data_inicio": "01/09/2025",
+        "data_fim": "23/09/2025",
 
-        "investimento_total_formatado": moeda_ptbr(investimento_total),
-        "orcamento_total_formatado": moeda_ptbr(orcamento_total),
+        "orcamento_total": 0.0,
+        "orcamento_total_formatado": moeda_ptbr(0),
 
-        "meta_leads_formatado": numero_ptbr(meta_leads),
-        "total_leads_formatado": numero_ptbr(total_leads),
+        "investimento_total": 0.0,
+        "investimento_total_formatado": moeda_ptbr(0),
 
-        "meta_cpl_formatado": moeda_ptbr(meta_cpl),
-        "cpl_medio_formatado": moeda_ptbr(cpl_medio),
+        "cpl_medio": 0.0,
+        "cpl_medio_formatado": moeda_ptbr(0),
+        "meta_cpl_formatado": moeda_ptbr(15),
 
-        "roas_geral": roas_geral,
+        "total_leads": 0,
+        "total_leads_formatado": numero_ptbr(0),
+        "meta_leads": 0,
+        "meta_leads_formatado": numero_ptbr(0),
 
-        "conversao": {
-            "taxa_conversao": taxa_conv,
-            "vendas_estimadas": numero_ptbr(vendas_estimadas),
-            "ticket_medio_curso": ticket_curso,
-            "ticket_medio_mentoria": ticket_mentoria,
-            "percentual_mentorias": pct_mentorias,
-            "receita_estimada_curso": receita_curso,
-            "receita_estimada_mentoria": receita_mentoria,
-        },
-
-        "canais": {
-            "facebook": {
-                "percentual": 0,
-                "roas": 0.0,
-                "leads_formatado": numero_ptbr(0),
-            },
-            "youtube": {
-                "cpl": 0.0,
-                "roas": 0.0,
-            },
-            "instagram": {
-                "leads_formatado": numero_ptbr(0),
-                "percentual": 0,
-            },
-        },
+        "roas_geral": 0.0,
 
         "engajamento": {
             "seguidores_instagram": 0,
-            "taxa_crescimento_instagram": 0,
             "seguidores_youtube": 0,
+            "taxa_crescimento_instagram": 0,
             "taxa_crescimento_youtube": 0,
         },
 
-        # metas auxiliares brutas (se quiser usar em extras):
-        "meta_leads": meta_leads,
-        "total_leads": total_leads,
-        "meta_cpl": meta_cpl,
-        "cpl_medio": cpl_medio,
-        "investimento_total": investimento_total,
-        "orcamento_total": orcamento_total,
+        "conversao": {
+            "taxa_conversao": 2.0,
+            "vendas_estimadas": 0,
+            "ticket_medio_curso": 297.0,
+            "ticket_medio_curso_formatado": moeda_ptbr(297),
+            "ticket_medio_mentoria": 1500.0,
+            "ticket_medio_mentoria_formatado": moeda_ptbr(1500),
+            "receita_estimada_curso": 0.0,
+            "receita_estimada_mentoria": 0.0,
+            "percentual_mentorias": 10,
+        },
+
+        "canais": {
+            "facebook":  {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},
+            "youtube":   {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},
+            "instagram": {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},
+            "google":    {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},  # <- evita Undefined 'google'
+        },
+
+        "regioes": {
+            "sudeste": {"percentual": 0},
+            "sul": {"percentual": 0},
+            "centro_oeste": {"percentual": 0},
+            "nordeste": {"percentual": 0},
+            "norte": {"percentual": 0},
+        },
+
+        "estados": {
+            "SP": {"leads": 0, "percentual": 0},
+            "RJ": {"leads": 0, "percentual": 0},
+            "MG": {"leads": 0, "percentual": 0},
+            "BA": {"leads": 0, "percentual": 0},
+        },
+
+        "profissoes": {
+            "dentista": {"total": 0},
+            "medico": {"total": 0},
+            "advogado": {"total": 0},
+            "engenheiro": {"total": 0},
+        },
     }
 
-    # Extras calculados/formatados
-    pct_orc = (investimento_total / orcamento_total * 100.0) if orcamento_total else 0.0
-    pct_leads = (total_leads / meta_leads * 100.0) if meta_leads else 100.0
-    pct_cpl = ((cpl_medio - meta_cpl) / meta_cpl * 100.0) if meta_cpl else 0.0
-
     extras = {
-        "percentual_orcamento": pct_orc,
-        "percentual_orcamento_formatado": _fmt_pct(pct_orc),
-        "percentual_leads": pct_leads,
-        "percentual_leads_formatado": _fmt_pct(pct_leads),
-        "percentual_cpl": pct_cpl,
-        "percentual_cpl_formatado": ("{:+.1f}%".format(pct_cpl)).replace(".", ","),
+        "percentual_orcamento": 0.0,
+        "percentual_orcamento_formatado": "0,0%",
+        "percentual_leads": 100.0,
+        "percentual_leads_formatado": "100,0%",
+        "percentual_cpl": 0.0,
+        "percentual_cpl_formatado": "0,0%",
     }
 
     return dados, extras
+
+def compute_kpis(dfs):
+    """
+    Aqui você pode ler os dataframes (quando existirem) e calcular KPIs.
+    Mantemos tudo robusto, com defaults, para não quebrar os templates.
+    """
+    dados, extras = _defaults()
+
+    # Exemplo de cálculo seguro (mantendo zeros quando não há dados):
+    orc = _to_float(dados.get("orcamento_total", 0))
+    inv = _to_float(dados.get("investimento_total", 0))
+    leads = int(_to_float(dados.get("total_leads", 0)))
+    meta_leads = max(1, int(_to_float(dados.get("meta_leads", 0))))  # evita div/0
+
+    # Percentual de orçamento usado
+    perc_orc = 0.0 if orc <= 0 else (inv / orc) * 100.0
+    extras["percentual_orcamento"] = perc_orc
+    extras["percentual_orcamento_formatado"] = f"{perc_orc:.1f}".replace(".", ",") + "%"
+
+    # Percentual de atingimento de leads (se meta 0, consideramos 100%)
+    perc_leads = 100.0 if meta_leads == 0 else (leads / meta_leads) * 100.0
+    extras["percentual_leads"] = perc_leads
+    extras["percentual_leads_formatado"] = f"{perc_leads:.1f}".replace(".", ",") + "%"
+
+    # Percentual CPL (comparação entre atual e meta)
+    cpl_atual = _to_float(dados.get("cpl_medio", 0))
+    cpl_meta = 15.0  # meta exemplificativa
+    extras["percentual_cpl"] = 0.0 if cpl_meta <= 0 else ((cpl_atual - cpl_meta) / cpl_meta) * 100.0
+    extras["percentual_cpl_formatado"] = f"{extras['percentual_cpl']:.1f}".replace(".", ",") + "%"
+
+    # Formatações garantidas
+    dados["investimento_total_formatado"] = moeda_ptbr(inv)
+    dados["orcamento_total_formatado"] = moeda_ptbr(orc)
+    dados["total_leads_formatado"] = numero_ptbr(leads)
+    dados["meta_leads_formatado"] = numero_ptbr(meta_leads if meta_leads != 1 else 0)  # se meta era 0, exibimos 0
+    dados["cpl_medio_formatado"] = moeda_ptbr(cpl_atual)
+    dados["meta_cpl_formatado"] = moeda_ptbr(cpl_meta)
+
+    return dados, extras
+
+def last_sync_info():
+    # Horário UTC-3 (Brasília) simples, sem dependências externas
+    tz = timezone(timedelta(hours=-3))
+    return datetime.now(tz).strftime("%d/%m/%Y %H:%M:%S")
