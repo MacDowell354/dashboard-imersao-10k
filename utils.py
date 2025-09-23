@@ -4,15 +4,13 @@ from __future__ import annotations
 import io
 import os
 from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 import requests
 
-# ------------------------------------------------------------
-# Config
-# ------------------------------------------------------------
+# ----------------------- Config -------------------------
 DEFAULT_SHEET_ID = os.getenv("SHEETS_DOC_ID", "")
 
 LOCAL_XLSX_CANDIDATES = [
@@ -22,9 +20,7 @@ LOCAL_XLSX_CANDIDATES = [
     "./base.xlsx",
 ]
 
-# ------------------------------------------------------------
-# Estado simples de sincronização e cache
-# ------------------------------------------------------------
+# ------------------- Estado/Cache -----------------------
 _LAST_SYNC = {"when": None, "source": None, "status": "never", "error": None}
 _DFS_CACHE: Dict[str, pd.DataFrame] | None = None
 
@@ -38,11 +34,9 @@ def last_sync_info() -> Dict[str, str]:
         "error": _LAST_SYNC.get("error") or "",
     }
 
-# ------------------------------------------------------------
-# Helpers pt-BR
-# ------------------------------------------------------------
+# ------------------ Helpers numéricos -------------------
 def _to_float_safe(v) -> float:
-    if v is None or (isinstance(v, float) and (np.isnan(v))):
+    if v is None or (isinstance(v, float) and np.isnan(v)):
         return 0.0
     if isinstance(v, (int, float, np.integer, np.floating)):
         try:
@@ -87,9 +81,7 @@ def format_percent(v, with_sign: bool = True) -> str:
         f = abs(f)
     return f"{sign}{f:.0f}%"
 
-# ------------------------------------------------------------
-# Leitura planilha (Google Sheets público -> .xlsx) + fallback local
-# ------------------------------------------------------------
+# ----------------- Leitura de planilhas -----------------
 def _download_gsheet_xlsx(doc_id: str) -> bytes:
     url = f"https://docs.google.com/spreadsheets/d/{doc_id}/export?format=xlsx"
     resp = requests.get(url, timeout=30)
@@ -133,9 +125,8 @@ def _try_local_xlsx() -> Dict[str, pd.DataFrame] | None:
     return None
 
 def get_dataframes(force_refresh: bool = False) -> Dict[str, pd.DataFrame]:
+    """Carrega dados (Sheets público -> xlsx) com cache simples."""
     global _DFS_CACHE
-
-    # Cache simples na memória (invalida se force_refresh=True)
     if not force_refresh and _DFS_CACHE is not None:
         return _DFS_CACHE
 
@@ -166,13 +157,11 @@ def get_dataframes(force_refresh: bool = False) -> Dict[str, pd.DataFrame]:
         _DFS_CACHE = local
         return local
 
-    # 3) Vazio (não quebra)
+    # 3) Vazio (mas não quebra)
     _DFS_CACHE = {}
     return {}
 
-# ------------------------------------------------------------
-# KPIs
-# ------------------------------------------------------------
+# ----------------------- KPIs ---------------------------
 def _find_sheet_by_candidates(dfs: Dict[str, pd.DataFrame], names: List[str]):
     lower_keys = {k.lower(): k for k in dfs.keys()}
     for candidate in names:
@@ -188,7 +177,7 @@ def compute_kpis(dfs: Dict[str, pd.DataFrame]) -> Dict[str, str]:
     roas_val = 1.0
     perc_cpl_val = 0.0
 
-    # 1) Tenta aba de KPIs
+    # 1) Procura aba de KPIs
     kpi_hit = _find_sheet_by_candidates(dfs, ["kpi", "resumo", "geral"])
     if kpi_hit:
         _, dfk = kpi_hit
@@ -213,7 +202,7 @@ def compute_kpis(dfs: Dict[str, pd.DataFrame]) -> Dict[str, str]:
         roas_val = _to_float_safe(v_roas) if v_roas is not None else roas_val
         perc_cpl_val = _to_float_safe(v_perc_cpl) if v_perc_cpl is not None else perc_cpl_val
 
-    # 2) Inferências simples
+    # 2) Inferências
     if leads == 0:
         hit = _find_sheet_by_candidates(dfs, ["lead", "cadastro"])
         if hit:
@@ -233,10 +222,4 @@ def compute_kpis(dfs: Dict[str, pd.DataFrame]) -> Dict[str, str]:
         perc_cpl_val = (cpl_medio_val / cpl_meta_val) - 1.0
 
     return {
-        "leads_total": format_number(leads),
-        "cpl_medio": format_currency(cpl_medio_val),
-        "cpl_meta": format_currency(cpl_meta_val),
-        "investimento_total": format_currency(investimento),
-        "roas": f"{_to_float_safe(roas_val):.2f}",
-        "perc_cpl": format_percent(perc_cpl_val, with_sign=True),
-    }
+        "leads_total": format_number(leads
