@@ -1,225 +1,161 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import io
 import os
+import re
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, Any
 
-import numpy as np
 import pandas as pd
-import requests
 
-# ----------------------- Config -------------------------
-DEFAULT_SHEET_ID = os.getenv("SHEETS_DOC_ID", "")
-
-LOCAL_XLSX_CANDIDATES = [
-    "./data/dados.xlsx",
-    "./data/base.xlsx",
-    "./dados.xlsx",
-    "./base.xlsx",
-]
-
-# ------------------- Estado/Cache -----------------------
-_LAST_SYNC = {"when": None, "source": None, "status": "never", "error": None}
-_DFS_CACHE: Dict[str, pd.DataFrame] | None = None
-
-def last_sync_info() -> Dict[str, str]:
-    if not _LAST_SYNC["when"]:
-        return {"when": "-", "source": "-", "status": "never", "error": ""}
-    return {
-        "when": _LAST_SYNC["when"],
-        "source": _LAST_SYNC.get("source") or "-",
-        "status": _LAST_SYNC.get("status") or "ok",
-        "error": _LAST_SYNC.get("error") or "",
-    }
-
-# ------------------ Helpers numéricos -------------------
+# -------------------- Parsing numérico robusto (pt-BR e en-US) --------------------
 def _to_float_safe(v) -> float:
-    if v is None or (isinstance(v, float) and np.isnan(v)):
+    if v is None:
         return 0.0
-    if isinstance(v, (int, float, np.integer, np.floating)):
+    if isinstance(v, (int, float)):
         try:
-            return float(v)
+            # trata NaN como 0
+            return float(0.0 if pd.isna(v) else v)
         except Exception:
-            return 0.0
+            return float(v)
+
     s = str(v).strip()
-    s = s.replace("R$", "").replace(" ", "")
-    s = s.replace(".", "").replace(",", ".")  # 9.500 -> 9500 ; 12,34 -> 12.34
+    if s == "":
+        return 0.0
+
+    # Remove símbolos comuns de moeda/espacos
+    s = re.sub(r"[^\d,.\-]", "", s)
+
+    # Caso com '.' e ',' -> assume pt-BR: '.' milhar, ',' decimal
+    if "." in s and "," in s:
+        s = s.replace(".", "").replace(",", ".")
+    else:
+        # Só vírgula: decimal em pt-BR
+        if "," in s and "." not in s:
+            s = s.replace(",", ".")
+        # Só ponto: pode ser milhar (ex.: '9.500')
+        elif s.count(".") == 1:
+            left, right = s.split(".")
+            if len(right) == 3 and right.isdigit():
+                # Provável milhar
+                s = left + right
+
     try:
         return float(s)
     except Exception:
-        return 0.0
+        # fallback agressivo
+        s2 = re.sub(r"[^0-9.\-]", "", s)
+        if s2.count(".") > 1:
+            head = s2[:-1].replace(".", "")
+            s2 = head + s2[-1]
+        try:
+            return float(s2)
+        except Exception:
+            return 0.0
 
-def _to_int_safe(v) -> int:
-    f = _to_float_safe(v)
-    try:
-        return int(round(f))
-    except Exception:
-        return 0
-
-def format_currency(v) -> str:
-    n = _to_float_safe(v)
-    s = f"{n:,.2f}"
-    return "R$ " + s.replace(",", "X").replace(".", ",").replace("X", ".")
-
+# -------------------- Formatações pt-BR --------------------
 def format_number(v) -> str:
-    n = _to_int_safe(v)
-    s = f"{n:,}"
-    return s.replace(",", ".")
+    n = int(round(_to_float_safe(v)))
+    return f"{n:,}".replace(",", ".")
 
-def format_percent(v, with_sign: bool = True) -> str:
-    if v is None:
-        return "0%"
-    f = _to_float_safe(v)
-    # aceita 0.12 ou 12 para 12%
-    if f <= 1.0:
-        f = f * 100.0
-    sign = ""
-    if with_sign and f != 0:
-        sign = "+" if f > 0 else "−"
-        f = abs(f)
-    return f"{sign}{f:.0f}%"
+def format_currency(v, prefix: str = "R$ ") -> str:
+    x = _to_float_safe(v)
+    inteiro = int(abs(x))
+    cent = int(round((abs(x) - inteiro) * 100))
+    s = f"{inteiro:,}".replace(",", ".") + "," + f"{cent:02d}"
+    return f"-{prefix}{s}" if x < 0 else f"{prefix}{s}"
 
-# ----------------- Leitura de planilhas -----------------
-def _download_gsheet_xlsx(doc_id: str) -> bytes:
-    url = f"https://docs.google.com/spreadsheets/d/{doc_id}/export?format=xlsx"
-    resp = requests.get(url, timeout=30)
-    resp.raise_for_status()
-    return resp.content
+def format_percent(v, with_sign: bool = False, decimals: int = 1) -> str:
+    x = _to_float_safe(v)
+    # Se vier em razão (0..1), vira percent; se já for percent (ex.: 43), mantém
+    if abs(x) <= 1.5:
+        x *= 100.0
+    s = f"{x:.{decimals}f}".replace(".", ",") + "%"
+    if with_sign:
+        if x > 0:
+            s = "+" + s
+        elif x < 0:
+            s = "–" + s  # en-dash
+    return s
 
-def _read_all_sheets_from_bytes(xlsx_bytes: bytes) -> Dict[str, pd.DataFrame]:
-    xl = pd.ExcelFile(io.BytesIO(xlsx_bytes))
-    dfs: Dict[str, pd.DataFrame] = {}
-    for name in xl.sheet_names:
-        df = xl.parse(name)
-        df.columns = [str(c).strip() for c in df.columns]
-        dfs[name] = df
-    return dfs
+def last_sync_info() -> str:
+    return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
-def _try_local_xlsx() -> Dict[str, pd.DataFrame] | None:
-    for path in LOCAL_XLSX_CANDIDATES:
-        if os.path.exists(path):
-            try:
-                xl = pd.ExcelFile(path)
-                dfs = {}
-                for name in xl.sheet_names:
-                    df = xl.parse(name)
-                    df.columns = [str(c).strip() for c in df.columns]
-                    dfs[name] = df
-                _LAST_SYNC.update(
-                    when=datetime.utcnow().isoformat(),
-                    source=f"local:{path}",
-                    status="ok",
-                    error=None,
-                )
-                return dfs
-            except Exception as e:
-                _LAST_SYNC.update(
-                    when=datetime.utcnow().isoformat(),
-                    source=f"local:{path}",
-                    status="error",
-                    error=str(e),
-                )
-                return None
-    return None
+# -------------------- Carregamento de dados com cache --------------------
+_CACHE: Dict[str, pd.DataFrame] = {}
+
+def _read_csv_if_exists(path: str) -> pd.DataFrame:
+    if os.path.exists(path):
+        try:
+            return pd.read_csv(path)
+        except Exception:
+            return pd.DataFrame()
+    return pd.DataFrame()
 
 def get_dataframes(force_refresh: bool = False) -> Dict[str, pd.DataFrame]:
-    """Carrega dados (Sheets público -> xlsx) com cache simples."""
-    global _DFS_CACHE
-    if not force_refresh and _DFS_CACHE is not None:
-        return _DFS_CACHE
+    """
+    Lê datasets de ./data (se existirem). Usa cache simples em memória.
+    Aceita force_refresh=True para recarregar.
+    Esperados (opcional): leads.csv, investimentos.csv, receitas.csv
+    """
+    global _CACHE
+    if _CACHE and not force_refresh:
+        return _CACHE
 
-    # 1) Google Sheets
-    if DEFAULT_SHEET_ID:
-        try:
-            raw = _download_gsheet_xlsx(DEFAULT_SHEET_ID)
-            dfs = _read_all_sheets_from_bytes(raw)
-            _LAST_SYNC.update(
-                when=datetime.utcnow().isoformat(),
-                source=f"gsheet:{DEFAULT_SHEET_ID}",
-                status="ok",
-                error=None,
-            )
-            _DFS_CACHE = dfs
-            return dfs
-        except Exception as e:
-            _LAST_SYNC.update(
-                when=datetime.utcnow().isoformat(),
-                source=f"gsheet:{DEFAULT_SHEET_ID}",
-                status="error",
-                error=str(e),
-            )
+    base = os.environ.get("DATA_DIR", "data")
+    dfs: Dict[str, pd.DataFrame] = {
+        "leads": _read_csv_if_exists(os.path.join(base, "leads.csv")),
+        "investimentos": _read_csv_if_exists(os.path.join(base, "investimentos.csv")),
+        "receitas": _read_csv_if_exists(os.path.join(base, "receitas.csv")),
+    }
 
-    # 2) Local
-    local = _try_local_xlsx()
-    if local is not None:
-        _DFS_CACHE = local
-        return local
+    _CACHE = dfs
+    return dfs
 
-    # 3) Vazio (mas não quebra)
-    _DFS_CACHE = {}
-    return {}
+# -------------------- KPIs mínimos robustos --------------------
+def _sum_cols(df: pd.DataFrame, colnames: list[str]) -> float:
+    if df is None or df.empty:
+        return 0.0
+    for c in colnames:
+        if c in df.columns:
+            return float(pd.to_numeric(df[c], errors="coerce").fillna(0).sum())
+    # se não achar col conhecida, tenta qualquer coluna numérica
+    num = df.select_dtypes(include=["number"])
+    return float(num.sum().sum()) if not num.empty else 0.0
 
-# ----------------------- KPIs ---------------------------
-def _find_sheet_by_candidates(dfs: Dict[str, pd.DataFrame], names: List[str]):
-    lower_keys = {k.lower(): k for k in dfs.keys()}
-    for candidate in names:
-        for k_lower, real_key in lower_keys.items():
-            if candidate.lower() in k_lower:
-                return real_key, dfs[real_key]
-    return None
+def compute_kpis(dfs: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
+    leads_df = dfs.get("leads", pd.DataFrame())
+    inv_df = dfs.get("investimentos", pd.DataFrame())
+    rec_df = dfs.get("receitas", pd.DataFrame())
 
-def compute_kpis(dfs: Dict[str, pd.DataFrame]) -> Dict[str, str]:
-    leads = 0
-    investimento = 0.0
-    cpl_meta_val = 15.0
-    roas_val = 1.0
-    perc_cpl_val = 0.0
+    # LEADS: prioridade por colunas usuais; senão, usa contagem de linhas.
+    leads_total = 0.0
+    if not leads_df.empty:
+        for col in ("leads", "qtde", "qtd", "quantidade"):
+            if col in leads_df.columns:
+                leads_total = float(pd.to_numeric(leads_df[col], errors="coerce").fillna(0).sum())
+                break
+        else:
+            leads_total = float(len(leads_df))
 
-    # 1) Procura aba de KPIs
-    kpi_hit = _find_sheet_by_candidates(dfs, ["kpi", "resumo", "geral"])
-    if kpi_hit:
-        _, dfk = kpi_hit
+    investimento_total = _sum_cols(inv_df, ["investimento", "valor", "spend", "gasto"])
+    receita_total = _sum_cols(rec_df, ["receita", "faturamento", "revenue", "valor"])
 
-        def pick(df: pd.DataFrame, hints: List[str]):
-            for c in df.columns:
-                c_norm = str(c).strip().lower()
-                for h in hints:
-                    if h in c_norm:
-                        return df[c].iloc[0]
-            return None
+    cpl_meta = 15.0  # meta default; altere se tiver fonte de dados
+    cpl_medio = (investimento_total / leads_total) if leads_total > 0 else 0.0
+    roas = (receita_total / investimento_total) if investimento_total > 0 else 0.0
 
-        v_leads     = pick(dfk, ["lead", "qtd", "total"])
-        v_inv       = pick(dfk, ["invest", "gasto", "spend", "custo total"])
-        v_cpl_meta  = pick(dfk, ["meta cpl", "cpl meta"])
-        v_roas      = pick(dfk, ["roas"])
-        v_perc_cpl  = pick(dfk, ["percentual cpl", "% cpl", "var cpl"])
-
-        leads = _to_int_safe(v_leads) if v_leads is not None else 0
-        investimento = _to_float_safe(v_inv) if v_inv is not None else 0.0
-        cpl_meta_val = _to_float_safe(v_cpl_meta) if v_cpl_meta is not None else cpl_meta_val
-        roas_val = _to_float_safe(v_roas) if v_roas is not None else roas_val
-        perc_cpl_val = _to_float_safe(v_perc_cpl) if v_perc_cpl is not None else perc_cpl_val
-
-    # 2) Inferências
-    if leads == 0:
-        hit = _find_sheet_by_candidates(dfs, ["lead", "cadastro"])
-        if hit:
-            _, dfl = hit
-            leads = len(dfl.index)
-
-    if investimento == 0:
-        hit = _find_sheet_by_candidates(dfs, ["invest", "mídia", "gasto", "ads", "facebook", "google"])
-        if hit:
-            _, dfi = hit
-            for col in dfi.columns:
-                if any(x in str(col).lower() for x in ["invest", "spend", "gasto", "custo"]):
-                    investimento += _to_float_safe(dfi[col].sum())
-
-    cpl_medio_val = (investimento / leads) if leads > 0 else 0.0
-    if perc_cpl_val == 0.0 and cpl_meta_val > 0:
-        perc_cpl_val = (cpl_medio_val / cpl_meta_val) - 1.0
+    # variação do CPL vs meta (formato pronto p/ frontend)
+    perc_cpl = (
+        format_percent((cpl_medio / cpl_meta) - 1.0, with_sign=True)
+        if cpl_meta > 0 else "0%"
+    )
 
     return {
-        "leads_total": format_number(leads
+        "leads_total": leads_total,
+        "investimento_total": investimento_total,
+        "cpl_medio": cpl_medio,
+        "cpl_meta": cpl_meta,
+        "roas": roas,
+        "perc_cpl": perc_cpl,
+    }
