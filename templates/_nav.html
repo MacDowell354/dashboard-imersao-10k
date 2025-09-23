@@ -1,12 +1,22 @@
+<!-- templates/_nav.html -->
 <nav style="background:#0f172a;border-bottom:1px solid #233045">
-  <div style="max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap">
-    <a href="{{ url_for('visao_geral') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Visão Geral</a>
-    <a href="{{ url_for('dashboard') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Dashboard</a>
-    <a href="{{ url_for('origem_conversao') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Origem & Conversão</a>
-    <a href="{{ url_for('profissao_canal') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Profissão & Canal</a>
-    <a href="{{ url_for('projecao_resultados') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Projeção</a>
-    <a href="{{ url_for('analise_regional') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Análise Regional</a>
-    <a href="{{ url_for('insights_ia') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Insights IA</a>
-    <a href="{{ url_for('vendas') }}" style="padding:8px 10px;border:1px solid #233045;border-radius:10px;color:#e2e8f0;text-decoration:none">Vendas</a>
+  <div style="max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;gap:14px;flex-wrap:wrap">
+    {% set items = [
+      ("/visao-geral","Visão Geral"),
+      ("/dashboard","Dashboard"),
+      ("/origem-conversao","Origem & Conversão"),
+      ("/insights-ia","Insights IA"),
+      ("/projecao-resultados","Projeção de Resultados"),
+      ("/analise-regional","Análise Regional"),
+      ("/profissao-canal","Profissão x Canal"),
+      ("/vendas","Vendas")
+    ] %}
+    {% for href, label in items %}
+      {% set active = 'font-weight:700;border-color:#60a5fa;background:rgba(96,165,250,.1);' if current_path.startswith(href) else '' %}
+      <a href="{{ href }}"
+         style="color:#e2e8f0;text-decoration:none;border:1px solid #233045;border-radius:10px;padding:6px 10px;{{active}}">
+        {{ label }}
+      </a>
+    {% endfor %}
   </div>
 </nav>
