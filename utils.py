@@ -1,412 +1,194 @@
 # -*- coding: utf-8 -*-
-"""
-Módulo utilitário do Dashboard CHT22.
-- NÃO importe este módulo dentro dele mesmo (evita import circular).
-- Fornece carregamento de dados, formatações e cálculos usados pelo app.
-"""
-
 import os
-import io
 from datetime import datetime, date, timedelta
-from typing import Dict, Tuple, List, Any, Optional
 
-import pandas as pd
-import numpy as np
-import requests
+from flask import Flask, render_template, redirect, url_for
+
+# Importa utilitários (NÃO importe app.py dentro de utils.py para evitar loop)
+from utils import (
+    get_dataframes,
+    compute_kpis,
+    compute_origem_conversao,
+    compute_profissao_canal,
+    compute_analise_regional,
+    compute_insights_ia,
+    compute_projecao_resultados,
+    format_currency,
+    format_number,
+    format_percent,
+    last_sync_info,
+)
+
+app = Flask(__name__)
 
 
-# ==============================
-# Config & Cache
-# ==============================
-_CACHE: Dict[str, Any] = {"dfs": None, "loaded_at": None, "source": None}
+# -----------------------------
+# Filtros Jinja (pt-BR)
+# -----------------------------
+@app.template_filter("moeda_ptbr")
+def moeda_ptbr(v):
+    return format_currency(v)
+
+@app.template_filter("numero_ptbr")
+def numero_ptbr(v):
+    return format_number(v)
+
+@app.template_filter("percent_ptbr")
+def percent_ptbr(v):
+    # aceita 0.05 ou 5 (%)
+    return format_percent(v, with_sign=False)
 
 
-# ==============================
-# Helpers de parsing / formatação
-# ==============================
-def _strip_str(x: Any) -> str:
-    if x is None or (isinstance(x, float) and pd.isna(x)):
-        return ""
-    return str(x).strip()
-
-
-def _to_float(x: Any) -> float:
-    """Converte valores em pt-BR para float.
-    Aceita: "9.500", "1.234,56", "R$ 12.345,67", "5%", 12_345.67, etc."""
-    if x is None:
-        return np.nan
-    if isinstance(x, (int, float, np.number)) and not pd.isna(x):
-        return float(x)
-    s = _strip_str(x)
-
-    if s == "":
-        return np.nan
-
-    # Remove moeda / espaços
-    s = s.replace("R$", "").replace(" ", "")
-
-    # Percentual
-    if s.endswith("%"):
-        s = s[:-1]
-        # Troca milhar/decimal pt-BR
-        s = s.replace(".", "").replace(",", ".")
+# -----------------------------
+# Helpers de contexto
+# -----------------------------
+def _parse_currency_text_to_float(txt: str) -> float:
+    """Converte 'R$ 12.345,67' -> 12345.67 de forma tolerante."""
+    if not isinstance(txt, str):
         try:
-            return float(s) / 100.0
+            return float(txt)
         except Exception:
-            return np.nan
-
-    # Número normal pt-BR
+            return 0.0
+    s = txt.strip().replace("R$", "").replace(" ", "")
     s = s.replace(".", "").replace(",", ".")
     try:
         return float(s)
     except Exception:
-        return np.nan
+        return 0.0
 
-
-def _safe_int(x: Any) -> int:
-    v = _to_float(x)
-    if pd.isna(v):
-        return 0
-    return int(round(float(v)))
-
-
-def format_number(v: Any) -> str:
-    """Formata integer com milhar em pt-BR: 12345 -> '12.345'"""
-    if v is None or (isinstance(v, float) and pd.isna(v)):
-        return "0"
-    n = _safe_int(v)
-    return f"{n:,}".replace(",", ".")
-
-
-def format_currency(v: Any) -> str:
-    """Formata moeda pt-BR: 12345.6 -> 'R$ 12.345,60'"""
-    val = _to_float(v)
-    if pd.isna(val):
-        val = 0.0
-    s = f"{val:,.2f}"
-    s = s.replace(",", "X").replace(".", ",").replace("X", ".")
-    return f"R$ {s}"
-
-
-def format_percent(v: Any, with_sign: bool = True) -> str:
-    """Formata percentual pt-BR. Aceita 0.05 ou 5 (%)"""
-    val = _to_float(v)
-    if pd.isna(val):
-        val = 0.0
-    # Se já veio em 5 (e não 0.05), interpreta como 5%
-    if abs(val) > 1:
-        pct = val
-    else:
-        pct = val * 100.0
-    sign = "+" if (with_sign and pct > 0) else ""
-    s = f"{pct:,.0f}".replace(",", ".")
-    return f"{sign}{s}%"
-
-
-def last_sync_info() -> Dict[str, Any]:
-    ts = _CACHE.get("loaded_at")
-    src = _CACHE.get("source") or "desconhecido"
-    return {
-        "when": (ts.isoformat() if isinstance(ts, datetime) else None),
-        "source": src,
-    }
-
-
-# ==============================
-# Carregamento de dados
-# ==============================
-def _gsheet_export_xlsx_url() -> Optional[str]:
-    gsid = os.getenv("GSHEET_ID", "").strip()
-    if gsid:
-        return f"https://docs.google.com/spreadsheets/d/{gsid}/export?format=xlsx"
-    url = os.getenv("GSHEET_XLSX_URL", "").strip()
-    if url:
-        return url
-    return None
-
-
-def _read_all_sheets_from_xlsx_bytes(content: bytes) -> Dict[str, pd.DataFrame]:
-    try:
-        dfs = pd.read_excel(io.BytesIO(content), sheet_name=None, engine="openpyxl")
-        # Normaliza nomes das abas
-        return {str(k).strip(): v for k, v in dfs.items()}
-    except Exception:
-        return {}
-
-
-def _read_data() -> Dict[str, pd.DataFrame]:
-    """
-    Tenta nesta ordem:
-      1) Google Sheets via export XLSX (se GSHEET_ID/GSHEET_XLSX_URL estiver setado)
-      2) Arquivo local (DATA_XLSX_PATH) ou defaults conhecidos.
-    """
-    # 1) Google Sheets export XLSX
-    url = _gsheet_export_xlsx_url()
-    if url:
+def _parse_number_text_to_float(txt: str) -> float:
+    """Converte '12.345' -> 12345 e '2,24' -> 2.24 (tolerante)."""
+    if not isinstance(txt, str):
         try:
-            r = requests.get(url, timeout=30)
-            r.raise_for_status()
-            dfs = _read_all_sheets_from_xlsx_bytes(r.content)
-            if dfs:
-                _CACHE["source"] = "google_sheets"
-                return dfs
+            return float(txt)
         except Exception:
-            pass
+            return 0.0
+    s = txt.strip().replace(".", "").replace(",", ".")
+    try:
+        return float(s)
+    except Exception:
+        return 0.0
 
-    # 2) Arquivo local
-    local_candidates = [
-        os.getenv("DATA_XLSX_PATH", "").strip(),
-        "/app/data.xlsx",
-        "/app/data/base.xlsx",
-        "/app/Base de Dados Para o Dash IA CHT22 (1).xlsx",
-        "/app/data/dados.xlsx",
-    ]
-    for path in [p for p in local_candidates if p]:
-        if os.path.exists(path):
-            try:
-                dfs = pd.read_excel(path, sheet_name=None, engine="openpyxl")
-                _CACHE["source"] = os.path.basename(path)
-                return {str(k).strip(): v for k, v in dfs.items()}
-            except Exception:
-                continue
+def build_dados_e_extras(kpis: dict) -> tuple[dict, dict]:
+    """Gera os dicionários 'dados' e 'extras' esperados pelo template."""
+    # Datas padrão: mês corrente
+    hoje = date.today()
+    inicio = hoje.replace(day=1)
+    fim = hoje
+    dias_campanha = (fim - inicio).days + 1
 
-    # Sem dados
-    _CACHE["source"] = "empty"
-    return {}
+    # Receita estimada: investimento x ROAS (se existir)
+    inv_float = _parse_currency_text_to_float(kpis.get("investimento_total", "R$ 0,00"))
+    roas_float = _parse_number_text_to_float(kpis.get("roas", "1"))
+    receita_estimada = inv_float * (roas_float if roas_float > 0 else 1.0)
 
-
-def get_dataframes(force_refresh: bool = False) -> Dict[str, pd.DataFrame]:
-    """Carrega e faz cache leve dos dataframes de todas as abas."""
-    if not force_refresh and _CACHE.get("dfs") is not None:
-        return _CACHE["dfs"]
-
-    dfs = _read_data()
-    _CACHE["dfs"] = dfs
-    _CACHE["loaded_at"] = datetime.utcnow()
-    return dfs
-
-
-# ==============================
-# Cálculos de KPIs
-# ==============================
-def _lookup_metric(df: pd.DataFrame, metric_names: List[str]) -> Any:
-    """Procura valor por nome de métrica (coluna/linha), tolerante a layout."""
-    if df is None or df.empty:
-        return np.nan
-
-    # Caso tipo tabela 2 colunas: "Métrica" | "Valor"
-    cols_lower = [str(c).strip().lower() for c in df.columns]
-    metric_col_idx = None
-    value_col_idx = None
-
-    for i, c in enumerate(cols_lower):
-        if c in {"metrica", "métrica", "indicador", "kpi", "nome"}:
-            metric_col_idx = i
-        if c in {"valor", "value", "resultado"}:
-            value_col_idx = i
-
-    if metric_col_idx is not None and value_col_idx is not None:
-        for _, row in df.iterrows():
-            name = _strip_str(row.iloc[metric_col_idx]).lower()
-            if any(name == m.lower() for m in metric_names):
-                return row.iloc[value_col_idx]
-
-    # Tenta por colunas com os nomes das métricas
-    for m in metric_names:
-        if m.lower() in cols_lower:
-            try:
-                col = df.iloc[:, cols_lower.index(m.lower())]
-                # Pega primeira célula não nula
-                val = col.dropna().iloc[0] if not col.dropna().empty else np.nan
-                return val
-            except Exception:
-                pass
-
-    return np.nan
-
-
-def compute_kpis(dfs: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
-    """Retorna dict com strings já formatadas para exibição."""
-    # Heurísticas de onde podem estar os KPIs
-    candidate_tabs = ["KPIs", "KPI", "Resumo", "RESUMO", "Visão Geral", "Dados", "Base", "Dashboard"]
-
-    df_kpis = None
-    for tab in candidate_tabs:
-        if tab in dfs:
-            df_kpis = dfs[tab]
-            break
-        # tenta por case-insensitive
-        for key in dfs.keys():
-            if key.strip().lower() == tab.strip().lower():
-                df_kpis = dfs[key]
-                break
-        if df_kpis is not None:
-            break
-
-    # Extrai métricas se existir aba
-    leads = _to_float(_lookup_metric(df_kpis, ["Total Leads", "Leads", "leads_total"]))
-    investimento = _to_float(_lookup_metric(df_kpis, ["Investimento", "Gasto", "Spend"]))
-    cpl_meta = _to_float(_lookup_metric(df_kpis, ["Meta CPL", "CPL Meta"]))
-    cpl_medio = _to_float(_lookup_metric(df_kpis, ["CPL Médio", "CPL", "Custo por Lead"]))
-    roas = _to_float(_lookup_metric(df_kpis, ["ROAS", "Return on Ad Spend"]))
-
-    # Fallbacks calculados
-    if pd.isna(leads):
-        # procura qualquer aba com leads por linha
-        for name, df in dfs.items():
-            try:
-                # se tem coluna 'lead' ou 'id' assume contagem de linhas
-                if isinstance(df, pd.DataFrame) and len(df) and df.shape[0] > 0:
-                    leads = float(len(df))
-                    break
-            except Exception:
-                pass
-    if pd.isna(investimento) and not pd.isna(cpl_medio) and not pd.isna(leads) and leads > 0:
-        investimento = cpl_medio * leads
-    if pd.isna(cpl_medio) and not pd.isna(investimento) and not pd.isna(leads) and leads > 0:
-        cpl_medio = investimento / max(leads, 1)
-    if pd.isna(cpl_meta):
-        cpl_meta = 0.0
-    if pd.isna(roas) and not pd.isna(investimento) and investimento > 0:
-        roas = 1.0  # neutro, caso não exista
-
-    # Percentual de variação do CPL vs meta
-    if cpl_meta and cpl_meta != 0 and not pd.isna(cpl_medio):
-        pct_cpl = (cpl_medio - cpl_meta) / cpl_meta
-    else:
-        pct_cpl = 0.0
-
-    # Sanitiza números absurdos (ex.: '45894' vindo como CPL) — mantém o app no ar
-    if not pd.isna(cpl_medio) and cpl_medio > 200:
-        cpl_medio = min(cpl_medio, 200)
-
-    return {
-        "leads_total": format_number(leads),
-        "cpl_medio": format_currency(cpl_medio),
-        "meta_cpl": format_currency(cpl_meta),
-        "investimento_total": format_currency(investimento),
-        "roas": f"{_to_float(roas):.2f}" if not pd.isna(roas) else "—",
-        "percentual_cpl": format_percent(pct_cpl, with_sign=True),
+    dados = {
+        "data_inicio": inicio.strftime("%d/%m/%Y"),
+        "data_fim": fim.strftime("%d/%m/%Y"),
+        "dias_campanha": dias_campanha,
+        "conversao": {
+            "receita_estimada_curso": receita_estimada
+        },
     }
 
+    # Percentual de orçamento (se tiver métrica 'Orçamento' na planilha, calcule; senão, mostra "—")
+    # Aqui deixamos só um placeholder seguro. Se você tiver o campo "Orçamento Total",
+    # podemos somar e calcular invest/orc para popular de fato.
+    extras = {
+        "percentual_orcamento_formatado": "—"
+    }
 
-# ==============================
-# Outras páginas: origens, profissões, região, IA, projeção
-# ==============================
-def compute_origem_conversao(dfs: Dict[str, pd.DataFrame]) -> Tuple[pd.DataFrame, Dict[str, Any]]:
-    """
-    Retorna:
-      - tabela por origem/canal com métricas básicas
-      - funil resumido (dict)
-    Tolerante a falta de colunas/abas.
-    """
-    # Tenta achar aba provável
-    origem_df = None
-    for key in dfs.keys():
-        if any(x in key.lower() for x in ["origem", "canal", "fonte", "source", "utm"]):
-            origem_df = dfs[key].copy()
-            break
+    return dados, extras
 
-    if origem_df is None or origem_df.empty:
-        # Default seguro
-        tabela = pd.DataFrame([
-            {"origem": "Google Ads", "leads": 0, "cpl": 0.0},
-            {"origem": "Meta Ads", "leads": 0, "cpl": 0.0},
-        ])
-        funil = {"impressoes": 0, "cliques": 0, "leads": 0, "vendas": 0, "taxa_conv": "0%"}
-        return tabela, funil
 
-    # Normaliza possíveis colunas
-    cols = {c.lower(): c for c in origem_df.columns}
-    origem_col = cols.get("origem") or cols.get("canal") or cols.get("fonte") or list(origem_df.columns)[0]
-    leads_col = None
-    for name in ["leads", "qtd_leads", "total_leads"]:
-        if name in cols:
-            leads_col = cols[name]
-            break
+# -----------------------------
+# Rotas
+# -----------------------------
+@app.route("/")
+def home():
+    return redirect(url_for("visao_geral"))
 
-    inv_col = None
-    for name in ["investimento", "gasto", "spend", "custo"]:
-        if name in cols:
-            inv_col = cols[name]
-            break
+@app.route("/healthz")
+def healthz():
+    return {"status": "ok", "ts": datetime.utcnow().isoformat()}
 
-    tabela = origem_df.copy()
-    tabela.rename(columns={origem_col: "origem"}, inplace=True)
-    if leads_col and leads_col in tabela:
-        tabela.rename(columns={leads_col: "leads"}, inplace=True)
-    else:
-        tabela["leads"] = 0
-
-    if inv_col and inv_col in tabela:
-        tabela["investimento"] = tabela[inv_col].apply(_to_float)
-    else:
-        tabela["investimento"] = 0.0
-
-    tabela["cpl"] = tabela.apply(
-        lambda r: (r["investimento"] / r["leads"]) if r["leads"] else 0.0, axis=1
+@app.route("/visao-geral")
+def visao_geral():
+    dfs = get_dataframes()
+    kpis = compute_kpis(dfs)
+    dados, extras = build_dados_e_extras(kpis)
+    return render_template(
+        "visao_geral_atualizada.html",
+        kpis=kpis,
+        dados=dados,
+        extras=extras,
+        last_sync=last_sync_info(),
     )
 
-    # Funil simples
-    funil = {
-        "impressoes": 0,
-        "cliques": 0,
-        "leads": int(tabela["leads"].sum()),
-        "vendas": 0,
-        "taxa_conv": format_percent(0.0, with_sign=False),
-    }
-    return tabela, funil
-
-
-def compute_profissao_canal(dfs: Dict[str, pd.DataFrame]) -> pd.DataFrame:
-    """Tabela por profissão x canal (default vazio se não houver dados)."""
-    for key, df in dfs.items():
-        if any(x in key.lower() for x in ["profissao", "profissão", "ocupacao", "ocupação"]):
-            return df.copy()
-    return pd.DataFrame(columns=["profissao", "canal", "leads", "cpl"])
-
-
-def compute_analise_regional(dfs: Dict[str, pd.DataFrame]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Retorna (estados, regioes) com métricas. Defaults vazios caso não existam."""
-    estados = pd.DataFrame(columns=["uf", "leads", "cpl"])
-    regioes = pd.DataFrame(columns=["regiao", "leads", "cpl"])
-    for key, df in dfs.items():
-        lk = key.lower()
-        if "estado" in lk or "uf" in lk:
-            estados = df.copy()
-        if "regiao" in lk or "região" in lk:
-            regioes = df.copy()
-    return estados, regioes
-
-
-def compute_insights_ia(dfs: Dict[str, pd.DataFrame]) -> List[Dict[str, str]]:
-    """Lista de insights (texto). Mantém seguro se não houver dados."""
-    return [
-        {"titulo": "Aquisição eficiente", "descricao": "CPL atual dentro da meta em canais principais."},
-        {"titulo": "Oportunidade regional", "descricao": "Aumentar orçamento em estados com CPL < média."},
-    ]
-
-
-def compute_projecao_resultados(dfs: Dict[str, pd.DataFrame]) -> Tuple[pd.DataFrame, Dict[str, Any]]:
-    """Projeções simples a partir do investimento atual."""
-    # Tenta encontrar investimento/leads
+@app.route("/origem")
+def origem():
+    dfs = get_dataframes()
+    tabela, funil = compute_origem_conversao(dfs)
     kpis = compute_kpis(dfs)
-    investimento = _to_float(kpis.get("investimento_total", 0))
-    cpl = _to_float(kpis.get("cpl_medio", 0))
+    return render_template(
+        "origem_conversao_canal.html",
+        tabela=tabela,
+        funil=funil,
+        kpis=kpis,
+        last_sync=last_sync_info(),
+    )
 
-    if pd.isna(investimento):
-        investimento = 0.0
-    if pd.isna(cpl) or cpl <= 0:
-        cpl = 1.0
+@app.route("/profissao-canal")
+def profissao_canal():
+    dfs = get_dataframes()
+    tabela = compute_profissao_canal(dfs)
+    kpis = compute_kpis(dfs)
+    return render_template(
+        "profissao_canal.html",
+        tabela=tabela,
+        kpis=kpis,
+        last_sync=last_sync_info(),
+    )
 
-    # Projeção básica para próximos 7 dias
-    dias = list(range(1, 8))
-    leads_proj = [int((investimento / cpl) * (d / 7.0)) for d in dias]
-    df = pd.DataFrame({"dia": dias, "leads_projetados": leads_proj})
+@app.route("/analise-regional")
+def analise_regional():
+    dfs = get_dataframes()
+    estados, regioes = compute_analise_regional(dfs)
+    kpis = compute_kpis(dfs)
+    return render_template(
+        "analise_regional.html",
+        estados=estados,
+        regioes=regioes,
+        kpis=kpis,
+        last_sync=last_sync_info(),
+    )
 
-    premissas = {
-        "cpl_considerado": format_currency(cpl),
-        "investimento_base": format_currency(investimento),
-        "janela_dias": 7,
-    }
-    return df, premissas
+@app.route("/insights-ia")
+def insights_ia():
+    dfs = get_dataframes()
+    insights = compute_insights_ia(dfs)
+    kpis = compute_kpis(dfs)
+    return render_template(
+        "insights_ia.html",
+        insights=insights,
+        kpis=kpis,
+        last_sync=last_sync_info(),
+    )
+
+@app.route("/projecao")
+def projecao():
+    dfs = get_dataframes()
+    df_proj, premissas = compute_projecao_resultados(dfs)
+    kpis = compute_kpis(dfs)
+    return render_template(
+        "projecao_resultados.html",
+        proj=df_proj,
+        premissas=premissas,
+        kpis=kpis,
+        last_sync=last_sync_info(),
+    )
+
+
+if __name__ == "__main__":
+    # Para rodar localmente: python app.py
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", "10000")), debug=True)
