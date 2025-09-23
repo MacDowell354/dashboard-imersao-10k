@@ -1,12 +1,14 @@
 # app.py
 from flask import Flask, render_template, request, url_for
 from utils import get_dataframes, compute_kpis, last_sync_info, moeda_ptbr, numero_ptbr
+from datetime import datetime
 
 app = Flask(__name__)
 
 # Filtros Jinja usados nos templates
 app.jinja_env.filters["moeda_ptbr"] = moeda_ptbr
 app.jinja_env.filters["numero_ptbr"] = numero_ptbr
+app.jinja_env.globals['datetime'] = datetime
 
 # Deixa o path atual disponível no template (_nav.html)
 @app.context_processor
