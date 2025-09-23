@@ -10,10 +10,9 @@ def _to_float(v):
             return 0.0
         if isinstance(v, (int, float)):
             return float(v)
-        # normaliza '9.500' -> 9500 e '9,50' -> 9.50
         s = str(v).strip()
+        # normaliza milhares/ponto e decimal/vírgula
         if s.count(".") > 1 and "," not in s:
-            # muitos pontos (thousands). remove todos os pontos
             s = s.replace(".", "")
         s = s.replace(".", "").replace(",", ".")
         return float(s)
@@ -23,7 +22,6 @@ def _to_float(v):
 def moeda_ptbr(v):
     n = _to_float(v)
     s = f"{n:,.2f}"
-    # 1,234,567.89 -> 1.234.567,89
     s = s.replace(",", "X").replace(".", ",").replace("X", ".")
     return f"R$ {s}"
 
@@ -40,8 +38,8 @@ def numero_ptbr(v):
 # ============
 def get_dataframes(force_refresh: bool = False):
     """
-    Deixe essa função pronta para, no futuro, carregar CSV/Sheets.
-    Por enquanto retornamos um dicionário vazio para manter o app estável.
+    Mantido simples (sem I/O) para estabilidade do deploy.
+    Quando você ligar planilhas/CSVs, carregue aqui.
     """
     return {}
 
@@ -92,7 +90,7 @@ def _defaults():
             "facebook":  {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},
             "youtube":   {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},
             "instagram": {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},
-            "google":    {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},  # <- evita Undefined 'google'
+            "google":    {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},
         },
 
         "regioes": {
@@ -130,45 +128,41 @@ def _defaults():
     return dados, extras
 
 def compute_kpis(dfs):
-    """
-    Aqui você pode ler os dataframes (quando existirem) e calcular KPIs.
-    Mantemos tudo robusto, com defaults, para não quebrar os templates.
-    """
+    """Cálculo simples e seguro dos KPIs (sem quebrar com dados vazios)."""
     dados, extras = _defaults()
 
-    # Exemplo de cálculo seguro (mantendo zeros quando não há dados):
     orc = _to_float(dados.get("orcamento_total", 0))
     inv = _to_float(dados.get("investimento_total", 0))
     leads = int(_to_float(dados.get("total_leads", 0)))
-    meta_leads = max(1, int(_to_float(dados.get("meta_leads", 0))))  # evita div/0
+    meta_leads_raw = int(_to_float(dados.get("meta_leads", 0)))
 
-    # Percentual de orçamento usado
+    # % orçamento
     perc_orc = 0.0 if orc <= 0 else (inv / orc) * 100.0
     extras["percentual_orcamento"] = perc_orc
     extras["percentual_orcamento_formatado"] = f"{perc_orc:.1f}".replace(".", ",") + "%"
 
-    # Percentual de atingimento de leads (se meta 0, consideramos 100%)
-    perc_leads = 100.0 if meta_leads == 0 else (leads / meta_leads) * 100.0
+    # % leads vs meta (se meta==0, mostramos 100%)
+    perc_leads = 100.0 if meta_leads_raw == 0 else (leads / max(meta_leads_raw, 1)) * 100.0
     extras["percentual_leads"] = perc_leads
     extras["percentual_leads_formatado"] = f"{perc_leads:.1f}".replace(".", ",") + "%"
 
-    # Percentual CPL (comparação entre atual e meta)
+    # % CPL vs meta
     cpl_atual = _to_float(dados.get("cpl_medio", 0))
-    cpl_meta = 15.0  # meta exemplificativa
-    extras["percentual_cpl"] = 0.0 if cpl_meta <= 0 else ((cpl_atual - cpl_meta) / cpl_meta) * 100.0
-    extras["percentual_cpl_formatado"] = f"{extras['percentual_cpl']:.1f}".replace(".", ",") + "%"
+    cpl_meta = 15.0
+    perc_cpl = 0.0 if cpl_meta <= 0 else ((cpl_atual - cpl_meta) / cpl_meta) * 100.0
+    extras["percentual_cpl"] = perc_cpl
+    extras["percentual_cpl_formatado"] = f"{perc_cpl:.1f}".replace(".", ",") + "%"
 
-    # Formatações garantidas
+    # Formatações
     dados["investimento_total_formatado"] = moeda_ptbr(inv)
     dados["orcamento_total_formatado"] = moeda_ptbr(orc)
     dados["total_leads_formatado"] = numero_ptbr(leads)
-    dados["meta_leads_formatado"] = numero_ptbr(meta_leads if meta_leads != 1 else 0)  # se meta era 0, exibimos 0
+    dados["meta_leads_formatado"] = numero_ptbr(meta_leads_raw)
     dados["cpl_medio_formatado"] = moeda_ptbr(cpl_atual)
     dados["meta_cpl_formatado"] = moeda_ptbr(cpl_meta)
 
     return dados, extras
 
 def last_sync_info():
-    # Horário UTC-3 (Brasília) simples, sem dependências externas
-    tz = timezone(timedelta(hours=-3))
+    tz = timezone(timedelta(hours=-3))  # Brasília
     return datetime.now(tz).strftime("%d/%m/%Y %H:%M:%S")
