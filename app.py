@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+import os
 from flask import Flask, render_template, jsonify, request, redirect, url_for
-from datetime import datetime
 from utils import (
     get_dataframes, compute_kpis, compute_origem_conversao, compute_profissao_canal,
     compute_analise_regional, compute_insights_ia, compute_projecao_resultados,
