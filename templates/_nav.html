@@ -1,24 +1,15 @@
-<!-- templates/_nav.html -->
-<nav class="topnav">
-  <div class="topnav-inner">
-    <div class="brand">CHT22</div>
-    {% set p = request.path %}
-    <a href="/visao-geral"          class="link {{ 'active' if p.startswith('/visao-geral') else '' }}">Visão Geral</a>
-    <a href="/dashboard"            class="link {{ 'active' if p.startswith('/dashboard') else '' }}">Dashboard</a>
-    <a href="/insights-ia"          class="link {{ 'active' if p.startswith('/insights-ia') else '' }}">Insights IA</a>
-    <a href="/origem-conversao"     class="link {{ 'active' if p.startswith('/origem-conversao') else '' }}">Origem da Conversa</a>
-    <a href="/profissao-canal"      class="link {{ 'active' if p.startswith('/profissao-canal') else '' }}">Profissão × Canal</a>
-    <a href="/projecao-resultados"  class="link {{ 'active' if p.startswith('/projecao-resultados') else '' }}">Projeção</a>
-    <a href="/vendas"               class="link {{ 'active' if p.startswith('/vendas') else '' }}">Vendas</a>
-    <a href="/analise-regional"     class="link {{ 'active' if p.startswith('/analise-regional') else '' }}">Análise Regional</a>
-  </div>
+<nav style="
+  display:flex; gap:.75rem; flex-wrap:wrap; align-items:center;
+  background:#0f172a; color:#fff; padding:.75rem 1rem; border-bottom:1px solid #1f2937;">
+  <a href="/visao-geral" style="color:#fff; text-decoration:none; font-weight:600;">🏠 Visão Geral</a>
+  <a href="/dashboard" style="color:#cbd5e1; text-decoration:none;">📊 Dashboard</a>
+  <a href="/insights-ia" style="color:#cbd5e1; text-decoration:none;">🤖 Insights IA</a>
+  <a href="/origem-conversao" style="color:#cbd5e1; text-decoration:none;">🔁 Origem & Conversão</a>
+  <a href="/profissao-canal" style="color:#cbd5e1; text-decoration:none;">🧑‍💼 Profissão x Canal</a>
+  <a href="/projecao-resultados" style="color:#cbd5e1; text-decoration:none;">📈 Projeção</a>
+  <a href="/analise-regional" style="color:#cbd5e1; text-decoration:none;">🗺️ Análise Regional</a>
+  <a href="/vendas" style="color:#cbd5e1; text-decoration:none;">🛒 Vendas</a>
+  <span style="margin-left:auto; font-size:.85rem; color:#94a3b8;">
+    <a href="/visao-geral?refresh=1" style="color:#94a3b8; text-decoration:none;">↻ Recarregar dados</a>
+  </span>
 </nav>
-
-<style>
-  .topnav{position:sticky;top:0;z-index:1000;background:#0f172a;border-bottom:1px solid #334155}
-  .topnav-inner{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-  .brand{font-weight:800;letter-spacing:.04em;color:#e2e8f0;margin-right:8px}
-  .link{color:#cbd5e1;text-decoration:none;padding:8px 10px;border-radius:10px;border:1px solid transparent}
-  .link:hover{background:#0b1220;border-color:#334155}
-  .link.active{color:#86efac;border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.08)}
-</style>
