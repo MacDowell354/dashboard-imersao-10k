@@ -1,161 +1,169 @@
-# -*- coding: utf-8 -*-
-from __future__ import annotations
+# utils.py
+from datetime import datetime, date
+from math import isfinite
 
-import os
-import re
-from datetime import datetime
-from typing import Dict, Any
-
-import pandas as pd
-
-# -------------------- Parsing numérico robusto (pt-BR e en-US) --------------------
-def _to_float_safe(v) -> float:
+# -----------------------------
+# Filtros Jinja (PT-BR)
+# -----------------------------
+def _to_float_ptbr(v):
+    """
+    Converte strings tipo '9.500', '1.234,56' em float.
+    Aceita também números já numéricos. Retorna 0.0 em caso de erro.
+    """
     if v is None:
         return 0.0
-    if isinstance(v, (int, float)):
-        try:
-            # trata NaN como 0
-            return float(0.0 if pd.isna(v) else v)
-        except Exception:
-            return float(v)
-
-    s = str(v).strip()
-    if s == "":
-        return 0.0
-
-    # Remove símbolos comuns de moeda/espacos
-    s = re.sub(r"[^\d,.\-]", "", s)
-
-    # Caso com '.' e ',' -> assume pt-BR: '.' milhar, ',' decimal
-    if "." in s and "," in s:
-        s = s.replace(".", "").replace(",", ".")
-    else:
-        # Só vírgula: decimal em pt-BR
-        if "," in s and "." not in s:
-            s = s.replace(",", ".")
-        # Só ponto: pode ser milhar (ex.: '9.500')
-        elif s.count(".") == 1:
-            left, right = s.split(".")
-            if len(right) == 3 and right.isdigit():
-                # Provável milhar
-                s = left + right
-
     try:
+        if isinstance(v, (int, float)):
+            return float(v)
+        s = str(v).strip()
+        # primeiro remove separador de milhar ".", depois troca "," por "."
+        s = s.replace(".", "").replace(",", ".")
         return float(s)
     except Exception:
-        # fallback agressivo
-        s2 = re.sub(r"[^0-9.\-]", "", s)
-        if s2.count(".") > 1:
-            head = s2[:-1].replace(".", "")
-            s2 = head + s2[-1]
-        try:
-            return float(s2)
-        except Exception:
-            return 0.0
+        return 0.0
 
-# -------------------- Formatações pt-BR --------------------
-def format_number(v) -> str:
-    n = int(round(_to_float_safe(v)))
-    return f"{n:,}".replace(",", ".")
+def _to_int_ptbr(v):
+    try:
+        return int(round(_to_float_ptbr(v)))
+    except Exception:
+        return 0
 
-def format_currency(v, prefix: str = "R$ ") -> str:
-    x = _to_float_safe(v)
-    inteiro = int(abs(x))
-    cent = int(round((abs(x) - inteiro) * 100))
-    s = f"{inteiro:,}".replace(",", ".") + "," + f"{cent:02d}"
-    return f"-{prefix}{s}" if x < 0 else f"{prefix}{s}"
+def moeda_ptbr(v):
+    f = _to_float_ptbr(v)
+    return ("R$ {:,.2f}".format(f)).replace(",", "X").replace(".", ",").replace("X", ".")
 
-def format_percent(v, with_sign: bool = False, decimals: int = 1) -> str:
-    x = _to_float_safe(v)
-    # Se vier em razão (0..1), vira percent; se já for percent (ex.: 43), mantém
-    if abs(x) <= 1.5:
-        x *= 100.0
-    s = f"{x:.{decimals}f}".replace(".", ",") + "%"
-    if with_sign:
-        if x > 0:
-            s = "+" + s
-        elif x < 0:
-            s = "–" + s  # en-dash
-    return s
+def numero_ptbr(v):
+    i = _to_int_ptbr(v)
+    return ("{:,}".format(i)).replace(",", ".")
 
-def last_sync_info() -> str:
+# -----------------------------
+# Dados e cálculos
+# -----------------------------
+def get_dataframes(force_refresh: bool = False):
+    """
+    Ponto único para carregar dados (CSV, GSheet, DB...). 
+    Mantemos stub seguro para não quebrar o app sem fonte de dados.
+    """
+    # TODO: plugar sua leitura real aqui (e cache, se quiser).
+    # Ex.: ler CSVs e retornar dict de DataFrames.
+    return {}
+
+def _fmt_pct(v):
+    try:
+        f = float(v)
+    except Exception:
+        f = 0.0
+    if not isfinite(f):
+        f = 0.0
+    return ("{:.1f}%".format(f)).replace(".", ",")
+
+def last_sync_info():
     return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
-# -------------------- Carregamento de dados com cache --------------------
-_CACHE: Dict[str, pd.DataFrame] = {}
-
-def _read_csv_if_exists(path: str) -> pd.DataFrame:
-    if os.path.exists(path):
-        try:
-            return pd.read_csv(path)
-        except Exception:
-            return pd.DataFrame()
-    return pd.DataFrame()
-
-def get_dataframes(force_refresh: bool = False) -> Dict[str, pd.DataFrame]:
+def compute_context(dfs: dict):
     """
-    Lê datasets de ./data (se existirem). Usa cache simples em memória.
-    Aceita force_refresh=True para recarregar.
-    Esperados (opcional): leads.csv, investimentos.csv, receitas.csv
+    Cria os dicionários esperados pelos templates:
+    - dados  (tudo que você acessa como {{ dados.* }})
+    - extras (percentuais/mensagens já formatadas)
+    Deixa tudo com valores seguros (zero/strings) se não houver dados.
     """
-    global _CACHE
-    if _CACHE and not force_refresh:
-        return _CACHE
+    # Exemplos de valores padrão para não explodir a UI:
+    hoje = date.today()
+    data_inicio = hoje.replace(day=1)
+    data_fim = hoje
 
-    base = os.environ.get("DATA_DIR", "data")
-    dfs: Dict[str, pd.DataFrame] = {
-        "leads": _read_csv_if_exists(os.path.join(base, "leads.csv")),
-        "investimentos": _read_csv_if_exists(os.path.join(base, "investimentos.csv")),
-        "receitas": _read_csv_if_exists(os.path.join(base, "receitas.csv")),
-    }
+    dias = (data_fim - data_inicio).days + 1
+    meta_cpl = 15.0
+    meta_leads = 0  # ajuste quando tiver dados
+    total_leads = 0
+    investimento_total = 0.0
+    orcamento_total = 0.0
 
-    _CACHE = dfs
-    return dfs
+    # CPL médio defensivo
+    cpl_medio = (investimento_total / total_leads) if total_leads else 0.0
+    roas_geral = 0.00
 
-# -------------------- KPIs mínimos robustos --------------------
-def _sum_cols(df: pd.DataFrame, colnames: list[str]) -> float:
-    if df is None or df.empty:
-        return 0.0
-    for c in colnames:
-        if c in df.columns:
-            return float(pd.to_numeric(df[c], errors="coerce").fillna(0).sum())
-    # se não achar col conhecida, tenta qualquer coluna numérica
-    num = df.select_dtypes(include=["number"])
-    return float(num.sum().sum()) if not num.empty else 0.0
+    # Conversão defensiva
+    taxa_conv = 2.0  # %
+    vendas_estimadas = int(round(total_leads * (taxa_conv / 100.0)))
+    ticket_curso = 297.0
+    ticket_mentoria = 1500.0
+    pct_mentorias = 10  # % das vendas
 
-def compute_kpis(dfs: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
-    leads_df = dfs.get("leads", pd.DataFrame())
-    inv_df = dfs.get("investimentos", pd.DataFrame())
-    rec_df = dfs.get("receitas", pd.DataFrame())
+    receita_curso = vendas_estimadas * ticket_curso * (1 - pct_mentorias/100.0)
+    receita_mentoria = vendas_estimadas * ticket_mentoria * (pct_mentorias/100.0)
 
-    # LEADS: prioridade por colunas usuais; senão, usa contagem de linhas.
-    leads_total = 0.0
-    if not leads_df.empty:
-        for col in ("leads", "qtde", "qtd", "quantidade"):
-            if col in leads_df.columns:
-                leads_total = float(pd.to_numeric(leads_df[col], errors="coerce").fillna(0).sum())
-                break
-        else:
-            leads_total = float(len(leads_df))
+    # Monta estrutura exatamente como os templates usam (dicts acessáveis via ponto)
+    dados = {
+        "dias_campanha": dias,
+        "data_inicio": data_inicio.strftime("%d/%m/%Y"),
+        "data_fim": data_fim.strftime("%d/%m/%Y"),
 
-    investimento_total = _sum_cols(inv_df, ["investimento", "valor", "spend", "gasto"])
-    receita_total = _sum_cols(rec_df, ["receita", "faturamento", "revenue", "valor"])
+        "investimento_total_formatado": moeda_ptbr(investimento_total),
+        "orcamento_total_formatado": moeda_ptbr(orcamento_total),
 
-    cpl_meta = 15.0  # meta default; altere se tiver fonte de dados
-    cpl_medio = (investimento_total / leads_total) if leads_total > 0 else 0.0
-    roas = (receita_total / investimento_total) if investimento_total > 0 else 0.0
+        "meta_leads_formatado": numero_ptbr(meta_leads),
+        "total_leads_formatado": numero_ptbr(total_leads),
 
-    # variação do CPL vs meta (formato pronto p/ frontend)
-    perc_cpl = (
-        format_percent((cpl_medio / cpl_meta) - 1.0, with_sign=True)
-        if cpl_meta > 0 else "0%"
-    )
+        "meta_cpl_formatado": moeda_ptbr(meta_cpl),
+        "cpl_medio_formatado": moeda_ptbr(cpl_medio),
 
-    return {
-        "leads_total": leads_total,
-        "investimento_total": investimento_total,
+        "roas_geral": roas_geral,
+
+        "conversao": {
+            "taxa_conversao": taxa_conv,
+            "vendas_estimadas": numero_ptbr(vendas_estimadas),
+            "ticket_medio_curso": ticket_curso,
+            "ticket_medio_mentoria": ticket_mentoria,
+            "percentual_mentorias": pct_mentorias,
+            "receita_estimada_curso": receita_curso,
+            "receita_estimada_mentoria": receita_mentoria,
+        },
+
+        "canais": {
+            "facebook": {
+                "percentual": 0,
+                "roas": 0.0,
+                "leads_formatado": numero_ptbr(0),
+            },
+            "youtube": {
+                "cpl": 0.0,
+                "roas": 0.0,
+            },
+            "instagram": {
+                "leads_formatado": numero_ptbr(0),
+                "percentual": 0,
+            },
+        },
+
+        "engajamento": {
+            "seguidores_instagram": 0,
+            "taxa_crescimento_instagram": 0,
+            "seguidores_youtube": 0,
+            "taxa_crescimento_youtube": 0,
+        },
+
+        # metas auxiliares brutas (se quiser usar em extras):
+        "meta_leads": meta_leads,
+        "total_leads": total_leads,
+        "meta_cpl": meta_cpl,
         "cpl_medio": cpl_medio,
-        "cpl_meta": cpl_meta,
-        "roas": roas,
-        "perc_cpl": perc_cpl,
+        "investimento_total": investimento_total,
+        "orcamento_total": orcamento_total,
     }
+
+    # Extras calculados/formatados
+    pct_orc = (investimento_total / orcamento_total * 100.0) if orcamento_total else 0.0
+    pct_leads = (total_leads / meta_leads * 100.0) if meta_leads else 100.0
+    pct_cpl = ((cpl_medio - meta_cpl) / meta_cpl * 100.0) if meta_cpl else 0.0
+
+    extras = {
+        "percentual_orcamento": pct_orc,
+        "percentual_orcamento_formatado": _fmt_pct(pct_orc),
+        "percentual_leads": pct_leads,
+        "percentual_leads_formatado": _fmt_pct(pct_leads),
+        "percentual_cpl": pct_cpl,
+        "percentual_cpl_formatado": ("{:+.1f}%".format(pct_cpl)).replace(".", ","),
+    }
+
+    return dados, extras
