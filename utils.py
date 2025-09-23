@@ -1,298 +1,274 @@
-"""
-Utilitários para validação e formatação de dados do Dashboard CHT22
-Criado para resolver definitivamente problemas de cálculos incorretos
-"""
 
-def validar_numero(valor, nome_campo="valor", minimo=0, maximo=None):
-    """
-    Valida se um número está dentro de limites aceitáveis
-    
-    Args:
-        valor: Valor a ser validado
-        nome_campo: Nome do campo para logs de erro
-        minimo: Valor mínimo aceitável
-        maximo: Valor máximo aceitável (opcional)
-    
-    Returns:
-        float: Valor validado ou None se inválido
-    """
+# -*- coding: utf-8 -*-
+import os, io, json, re, time, math, requests
+from datetime import datetime
+from typing import Dict, Tuple, List
+import pandas as pd
+
+# =========================
+# CONFIGURAÇÕES CENTRAIS
+# =========================
+SHEET_ID = os.getenv("CHT22_SHEET_ID", "1f5qcPc4l0SYVQv3qhq8d17s_fTMPkyoT")
+GVIZ_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={{sheet}}"
+CACHE_SECONDS = int(os.getenv("CHT22_CACHE_SECONDS", "300"))
+
+_TAB_MAP = {
+    # slug -> nomes possíveis na planilha
+    "visao_geral": ["Visão Geral", "Visao Geral", "visao_geral", "overview"],
+    "origem_conversao": ["Origem e Conversão", "Origem e Conversao", "origem_conversao", "origem"],
+    "profissao_canal": ["Profissão x Canal", "Profissao x Canal", "profissao_canal"],
+    "analise_regional": ["Análise Regional", "Analise Regional", "analise_regional", "regional"],
+    "insights_ia": ["Insights de IA", "Insights IA", "insights_ia"],
+    "projecao_resultados": ["Projeção de Resultado", "Projecao de Resultado", "projecao_resultados"],
+}
+
+_ALIAS = {
+    "data": ["data", "date", "dia", "Data"],
+    "canal": ["canal", "origem", "source", "Canal"],
+    "profissao": ["profissao", "profissão", "especialidade", "Profissão"],
+    "regiao": ["regiao", "região", "Região"],
+    "estado": ["estado", "uf", "Estado"],
+    "leads": ["leads", "contatos", "cadastros", "Leads"],
+    "conversoes": ["conversoes", "conversões", "vendas", "fechamentos", "Conversões"],
+    "receita": ["receita", "faturamento", "valor", "Receita"],
+    "custo": ["custo", "investimento", "ads_cost", "Custo"],
+}
+
+_cache = {"dfs": None, "ts": 0, "last_ok": None}
+
+def last_sync_info():
+    if _cache["last_ok"]:
+        return _cache["last_ok"].strftime("%d/%m/%Y %H:%M")
+    return "—"
+
+def _find_col(df, key):
+    for col in df.columns:
+        low = str(col).strip().lower()
+        if low in [a.lower() for a in _ALIAS.get(key, [])]:
+            return col
+    return None
+
+def _download_sheet(sheet_names: List[str]) -> pd.DataFrame:
+    err = {}
+    for name in sheet_names:
+        try:
+            url = GVIZ_URL.format(sheet=name)
+            resp = requests.get(url, timeout=30)
+            resp.raise_for_status()
+            df = pd.read_csv(io.BytesIO(resp.content))
+            if not df.empty:
+                return df
+        except Exception as e:
+            err[name] = str(e)
+    # nenhum encontrado
+    return pd.DataFrame()
+
+def get_dataframes(force_refresh: bool=False) -> Dict[str, pd.DataFrame]:
+    now = time.time()
+    if (not force_refresh) and _cache["dfs"] is not None and now - _cache["ts"] < CACHE_SECONDS:
+        return _cache["dfs"]
+
+    dfs = {}
+    for slug, names in _TAB_MAP.items():
+        df = _download_sheet(names)
+        dfs[slug] = df
+
+    _cache["dfs"] = dfs
+    _cache["ts"] = now
+    _cache["last_ok"] = datetime.now()
+    return dfs
+
+# ===============
+# FORMATAÇÃO PT-BR
+# ===============
+def format_number_ptbr(x):
     try:
-        valor_float = float(valor)
-        
-        # Verificar se é um número válido (não NaN ou infinito)
-        if not (valor_float == valor_float and valor_float != float('inf') and valor_float != float('-inf')):
-            print(f"⚠️ {nome_campo}: Valor inválido (NaN ou infinito): {valor}")
-            return None
-        
-        # Verificar limites
-        if valor_float < minimo:
-            print(f"⚠️ {nome_campo}: Valor abaixo do mínimo ({valor_float} < {minimo})")
-            return None
-            
-        if maximo is not None and valor_float > maximo:
-            print(f"⚠️ {nome_campo}: Valor acima do máximo ({valor_float} > {maximo})")
-            return None
-            
-        return valor_float
-        
-    except (ValueError, TypeError):
-        print(f"⚠️ {nome_campo}: Não é um número válido: {valor}")
-        return None
+        return f"{int(x):,}".replace(",", ".")
+    except:
+        try:
+            return f"{float(x):,.0f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        except:
+            return str(x)
 
-def calcular_percentual_seguro(valor_atual, valor_meta, nome_calculo="percentual"):
-    """
-    Calcula percentual de forma segura, evitando erros de divisão por zero
-    e valores absurdos
-    
-    Args:
-        valor_atual: Valor atual
-        valor_meta: Valor da meta
-        nome_calculo: Nome do cálculo para logs
-    
-    Returns:
-        float: Percentual calculado ou 0 se houver erro
-    """
+def format_percent_ptbr(v):
     try:
-        # Validar valores de entrada
-        atual = validar_numero(valor_atual, f"{nome_calculo}_atual", minimo=0, maximo=1000000)
-        meta = validar_numero(valor_meta, f"{nome_calculo}_meta", minimo=0.01, maximo=1000000)
-        
-        if atual is None or meta is None:
-            print(f"❌ {nome_calculo}: Valores inválidos - atual: {valor_atual}, meta: {valor_meta}")
-            return 0
-        
-        # Calcular percentual
-        percentual = ((atual / meta - 1) * 100)
-        
-        # Verificar se o resultado é razoável (entre -100% e +10000%)
-        if percentual < -100 or percentual > 10000:
-            print(f"⚠️ {nome_calculo}: Percentual fora do esperado: {percentual:.2f}%")
-            print(f"   Valores: atual={atual}, meta={meta}")
-            return 0
-        
-        return percentual
-        
-    except Exception as e:
-        print(f"❌ Erro no cálculo de {nome_calculo}: {e}")
-        return 0
+        return f"{100*float(v):.1f}%".replace(".", ",")
+    except:
+        return "—"
 
-def formatar_percentual(percentual):
-    """
-    Formata percentual para exibição, garantindo formato consistente
-    
-    Args:
-        percentual: Valor do percentual
-    
-    Returns:
-        str: Percentual formatado (ex: "+5%" ou "-3%")
-    """
+def format_currency_ptbr(v):
     try:
-        perc = validar_numero(percentual, "percentual", minimo=-100, maximo=10000)
-        if perc is None:
-            return "0%"
-        
-        if perc >= 0:
-            return f"+{perc:.0f}%"
-        else:
-            return f"{perc:.0f}%"
-            
-    except Exception:
-        return "0%"
+        return "R$ " + f"{float(v):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except:
+        return "R$ —"
 
-def validar_dados_dashboard(dados):
-    """
-    Valida todos os dados principais do dashboard
-    
-    Args:
-        dados: Dicionário com dados do dashboard
-    
-    Returns:
-        dict: Dados validados e corrigidos
-    """
-    dados_validados = dados.copy()
-    
-    # Validações específicas para cada campo
-    validacoes = {
-        'total_leads': {'min': 0, 'max': 50000, 'default': 7713},
-        'cpl_medio': {'min': 1, 'max': 200, 'default': 15.81},  # Corrigido para valor atual
-        'meta_cpl': {'min': 1, 'max': 200, 'default': 15.00},   # Corrigido para meta atual
-        'investimento_total': {'min': 0, 'max': 1000000, 'default': 120114.64},
-        'roas_geral': {'min': 0.1, 'max': 50, 'default': 2.24},
-        'meta_leads': {'min': 1000, 'max': 100000, 'default': 9000},
-        'orcamento_total': {'min': 10000, 'max': 10000000, 'default': 140000}
-    }
-    
-    for campo, config in validacoes.items():
-        if campo in dados_validados:
-            valor_validado = validar_numero(
-                dados_validados[campo], 
-                campo, 
-                config['min'], 
-                config['max']
-            )
-            
-            if valor_validado is None:
-                print(f"🔧 {campo}: Usando valor padrão {config['default']}")
-                dados_validados[campo] = config['default']
-            else:
-                dados_validados[campo] = valor_validado
-    
-    return dados_validados
+# =================
+# CÁLCULOS / KPIs
+# =================
+def _as_date_series(df, col):
+    s = pd.to_datetime(df[col], errors="coerce")
+    return s
 
-def log_dados_dashboard(dados):
-    """
-    Registra os dados do dashboard para debug
-    """
-    print("📊 DADOS DO DASHBOARD:")
-    print(f"   Total Leads: {dados.get('total_leads', 'N/A'):,}")
-    print(f"   CPL Médio: R$ {dados.get('cpl_medio', 'N/A'):.2f}")
-    print(f"   Meta CPL: R$ {dados.get('meta_cpl', 'N/A'):.2f}")
-    print(f"   Investimento: R$ {dados.get('investimento_total', 'N/A'):,.2f}")
-    print(f"   ROAS: {dados.get('roas_geral', 'N/A'):.2f}")
-    
-    # Calcular e mostrar percentual CPL
-    if 'cpl_medio' in dados and 'meta_cpl' in dados:
-        perc_cpl = calcular_percentual_seguro(dados['cpl_medio'], dados['meta_cpl'], "CPL")
-        print(f"   Percentual CPL: {formatar_percentual(perc_cpl)}")
+def compute_kpis(dfs: Dict[str, pd.DataFrame]):
+    base = dfs.get("visao_geral") if dfs else None
+    if base is None or base.empty:
+        return {
+            "leads_total": "0",
+            "conversoes_total": "0",
+            "taxa_conversao": "0,0%",
+            "receita_total": "R$ —",
+            "cpl": "R$ —",
+        }
+    # tentar detectar colunas
+    leads_col = _find_col(base, "leads") or base.columns[0]
+    conv_col  = _find_col(base, "conversoes") or base.columns[min(1, len(base.columns)-1)]
+    receita_col = _find_col(base, "receita")
+    custo_col = _find_col(base, "custo")
 
+    leads = pd.to_numeric(base[leads_col], errors="coerce").fillna(0).sum()
+    convs = pd.to_numeric(base[conv_col], errors="coerce").fillna(0).sum()
+    receita = pd.to_numeric(base[receita_col], errors="coerce").fillna(0).sum() if receita_col in base.columns else 0
+    custo = pd.to_numeric(base[custo_col], errors="coerce").fillna(0).sum() if custo_col in base.columns else None
 
+    taxa = (convs / leads) if leads > 0 else 0
+    cpl = (custo / leads) if (custo is not None and leads > 0) else None
 
-def formatar_moeda_ptbr(valor, incluir_simbolo=True):
-    """
-    Formata valor monetário no padrão brasileiro (PT-BR)
-    
-    Args:
-        valor: Valor numérico a ser formatado
-        incluir_simbolo: Se deve incluir o símbolo R$
-    
-    Returns:
-        str: Valor formatado (ex: "R$ 1.234,56" ou "1.234,56")
-    """
-    try:
-        valor_float = validar_numero(valor, "valor_moeda", minimo=0)
-        if valor_float is None:
-            return "R$ 0,00" if incluir_simbolo else "0,00"
-        
-        # Formatação brasileira: ponto para milhares, vírgula para decimais
-        valor_formatado = f"{valor_float:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-        
-        if incluir_simbolo:
-            return f"R$ {valor_formatado}"
-        else:
-            return valor_formatado
-            
-    except Exception as e:
-        print(f"❌ Erro na formatação de moeda: {e}")
-        return "R$ 0,00" if incluir_simbolo else "0,00"
-
-def formatar_numero_ptbr(valor, decimais=0):
-    """
-    Formata número no padrão brasileiro (PT-BR)
-    
-    Args:
-        valor: Valor numérico a ser formatado
-        decimais: Número de casas decimais
-    
-    Returns:
-        str: Número formatado (ex: "1.234" ou "1.234,56")
-    """
-    try:
-        valor_float = validar_numero(valor, "numero", minimo=0)
-        if valor_float is None:
-            return "0"
-        
-        if decimais == 0:
-            # Número inteiro
-            valor_formatado = f"{int(valor_float):,}".replace(",", ".")
-        else:
-            # Número com decimais
-            formato = f"{{:,.{decimais}f}}"
-            valor_formatado = formato.format(valor_float).replace(",", "X").replace(".", ",").replace("X", ".")
-        
-        return valor_formatado
-        
-    except Exception as e:
-        print(f"❌ Erro na formatação de número: {e}")
-        return "0"
-
-def formatar_numero_ptbr_com_decimais(valor, decimais):
-    """Wrapper para usar com filtros Jinja2 que passam argumentos"""
-    return formatar_numero_ptbr(valor, decimais)
-
-def formatar_percentual_ptbr(percentual, incluir_sinal=True):
-    """
-    Formata percentual no padrão brasileiro
-    
-    Args:
-        percentual: Valor do percentual
-        incluir_sinal: Se deve incluir + ou -
-    
-    Returns:
-        str: Percentual formatado (ex: "+5,2%" ou "5,2%")
-    """
-    try:
-        perc = validar_numero(percentual, "percentual", minimo=-100, maximo=10000)
-        if perc is None:
-            return "0%"
-        
-        # Formatação com vírgula decimal
-        if abs(perc) >= 10:
-            perc_formatado = f"{perc:.0f}".replace(".", ",")
-        else:
-            perc_formatado = f"{perc:.1f}".replace(".", ",")
-        
-        if incluir_sinal and perc >= 0:
-            return f"+{perc_formatado}%"
-        else:
-            return f"{perc_formatado}%"
-            
-    except Exception:
-        return "0%"
-
-def criar_filtros_jinja():
-    """
-    Cria filtros personalizados para templates Jinja2
-    
-    Returns:
-        dict: Dicionário com filtros personalizados
-    """
     return {
-        'moeda_ptbr': formatar_moeda_ptbr,
-        'numero_ptbr': formatar_numero_ptbr,
-        'percentual_ptbr': formatar_percentual_ptbr
+        "leads_total": format_number_ptbr(leads),
+        "conversoes_total": format_number_ptbr(convs),
+        "taxa_conversao": format_percent_ptbr(taxa),
+        "receita_total": format_currency_ptbr(receita),
+        "cpl": format_currency_ptbr(cpl) if cpl is not None else "R$ —",
     }
 
-def aplicar_formatacao_ptbr(dados):
-    """
-    Aplica formatação PT-BR a todos os dados monetários
-    
-    Args:
-        dados: Dicionário com dados do dashboard
-    
-    Returns:
-        dict: Dados com formatação PT-BR aplicada
-    """
-    dados_formatados = dados.copy()
-    
-    # Campos monetários para formatar
-    campos_moeda = [
-        'cpl_medio', 'meta_cpl', 'investimento_total', 'orcamento_total'
-    ]
-    
-    # Campos numéricos para formatar
-    campos_numero = [
-        'total_leads', 'meta_leads', 'dias_campanha'
-    ]
-    
-    # Aplicar formatação monetária
-    for campo in campos_moeda:
-        if campo in dados_formatados:
-            dados_formatados[f'{campo}_formatado'] = formatar_moeda_ptbr(dados_formatados[campo])
-    
-    # Aplicar formatação numérica
-    for campo in campos_numero:
-        if campo in dados_formatados:
-            dados_formatados[f'{campo}_formatado'] = formatar_numero_ptbr(dados_formatados[campo])
-    
-    return dados_formatados
+def compute_origem_conversao(dfs: Dict[str, pd.DataFrame]):
+    df = dfs.get("origem_conversao")
+    if df is None or df.empty:
+        return pd.DataFrame(), {
+            "leads": 0, "conversoes": 0, "taxa": "0,0%"
+        }
+    canal = _find_col(df, "canal") or df.columns[0]
+    leads = _find_col(df, "leads")
+    convs = _find_col(df, "conversoes")
 
+    # somar por canal
+    grp = df.groupby(canal).agg(
+        leads=(leads if leads else df.columns[1], "sum"),
+        conversoes=(convs if convs else df.columns[min(2, len(df.columns)-1)], "sum")
+    ).reset_index()
+
+    grp["taxa"] = grp.apply(lambda r: (r["conversoes"]/r["leads"]) if r["leads"]>0 else 0, axis=1)
+    grp["taxa_fmt"] = grp["taxa"].apply(format_percent_ptbr)
+    grp["leads_fmt"] = grp["leads"].apply(format_number_ptbr)
+    grp["conversoes_fmt"] = grp["conversoes"].apply(format_number_ptbr)
+
+    funil = {
+        "leads": int(grp["leads"].sum()),
+        "conversoes": int(grp["conversoes"].sum()),
+        "taxa": format_percent_ptbr( (grp["conversoes"].sum() / grp["leads"].sum()) if grp["leads"].sum() > 0 else 0 )
+    }
+
+    # tabela ordenada por conversões
+    grp = grp[[canal, "leads_fmt", "conversoes_fmt", "taxa_fmt"]].rename(columns={canal: "canal"})
+    return grp, funil
+
+def compute_profissao_canal(dfs: Dict[str, pd.DataFrame]):
+    df = dfs.get("profissao_canal")
+    if df is None or df.empty:
+        return pd.DataFrame()
+    prof = _find_col(df, "profissao") or df.columns[0]
+    canal = _find_col(df, "canal") or df.columns[min(1, len(df.columns)-1)]
+    convs = _find_col(df, "conversoes")
+
+    grp = df.groupby([prof, canal]).agg(conversoes=(convs if convs else df.columns[-1], "sum")).reset_index()
+    grp = grp.sort_values("conversoes", ascending=False)
+    grp["conversoes_fmt"] = grp["conversoes"].apply(format_number_ptbr)
+    return grp.rename(columns={prof: "profissao", canal: "canal"})[["profissao","canal","conversoes_fmt"]]
+
+def compute_analise_regional(dfs: Dict[str, pd.DataFrame]):
+    df = dfs.get("analise_regional")
+    if df is None or df.empty:
+        return pd.DataFrame(), pd.DataFrame()
+    estado = _find_col(df, "estado") or df.columns[0]
+    regiao = _find_col(df, "regiao")
+    leads = _find_col(df, "leads")
+    convs = _find_col(df, "conversoes")
+
+    by_estado = df.groupby(estado).agg(
+        leads=(leads if leads else df.columns[min(1,len(df.columns)-1)], "sum"),
+        conversoes=(convs if convs else df.columns[min(2,len(df.columns)-1)], "sum"),
+    ).reset_index()
+    by_estado["taxa"] = by_estado.apply(lambda r: (r["conversoes"]/r["leads"]) if r["leads"]>0 else 0, axis=1)
+    by_estado["leads_fmt"] = by_estado["leads"].apply(format_number_ptbr)
+    by_estado["conversoes_fmt"] = by_estado["conversoes"].apply(format_number_ptbr)
+    by_estado["taxa_fmt"] = by_estado["taxa"].apply(format_percent_ptbr)
+    by_estado = by_estado.rename(columns={estado: "estado"})[["estado","leads_fmt","conversoes_fmt","taxa_fmt"]]
+
+    if regiao and regiao in df.columns:
+        by_regiao = df.groupby(regiao).agg(
+            leads=(leads if leads else df.columns[min(1,len(df.columns)-1)], "sum"),
+            conversoes=(convs if convs else df.columns[min(2,len(df.columns)-1)], "sum"),
+        ).reset_index()
+        by_regiao["taxa"] = by_regiao.apply(lambda r: (r["conversoes"]/r["leads"]) if r["leads"]>0 else 0, axis=1)
+        by_regiao["leads_fmt"] = by_regiao["leads"].apply(format_number_ptbr)
+        by_regiao["conversoes_fmt"] = by_regiao["conversoes"].apply(format_number_ptbr)
+        by_regiao["taxa_fmt"] = by_regiao["taxa"].apply(format_percent_ptbr)
+        by_regiao = by_regiao.rename(columns={regiao: "regiao"})[["regiao","leads_fmt","conversoes_fmt","taxa_fmt"]]
+    else:
+        by_regiao = pd.DataFrame(columns=["regiao","leads_fmt","conversoes_fmt","taxa_fmt"])
+
+    return by_estado, by_regiao
+
+def compute_insights_ia(dfs: Dict[str, pd.DataFrame]):
+    # Heurísticas simples de insights (sem dependência externa)
+    insights = []
+    k = compute_kpis(dfs)
+    insights.append(f"Taxa de conversão geral: {k['taxa_conversao']} com {k['conversoes_total']} fechamentos sobre {k['leads_total']} leads.")
+
+    tabela, funil = compute_origem_conversao(dfs)
+    if not tabela.empty:
+        top = tabela.sort_values("conversoes_fmt", ascending=False).head(1).to_dict(orient="records")[0]
+        insights.append(f"Melhor canal em fechamentos: {top['canal']} (conversões {top['conversoes_fmt']}).")
+        insights.append(f"Funil geral indica taxa de {funil['taxa']} do topo (leads {funil['leads']}) ao fundo (conversões {funil['conversoes']}).")
+
+    prof = compute_profissao_canal(dfs)
+    if not prof.empty:
+        linha = prof.iloc[0]
+        insights.append(f"Profissão com maior conversão por canal: {linha['profissao']} no canal {linha['canal']} (conversões {linha['conversoes_fmt']}).")
+
+    return insights
+
+def compute_projecao_resultados(dfs: Dict[str, pd.DataFrame]):
+    # Projeção simples: manter taxa de conversão média e crescer leads +X%
+    base = dfs.get("visao_geral")
+    if base is None or base.empty:
+        return pd.DataFrame(columns=["mes","leads","conversoes","receita"]), {"crescimento_leads":"10%", "ticket_medio":"R$ —"}
+
+    leads_col = _find_col(base, "leads") or base.columns[0]
+    conv_col  = _find_col(base, "conversoes") or base.columns[min(1, len(base.columns)-1)]
+    receita_col = _find_col(base, "receita")
+
+    leads = pd.to_numeric(base[leads_col], errors="coerce").fillna(0).sum()
+    convs = pd.to_numeric(base[conv_col], errors="coerce").fillna(0).sum()
+    taxa = (convs / leads) if leads>0 else 0
+    receita_total = pd.to_numeric(base[receita_col], errors="coerce").fillna(0).sum() if receita_col in base.columns else 0
+    ticket = (receita_total / convs) if convs>0 else 0
+
+    crescimento = 0.10  # 10%
+    meses = ["M+1","M+2","M+3"]
+    rows = []
+    for i, m in enumerate(meses, start=1):
+        leads_proj = int(leads * ((1 + crescimento) ** i) / 3)  # distribuir por 3 meses
+        convs_proj = int(leads_proj * taxa)
+        receita_proj = convs_proj * ticket
+        rows.append({"mes": m,
+                     "leads": format_number_ptbr(leads_proj),
+                     "conversoes": format_number_ptbr(convs_proj),
+                     "receita": format_currency_ptbr(receita_proj)})
+
+    premissas = {
+        "crescimento_leads": "10%",
+        "taxa_conversao_base": format_percent_ptbr(taxa),
+        "ticket_medio": format_currency_ptbr(ticket),
+    }
+    return pd.DataFrame(rows), premissas
