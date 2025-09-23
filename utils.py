@@ -49,10 +49,38 @@ def get_dataframes(force_refresh=False):
     _cache["last_ok"] = datetime.now()
     return dfs
 
-# Helpers de formatação
-def format_number(v): return f"{int(v):,}".replace(",", ".") if pd.notnull(v) else "0"
-def format_currency(v): return "R$ " + f"{float(v):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") if pd.notnull(v) else "R$ —"
-def format_percent(v): return f"{100*float(v):.1f}%".replace(".", ",") if pd.notnull(v) else "—"
+# Helpers de formatação robustos
+def format_number(v):
+    if pd.isnull(v):
+        return "0"
+    try:
+        if isinstance(v, str):
+            v = v.replace(".", "").replace(",", ".")
+        return f"{int(float(v)):,}".replace(",", ".")
+    except Exception:
+        return str(v)
+
+def format_currency(v):
+    if pd.isnull(v):
+        return "R$ —"
+    try:
+        if isinstance(v, str):
+            v = v.replace(".", "").replace(",", ".")
+        v = float(v)
+        return "R$ " + f"{v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except Exception:
+        return f"R$ {v}"
+
+def format_percent(v):
+    if pd.isnull(v):
+        return "—"
+    try:
+        if isinstance(v, str):
+            v = v.replace(".", "").replace(",", ".")
+        v = float(v)
+        return f"{100*v:.1f}%".replace(".", ",")
+    except Exception:
+        return f"{v}%"
 
 # Cálculos simplificados
 def compute_kpis(dfs):
@@ -66,7 +94,7 @@ def compute_kpis(dfs):
         "leads_total": format_number(leads),
         "cpl": format_currency(cpl),
         "investimento": format_currency(investimento),
-        "roas": "2.24"  # Exemplo fixo até ter coluna certa
+        "roas": "2.24"  # Placeholder até integrar coluna correta
     }
 
 def compute_origem_conversao(dfs):
