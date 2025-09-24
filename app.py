@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from flask import Flask, render_template, request
 
-# Tenta importar utilidades do projeto; se não existirem, usa stubs.
+# Importa utilidades do projeto se existirem; caso contrário, usa stubs inofensivos.
 try:
     from utils import get_dataframes, last_sync_info  # type: ignore
 except Exception:
@@ -21,7 +21,7 @@ def _moeda_ptbr(valor):
         v = float(valor or 0)
     except Exception:
         v = 0.0
-    s = f"{v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    s = f"{v:,.2f}".replace(",", "§").replace(".", ",").replace("§", ".")
     return f"R$ {s}"
 
 def _numero_ptbr(valor):
@@ -42,10 +42,9 @@ app.add_template_filter(_moeda_ptbr, name="moeda_ptbr")
 app.add_template_filter(_numero_ptbr, name="numero_ptbr")
 app.add_template_filter(_pct_ptbr,    name="pct_ptbr")
 
-# Globals nos templates
+# Globals nos templates (para _nav.html e timestamps)
 app.jinja_env.globals["datetime"] = datetime
 
-# Para o _nav.html
 @app.context_processor
 def inject_current_path():
     try:
@@ -91,15 +90,16 @@ def _defaults(dados_in: dict | None) -> tuple[dict, dict]:
     conv.setdefault("ticket_medio_mentoria", 1500.0)
     conv.setdefault("receita_estimada_mentoria", 0.0)
 
-    # canais (inclui 'google'); **agora com investimento=0**
+    # canais (agora inclui 'google' e 'email' para não quebrar origem_conversao.html)
     canais = _ensure(dados, ["canais"], {})
-    for canal in ("facebook", "instagram", "youtube", "google"):
+    for canal in ("facebook", "instagram", "youtube", "google", "email"):
         c = canais.setdefault(canal, {})
         c.setdefault("percentual", 0)
         c.setdefault("roas", 0.0)
         c.setdefault("cpl", 0.0)
         c.setdefault("leads", 0)
-        c.setdefault("investimento", 0.0)  # <- CORREÇÃO QUE RESOLVE O ERRO DO LOG
+        c.setdefault("investimento", 0.0)
+        # formatos úteis no template
         c.setdefault("leads_formatado", _numero_ptbr(c.get("leads", 0)))
 
     # engajamento
@@ -117,14 +117,14 @@ def _defaults(dados_in: dict | None) -> tuple[dict, dict]:
         rr.setdefault("leads", 0)
     _ensure(dados, ["estados"], {})
 
-    # profissoes (inclui 'outra' para evitar UndefinedError)
+    # profissoes (inclui 'psicologo' para não quebrar profissao_canal.html)
     profs = _ensure(dados, ["profissoes"], {})
-    for p in ("dentista", "medico", "advogado", "outra"):
+    for p in ("dentista", "medico", "advogado", "psicologo", "outra"):
         pp = profs.setdefault(p, {})
         pp.setdefault("total", 0)
         pp.setdefault("percentual", 0)
 
-    # formatados base
+    # campos formatados base
     dados["cpl_medio_formatado"] = _moeda_ptbr(dados.get("cpl_medio"))
     dados["meta_cpl_formatado"] = _moeda_ptbr(dados.get("meta_cpl"))
     dados["total_leads_formatado"] = _numero_ptbr(dados.get("total_leads"))
@@ -133,7 +133,7 @@ def _defaults(dados_in: dict | None) -> tuple[dict, dict]:
     dados["investimento_total_formatado"] = _moeda_ptbr(dados.get("investimento_total"))
     dados["roas_geral_formatado"] = f"{float(dados.get('roas_geral', 0.0)):.2f}".replace(".", ",")
 
-    # extras
+    # extras (percentuais já prontos para exibir)
     inv = float(dados.get("investimento_total") or 0)
     orc = float(dados.get("orcamento_total") or 0)
     leads = int(dados.get("total_leads") or 0)
