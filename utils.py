@@ -1,182 +1,182 @@
-# app.py
+# app.py — versão completa, pronta para colar
+
 from __future__ import annotations
 
 import os
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any, Dict
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 
+# -----------------------------------------------------------------------------
+# App
+# -----------------------------------------------------------------------------
 app = Flask(__name__)
 
-# ----------------------------
-# Filtros Jinja (moeda/numero/pct)
-# ----------------------------
-def moeda_ptbr(valor) -> str:
-    try:
-        v = float(valor or 0)
-    except (TypeError, ValueError):
-        v = 0.0
-    s = f"{v:,.2f}"
-    return "R$ " + s.replace(",", "X").replace(".", ",").replace("X", ".")
 
-def numero_ptbr(valor) -> str:
+# -----------------------------------------------------------------------------
+# Filtros Jinja (corrigem "No filter named '...'" nos templates)
+# -----------------------------------------------------------------------------
+def _to_float(v: Any, default: float = 0.0) -> float:
     try:
-        v = float(valor or 0)
-    except (TypeError, ValueError):
-        v = 0.0
-    s = f"{v:,.0f}"
+        if v is None:
+            return default
+        return float(v)
+    except Exception:
+        return default
+
+
+def _to_int(v: Any, default: int = 0) -> int:
+    try:
+        if v is None:
+            return default
+        return int(round(float(v)))
+    except Exception:
+        return default
+
+
+def numero_ptbr(value: Any) -> str:
+    """
+    Formata número inteiro sem casas em pt-BR (separador milhar '.' e decimal ',').
+    Ex.: 12345 -> '12.345'
+    """
+    n = _to_int(value, 0)
+    s = f"{n:,.0f}"
+    # trocar separadores (US -> BR)
     return s.replace(",", "X").replace(".", ",").replace("X", ".")
 
-def pct(valor, digits: int = 1) -> str:
-    try:
-        v = float(valor or 0)
-    except (TypeError, ValueError):
-        v = 0.0
-    txt = f"{v:.{digits}f}%"
-    return txt.replace(".", ",")
 
-app.jinja_env.filters["moeda_ptbr"] = moeda_ptbr
+def moeda_ptbr(value: Any) -> str:
+    """
+    Formata moeda pt-BR com 'R$' e 2 casas.
+    Ex.: 1234.5 -> 'R$ 1.234,50'
+    """
+    v = _to_float(value, 0.0)
+    s = f"{v:,.2f}"
+    s = s.replace(",", "X").replace(".", ",").replace("X", ".")
+    return f"R$ {s}"
+
+
+def pct_br(value: Any, casas: int = 1) -> str:
+    """
+    Formata porcentagem pt-BR com N casas.
+    Ex.: 12.345 -> '12,3%'
+    """
+    v = _to_float(value, 0.0)
+    fmt = f"{{:.{casas}f}}"
+    s = fmt.format(v).replace(".", ",")
+    return f"{s}%"
+
+
+# registra filtros
 app.jinja_env.filters["numero_ptbr"] = numero_ptbr
-app.jinja_env.filters["pct"] = pct
+app.jinja_env.filters["moeda_ptbr"] = moeda_ptbr
+app.jinja_env.filters["pct_br"] = pct_br
 
-# ----------------------------
-# Injeções globais (usadas pelo _nav.html)
-# ----------------------------
-@app.context_processor
-def inject_globals():
-    return {"current_path": request.path}
+# expõe datetime para uso direto em template (resolve 'datetime is undefined')
+app.jinja_env.globals.update(datetime=datetime)
 
-# ----------------------------
-# Helpers
-# ----------------------------
-def _safe_div(a, b) -> float:
-    try:
-        a = float(a or 0)
-        b = float(b or 0)
-        return a / b if b else 0.0
-    except (TypeError, ValueError):
-        return 0.0
 
-def _skeleton_dados() -> Dict[str, Any]:
-    """Estrutura completa esperada pelos templates, com valores-padrão seguros."""
-    canal_zero = {"leads": 0, "investimento": 0.0, "cpl": 0.0, "roas": 0.0, "percentual": 0.0}
-    prof_zero = {"total": 0, "percentual": 0.0}
-    reg_zero  = {"percentual": 0.0}
-
-    return {
-        "meta_cpl": 15.0,
-        "orcamento_total": 0.0,
-        "investimento_total": 0.0,
+# -----------------------------------------------------------------------------
+# Carregamento de dados p/ Visão Geral
+#  - Garante TODAS as chaves esperadas pelos templates
+#  - Se você quiser ler da planilha, preencha aqui (mantendo as mesmas chaves)
+# -----------------------------------------------------------------------------
+def carregar_dados_visao_geral() -> Dict[str, Any]:
+    """
+    Retorna o contexto com todas as chaves usadas nos templates:
+      - dados.roas_geral
+      - dados.canais.{google,facebook,youtube,outros}.{investimento,cpl,roas,leads}
+      - dados.profissoes.{psicologo,fisioterapeuta,nutricionista}.total e .canal
+      - extras.percentual_cpl_formatado
+      - extras.atualizado_em
+    """
+    # --------- valores padrão (não quebram se faltarem dados reais) ---------
+    dados: Dict[str, Any] = {
         "roas_geral": 0.0,
-
-        "meta_leads": 0,
-        "taxa_conversao": 2.0,          # %
-        "ticket_curso": 297.0,
-        "ticket_mentoria": 1500.0,
-        "perc_vendas_mentoria": 10.0,   # %
-
         "canais": {
-            "facebook":  canal_zero.copy(),
-            "instagram": canal_zero.copy(),
-            "youtube":   canal_zero.copy(),
-            "google":    canal_zero.copy(),
-            "email":     canal_zero.copy(),
+            "google":   {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},
+            "facebook": {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},
+            "youtube":  {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},
+            "outros":   {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},
         },
-
         "profissoes": {
-            "dentista":       prof_zero.copy(),
-            "psicologo":      prof_zero.copy(),
-            "fisioterapeuta": prof_zero.copy(),
-            "nutricionista":  prof_zero.copy(),
-            "medico":         prof_zero.copy(),
-            "outra":          prof_zero.copy(),
-        },
-
-        "regioes": {
-            "sudeste":      reg_zero.copy(),
-            "sul":          reg_zero.copy(),
-            "nordeste":     reg_zero.copy(),
-            "centro_oeste": reg_zero.copy(),
-            "norte":        reg_zero.copy(),
-        },
-
-        "estados": {
-            "SP": {"total": 0}, "RJ": {"total": 0}, "MG": {"total": 0}, "ES": {"total": 0},
-            "PR": {"total": 0}, "RS": {"total": 0}, "SC": {"total": 0},
-            "BA": {"total": 0}, "PE": {"total": 0}, "CE": {"total": 0},
-            "DF": {"total": 0},
+            "psicologo": {
+                "total": 0,
+                "canal": {"google": 0, "facebook": 0, "youtube": 0, "outros": 0},
+            },
+            "fisioterapeuta": {
+                "total": 0,
+                "canal": {"google": 0, "facebook": 0, "youtube": 0, "outros": 0},
+            },
+            "nutricionista": {
+                "total": 0,
+                "canal": {"google": 0, "facebook": 0, "youtube": 0, "outros": 0},
+            },
         },
     }
 
-def _extras_from(dados: Dict[str, Any]) -> Dict[str, Any]:
-    orc_pct = _safe_div(dados.get("investimento_total", 0), dados.get("orcamento_total", 0)) * 100
-    return {
-        "periodo": "01/09/2025 - 23/09/2025",
-        "dias": 23,
-        "status": "Campanha Ativa",
-        "ultima_atualizacao": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-        "percentual_cpl_formatado": pct(orc_pct, 1),
-        "orcamento_usado_pct": orc_pct,
+    extras: Dict[str, Any] = {
+        "percentual_cpl_formatado": pct_br(0.0, 1),
+        "atualizado_em": datetime.now().strftime("%d/%m"),
     }
 
-def _ctx() -> Dict[str, Any]:
-    """
-    Contexto único para todas as páginas.
-    Se no futuro você puxar da planilha, preencha 'dados' aqui antes de montar 'extras'.
-    """
-    dados = _skeleton_dados()
+    # --------- (opcional) carregar planilha e preencher dados ---------
+    # Se você quiser ler da planilha "Base de Dados Para o Dash IA CHT22 (1).xlsx",
+    # implemente aqui a leitura e MANTENHA as mesmas chaves do dicionário acima.
+    #
+    # Exemplo (descomente se quiser usar pandas):
+    #
+    # try:
+    #     import pandas as pd
+    #     base_path = os.getenv("DASH_PLANILHA_PATH", "/mnt/data/Base de Dados Para o Dash IA CHT22 (1).xlsx")
+    #     if os.path.exists(base_path):
+    #         # Leia suas abas e calcule os agregados desejados...
+    #         # Exemplo ilustrativo:
+    #         # df = pd.read_excel(base_path, sheet_name="Visão Geral")
+    #         # dados["roas_geral"] = float(df.loc[0, "ROAS_Geral"])
+    #         # dados["canais"]["google"]["roas"] = float(df.loc[0, "ROAS_Google"])
+    #         # ... e assim por diante.
+    #         # Ao final, também pode atualizar 'extras':
+    #         extras["atualizado_em"] = datetime.now().strftime("%d/%m")
+    # except Exception as e:
+    #     # Em caso de erro na planilha, mantemos os defaults para não quebrar o template
+    #     print(f"[WARN] Falha ao ler planilha: {e}")
 
-    # >>> Aqui você pode sobrepor 'dados' com valores reais da planilha, quando quiser. <<<
-    # Ex.: dados["orcamento_total"] = valor_da_planilha
-
-    extras = _extras_from(dados)
+    # --------- retorno do contexto ---------
     return {"dados": dados, "extras": extras}
 
-# Compatibilidade: se o seu código antigo chamar esta função, ela agora devolve o mesmo contexto.
-def carregar_dados_visao_geral() -> Dict[str, Any]:
-    return _ctx()
 
-# ----------------------------
+# -----------------------------------------------------------------------------
 # Rotas
-# ----------------------------
+# -----------------------------------------------------------------------------
+@app.route("/healthz")
+def healthz():
+    return "ok", 200
+
+
 @app.route("/")
-@app.route("/visao-geral")
 def visao_geral():
-    # mantém compatibilidade com código legado
+    # Usa visao_geral_atualizada.html -> inclui visao_geral.html
     return render_template("visao_geral_atualizada.html", **carregar_dados_visao_geral())
 
-@app.route("/dashboard")
-def dashboard():
-    return render_template("dashboard_atualizado.html", **_ctx())
 
 @app.route("/origem-conversao")
 def origem_conversao():
-    return render_template("origem_conversao_atualizada.html", **_ctx())
+    # Usa origem_conversao_atualizada.html -> inclui origem_conversao.html
+    return render_template("origem_conversao_atualizada.html", **carregar_dados_visao_geral())
 
-@app.route("/insights-ia")
-def insights_ia():
-    return render_template("insights_ia_atualizada.html", **_ctx())
 
 @app.route("/profissao-canal")
 def profissao_canal():
-    return render_template("profissao_canal_atualizada.html", **_ctx())
+    # Usa profissao_canal_atualizada.html -> inclui profissao_canal.html
+    return render_template("profissao_canal_atualizada.html", **carregar_dados_visao_geral())
 
-@app.route("/projecao-resultados")
-def projecao_resultados():
-    return render_template("projecao_resultados_atualizada.html", **_ctx())
 
-@app.route("/analise-regional")
-def analise_regional():
-    return render_template("analise_regional_atualizada.html", **_ctx())
-
-@app.route("/vendas")
-def vendas():
-    return render_template("vendas.html", **_ctx())
-
-@app.route("/healthz")
-def healthz():
-    return {"ok": True, "ts": datetime.now().isoformat()}
-
+# -----------------------------------------------------------------------------
+# Gunicorn entrypoint (Render)
+# -----------------------------------------------------------------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.getenv("PORT", "8000")), debug=True)
+    # Para rodar localmente: python app.py
+    port = int(os.getenv("PORT", "10000"))
+    app.run(host="0.0.0.0", port=port, debug=True)
