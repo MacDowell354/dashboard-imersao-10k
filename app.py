@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Flask, render_template, request
 
 # -----------------------------
-# Helpers / Filtros do Jinja
+# Filtros Jinja
 # -----------------------------
 def moeda_ptbr(value):
     """Formata número como moeda brasileira: R$ 1.234,56 (tolera None/strings)."""
@@ -12,7 +12,6 @@ def moeda_ptbr(value):
         v = float(value or 0)
     except Exception:
         v = 0.0
-    # formata como 1,234.56 e troca separadores para pt-BR
     s = f"{v:,.2f}"
     s = s.replace(",", "X").replace(".", ",").replace("X", ".")
     return f"R$ {s}"
@@ -35,49 +34,68 @@ def pct_br(value, ndigits=0):
 # -----------------------------
 app = Flask(__name__)
 
-# Disponibiliza datetime dentro dos templates Jinja (corrige o erro 'datetime is undefined')
+# Disponibiliza datetime nos templates
 app.jinja_env.globals.update(datetime=datetime)
 
-# Registra filtros usados nos templates (corrige 'No filter named moeda_ptbr')
+# Registra filtros
 app.jinja_env.filters["moeda_ptbr"] = moeda_ptbr
 app.jinja_env.filters["pct_br"] = pct_br
 
 # -----------------------------
-# Carga de dados (mínima e à prova de falhas)
+# Contexto seguro p/ templates
 # -----------------------------
+def _dados_padrao():
+    """Estrutura mínima com TODAS as chaves usadas nos templates, com defaults seguros."""
+    return {
+        # Visão Geral
+        "roas_geral": 0.0,
+        "meta_cpl": 0.0,
+
+        # Canais (usados em várias abas)
+        "canais": {
+            "facebook":   {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},
+            "instagram":  {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},
+            "youtube":    {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},
+            "email":      {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},  # apareceu em erro
+            "google_ads": {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},  # segurança extra
+        },
+
+        # Profissões (usadas em /profissao-canal e /insights-ia)
+        "profissoes": {
+            "psicologo":      {"total": 0, "percentual": 0.0},
+            "fisioterapeuta": {"total": 0, "percentual": 0.0},
+            "professor":      {"total": 0, "percentual": 0.0},
+            "outra":          {"total": 0, "percentual": 0.0},
+        },
+    }
+
 def carregar_dados_visao_geral():
     """
-    Retorna o contexto mínimo necessário para a Visão Geral sem quebrar templates.
-    Você pode substituir aqui pela leitura real da planilha quando quiser.
+    Retorna um contexto completo e à prova de falhas para renderização dos templates.
+    (Depois você pode preencher esses valores com a planilha sem quebrar nada.)
     """
-    # 'dados' pode conter o que você já usa nos templates. Mantemos vazio aqui pra não interferir.
-    dados = {}
+    dados = _dados_padrao()
 
-    # 'extras' é usado na Visão Geral (evita 'extras is undefined' que apareceu no log)
+    # 'extras' é referenciado na Visão Geral
     extras = {
-        # Ajuste se quiser um valor real – aqui fica só um placeholder seguro
-        "percentual_cpl_formatado": "-",
+        "percentual_cpl_formatado": "-",  # string segura, até virmos com valor real
     }
 
-    # Mantém compatibilidade com _nav.html que usa 'current_path'
-    ctx = {
+    return {
         "dados": dados,
         "extras": extras,
-        "current_path": request.path,
+        "current_path": request.path,  # usado no _nav.html
     }
-    return ctx
 
 # -----------------------------
 # Rotas
 # -----------------------------
 @app.route("/")
 def visao_geral():
-    # Renderiza a Visão Geral com contexto seguro
     return render_template("visao_geral_atualizada.html", **carregar_dados_visao_geral())
 
 @app.route("/origem-conversao")
 def origem_conversao():
-    # Mantemos o mesmo contexto básico para não quebrar navegação
     return render_template("origem_conversao_atualizada.html", **carregar_dados_visao_geral())
 
 @app.route("/profissao-canal")
