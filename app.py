@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from flask import Flask, render_template, request
 
-# Tenta importar utilidades do seu projeto; se não existirem, segue com stubs.
+# Tenta importar utilidades do projeto; se não existirem, usa stubs.
 try:
     from utils import get_dataframes, last_sync_info  # type: ignore
 except Exception:
@@ -15,7 +15,7 @@ except Exception:
 
 app = Flask(__name__)
 
-# ----------------- Filtros Jinja (CORREÇÃO PRINCIPAL) -----------------
+# ----------------- Filtros Jinja -----------------
 def _moeda_ptbr(valor):
     try:
         v = float(valor or 0)
@@ -36,17 +36,16 @@ def _pct_ptbr(valor):
         v = float(valor or 0)
     except Exception:
         v = 0.0
-    # 1 casa, vírgula como separador
     return f"{v:.1f}".replace(".", ",") + "%"
 
 app.add_template_filter(_moeda_ptbr, name="moeda_ptbr")
 app.add_template_filter(_numero_ptbr, name="numero_ptbr")
 app.add_template_filter(_pct_ptbr,    name="pct_ptbr")
 
-# Disponibiliza datetime nos templates (ex.: {{ datetime.now()... }})
+# Globals nos templates
 app.jinja_env.globals["datetime"] = datetime
 
-# Para o _nav.html: define current_path em todos os renders
+# Para o _nav.html
 @app.context_processor
 def inject_current_path():
     try:
@@ -72,7 +71,7 @@ def _defaults(dados_in: dict | None) -> tuple[dict, dict]:
     _ensure(dados, ["meta_cpl"], 15.0)
     _ensure(dados, ["cpl_medio"], 0.0)
     _ensure(dados, ["total_leads"], 0)
-    _ensure(dados, ["meta_leads"], max(1, int(dados.get("total_leads", 0)) or 1))  # evita div/0
+    _ensure(dados, ["meta_leads"], max(1, int(dados.get("total_leads", 0)) or 1))
     _ensure(dados, ["orcamento_total"], 0.0)
     _ensure(dados, ["investimento_total"], 0.0)
     _ensure(dados, ["roas_geral"], 0.0)
@@ -92,7 +91,7 @@ def _defaults(dados_in: dict | None) -> tuple[dict, dict]:
     conv.setdefault("ticket_medio_mentoria", 1500.0)
     conv.setdefault("receita_estimada_mentoria", 0.0)
 
-    # canais (inclui google para evitar UndefinedError)
+    # canais (inclui 'google'); **agora com investimento=0**
     canais = _ensure(dados, ["canais"], {})
     for canal in ("facebook", "instagram", "youtube", "google"):
         c = canais.setdefault(canal, {})
@@ -100,6 +99,7 @@ def _defaults(dados_in: dict | None) -> tuple[dict, dict]:
         c.setdefault("roas", 0.0)
         c.setdefault("cpl", 0.0)
         c.setdefault("leads", 0)
+        c.setdefault("investimento", 0.0)  # <- CORREÇÃO QUE RESOLVE O ERRO DO LOG
         c.setdefault("leads_formatado", _numero_ptbr(c.get("leads", 0)))
 
     # engajamento
@@ -117,7 +117,7 @@ def _defaults(dados_in: dict | None) -> tuple[dict, dict]:
         rr.setdefault("leads", 0)
     _ensure(dados, ["estados"], {})
 
-    # profissoes (inclui 'outra')
+    # profissoes (inclui 'outra' para evitar UndefinedError)
     profs = _ensure(dados, ["profissoes"], {})
     for p in ("dentista", "medico", "advogado", "outra"):
         pp = profs.setdefault(p, {})
@@ -137,7 +137,7 @@ def _defaults(dados_in: dict | None) -> tuple[dict, dict]:
     inv = float(dados.get("investimento_total") or 0)
     orc = float(dados.get("orcamento_total") or 0)
     leads = int(dados.get("total_leads") or 0)
-    meta_leads = int(dados.get("meta_leads") or 1)  # evita div/0
+    meta_leads = int(dados.get("meta_leads") or 1)
     cpl = float(dados.get("cpl_medio") or 0)
     meta_cpl = float(dados.get("meta_cpl") or 0)
 
