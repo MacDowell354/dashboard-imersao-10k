@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Flask, render_template, request
 
 # -----------------------------
-# Filtros Jinja2 (moeda e % BR)
+# Filtros Jinja2 (BR)
 # -----------------------------
 def moeda_ptbr(value):
     try:
@@ -14,6 +14,24 @@ def moeda_ptbr(value):
     s = f"{v:,.2f}"
     s = s.replace(",", "X").replace(".", ",").replace("X", ".")
     return f"R$ {s}"
+
+def numero_ptbr(value, ndigits=0):
+    """Formata número no padrão BR (ponto milhar, vírgula decimal)."""
+    try:
+        v = float(value or 0)
+    except Exception:
+        v = 0.0
+    try:
+        nd = int(ndigits or 0)
+    except Exception:
+        nd = 0
+    s = f"{v:,.{nd}f}"
+    # troca separadores: 1,234.56 -> 1.234,56
+    s = s.replace(",", "X").replace(".", ",").replace("X", ".")
+    # se nd=0, remove ",00"
+    if nd == 0 and "," in s:
+        s = s.split(",")[0]
+    return s
 
 def pct_br(value, ndigits=0):
     try:
@@ -29,10 +47,11 @@ def pct_br(value, ndigits=0):
 
 app = Flask(__name__)
 
-# Deixar datetime acessível no Jinja
+# Disponibiliza datetime no Jinja
 app.jinja_env.globals.update(datetime=datetime)
-# Registrar filtros
+# Registra filtros
 app.jinja_env.filters["moeda_ptbr"] = moeda_ptbr
+app.jinja_env.filters["numero_ptbr"] = numero_ptbr
 app.jinja_env.filters["pct_br"] = pct_br
 
 # -----------------------------
@@ -51,11 +70,11 @@ def _dados_padrao():
             "instagram":  {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},
             "youtube":    {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},
             "email":      {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},
-            # IMPORTANTE: o template usa "google", não "google_ads"
+            # IMPORTANTE: o template usa "google"
             "google":     {"investimento": 0.0, "cpl": 0.0, "roas": 0.0, "leads": 0},
         },
 
-        # Profissões (usadas em /profissao-canal e possivelmente em insights)
+        # Profissões (usadas em /profissao-canal)
         "profissoes": {
             "psicologo":      {"total": 0, "percentual": 0.0},
             "fisioterapeuta": {"total": 0, "percentual": 0.0},
@@ -71,7 +90,7 @@ def carregar_dados_visao_geral():
     """
     dados = _dados_padrao()
 
-    # 'extras' é usado na Visão Geral em alguns blocos
+    # 'extras' é usado na Visão Geral
     extras = {
         "percentual_cpl_formatado": "-",  # mantém string segura até vir o valor real
     }
@@ -79,7 +98,7 @@ def carregar_dados_visao_geral():
     return {
         "dados": dados,
         "extras": extras,
-        "current_path": request.path,  # usado no _nav.html, se houver
+        "current_path": request.path,  # se usado no menu ativo
     }
 
 # -----------------------------
