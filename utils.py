@@ -1,168 +1,200 @@
-# utils.py
-from datetime import datetime, timedelta, timezone
+# app.py
+from __future__ import annotations
 
-# ============
-# Filtros Jinja
-# ============
-def _to_float(v):
+import os
+from datetime import datetime
+from typing import Dict, Any
+
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+
+# ----------------------------
+# Filtros Jinja (moeda/numero/pct)
+# ----------------------------
+def moeda_ptbr(valor) -> str:
     try:
-        if v is None:
-            return 0.0
-        if isinstance(v, (int, float)):
-            return float(v)
-        s = str(v).strip()
-        # normaliza milhares/ponto e decimal/vírgula
-        if s.count(".") > 1 and "," not in s:
-            s = s.replace(".", "")
-        s = s.replace(".", "").replace(",", ".")
-        return float(s)
-    except Exception:
+        v = float(valor or 0)
+    except (TypeError, ValueError):
+        v = 0.0
+    s = f"{v:,.2f}"
+    return "R$ " + s.replace(",", "X").replace(".", ",").replace("X", ".")
+
+def numero_ptbr(valor) -> str:
+    try:
+        v = float(valor or 0)
+    except (TypeError, ValueError):
+        v = 0.0
+    s = f"{v:,.0f}"
+    return s.replace(",", "X").replace(".", ",").replace("X", ".")
+
+def pct(valor, digits: int = 1) -> str:
+    try:
+        v = float(valor or 0)
+    except (TypeError, ValueError):
+        v = 0.0
+    fmt = f"{{:.{digits}f}}%".format(v)
+    return fmt.replace(".", ",")
+
+app.jinja_env.filters["moeda_ptbr"] = moeda_ptbr
+app.jinja_env.filters["numero_ptbr"] = numero_ptbr
+app.jinja_env.filters["pct"] = pct
+
+# ----------------------------
+# Injeção global p/ _nav.html e datas
+# ----------------------------
+@app.context_processor
+def inject_globals():
+    return {
+        "current_path": request.path,
+    }
+
+# ----------------------------
+# Helpers
+# ----------------------------
+def _safe_div(a, b) -> float:
+    try:
+        a = float(a or 0)
+        b = float(b or 0)
+        return a / b if b != 0 else 0.0
+    except (TypeError, ValueError):
         return 0.0
 
-def moeda_ptbr(v):
-    n = _to_float(v)
-    s = f"{n:,.2f}"
-    s = s.replace(",", "X").replace(".", ",").replace("X", ".")
-    return f"R$ {s}"
+def _skeleton_dados() -> Dict[str, Any]:
+    """Estrutura completa esperada pelos templates, com valores-padrão seguros."""
+    canal_zero = {"leads": 0, "investimento": 0.0, "cpl": 0.0, "roas": 0.0, "percentual": 0.0}
+    prof_zero = {"total": 0, "percentual": 0.0}
+    reg_zero  = {"percentual": 0.0}
 
-def numero_ptbr(v):
-    try:
-        n = int(_to_float(v))
-    except Exception:
-        n = 0
-    s = f"{n:,}"
-    return s.replace(",", ".")
-
-# ============
-# Dados / KPIs
-# ============
-def get_dataframes(force_refresh: bool = False):
-    """
-    Mantido simples (sem I/O) para estabilidade do deploy.
-    Quando você ligar planilhas/CSVs, carregue aqui.
-    """
-    return {}
-
-def _defaults():
-    """Estrutura padrão para evitar UndefinedError nos templates."""
-    dados = {
-        "dias_campanha": 23,
-        "data_inicio": "01/09/2025",
-        "data_fim": "23/09/2025",
-
+    return {
+        # KPIs gerais
+        "meta_cpl": 15.0,
         "orcamento_total": 0.0,
-        "orcamento_total_formatado": moeda_ptbr(0),
-
         "investimento_total": 0.0,
-        "investimento_total_formatado": moeda_ptbr(0),
-
-        "cpl_medio": 0.0,
-        "cpl_medio_formatado": moeda_ptbr(0),
-        "meta_cpl_formatado": moeda_ptbr(15),
-
-        "total_leads": 0,
-        "total_leads_formatado": numero_ptbr(0),
-        "meta_leads": 0,
-        "meta_leads_formatado": numero_ptbr(0),
-
         "roas_geral": 0.0,
 
-        "engajamento": {
-            "seguidores_instagram": 0,
-            "seguidores_youtube": 0,
-            "taxa_crescimento_instagram": 0,
-            "taxa_crescimento_youtube": 0,
-        },
+        # Metas/conversão/vendas
+        "meta_leads": 0,
+        "taxa_conversao": 2.0,  # %
+        "ticket_curso": 297.0,
+        "ticket_mentoria": 1500.0,
+        "perc_vendas_mentoria": 10.0,  # %
 
-        "conversao": {
-            "taxa_conversao": 2.0,
-            "vendas_estimadas": 0,
-            "ticket_medio_curso": 297.0,
-            "ticket_medio_curso_formatado": moeda_ptbr(297),
-            "ticket_medio_mentoria": 1500.0,
-            "ticket_medio_mentoria_formatado": moeda_ptbr(1500),
-            "receita_estimada_curso": 0.0,
-            "receita_estimada_mentoria": 0.0,
-            "percentual_mentorias": 10,
-        },
-
+        # Canais
         "canais": {
-            "facebook":  {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},
-            "youtube":   {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},
-            "instagram": {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},
-            "google":    {"percentual": 0, "roas": 0.0, "leads_formatado": numero_ptbr(0), "cpl": 0.0},
+            "facebook": canal_zero.copy(),
+            "instagram": canal_zero.copy(),
+            "youtube": canal_zero.copy(),
+            "google": canal_zero.copy(),
+            "email": canal_zero.copy(),
         },
 
-        "regioes": {
-            "sudeste": {"percentual": 0},
-            "sul": {"percentual": 0},
-            "centro_oeste": {"percentual": 0},
-            "nordeste": {"percentual": 0},
-            "norte": {"percentual": 0},
-        },
-
-        "estados": {
-            "SP": {"leads": 0, "percentual": 0},
-            "RJ": {"leads": 0, "percentual": 0},
-            "MG": {"leads": 0, "percentual": 0},
-            "BA": {"leads": 0, "percentual": 0},
-        },
-
+        # Profissões
         "profissoes": {
-            "dentista": {"total": 0},
-            "medico": {"total": 0},
-            "advogado": {"total": 0},
-            "engenheiro": {"total": 0},
+            "dentista": prof_zero.copy(),
+            "psicologo": prof_zero.copy(),
+            "fisioterapeuta": prof_zero.copy(),
+            "nutricionista": prof_zero.copy(),
+            "medico": prof_zero.copy(),
+            "outra": prof_zero.copy(),
+        },
+
+        # Regiões e estados (apenas alguns para não quebrar loops)
+        "regioes": {
+            "sudeste": reg_zero.copy(),
+            "sul": reg_zero.copy(),
+            "nordeste": reg_zero.copy(),
+            "centro_oeste": reg_zero.copy(),
+            "norte": reg_zero.copy(),
+        },
+        "estados": {
+            "SP": {"total": 0},
+            "RJ": {"total": 0},
+            "MG": {"total": 0},
+            "ES": {"total": 0},
+            "PR": {"total": 0},
+            "RS": {"total": 0},
+            "SC": {"total": 0},
+            "BA": {"total": 0},
+            "PE": {"total": 0},
+            "CE": {"total": 0},
+            "DF": {"total": 0},
         },
     }
 
-    extras = {
-        "percentual_orcamento": 0.0,
-        "percentual_orcamento_formatado": "0,0%",
-        "percentual_leads": 100.0,
-        "percentual_leads_formatado": "100,0%",
-        "percentual_cpl": 0.0,
-        "percentual_cpl_formatado": "0,0%",
+def _extras_from(dados: Dict[str, Any]) -> Dict[str, Any]:
+    orc_usado_pct = _safe_div(dados.get("investimento_total", 0), dados.get("orcamento_total", 0)) * 100.0
+    return {
+        "periodo": "01/09/2025 - 23/09/2025",
+        "dias": 23,
+        "status": "Campanha Ativa",
+        "ultima_atualizacao": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        # usado por visao_geral.html
+        "percentual_cpl_formatado": pct(orc_usado_pct, 1),  # ex.: "76,7%"
+        "orcamento_usado_pct": orc_usado_pct,
     }
 
-    return dados, extras
+def _ctx() -> Dict[str, Any]:
+    """
+    Contexto único para todas as páginas.
+    Se no futuro você carregar valores reais da planilha, é só popular `dados`
+    antes de montar `extras` – o resto dos templates continua funcionando.
+    """
+    dados = _skeleton_dados()
 
-def compute_kpis(dfs):
-    """Cálculo simples e seguro dos KPIs (sem quebrar com dados vazios)."""
-    dados, extras = _defaults()
+    # >>> Lugar certo para sobrepor 'dados' com números reais da planilha, se/quando desejar <<<
+    # Exemplo (quando tiver o dicionário com valores da planilha):
+    # dados["orcamento_total"] = planilha["orcamento_total"]
+    # dados["canais"]["facebook"]["investimento"] = planilha["invest_fb"]
+    # ... etc.
 
-    orc = _to_float(dados.get("orcamento_total", 0))
-    inv = _to_float(dados.get("investimento_total", 0))
-    leads = int(_to_float(dados.get("total_leads", 0)))
-    meta_leads_raw = int(_to_float(dados.get("meta_leads", 0)))
+    extras = _extras_from(dados)
+    return {"dados": dados, "extras": extras}
 
-    # % orçamento
-    perc_orc = 0.0 if orc <= 0 else (inv / orc) * 100.0
-    extras["percentual_orcamento"] = perc_orc
-    extras["percentual_orcamento_formatado"] = f"{perc_orc:.1f}".replace(".", ",") + "%"
+# ----------------------------
+# Rotas
+# ----------------------------
+@app.route("/")
+@app.route("/visao-geral")
+def visao_geral():
+    return render_template("visao_geral_atualizada.html", **_ctx())
 
-    # % leads vs meta (se meta==0, mostramos 100%)
-    perc_leads = 100.0 if meta_leads_raw == 0 else (leads / max(meta_leads_raw, 1)) * 100.0
-    extras["percentual_leads"] = perc_leads
-    extras["percentual_leads_formatado"] = f"{perc_leads:.1f}".replace(".", ",") + "%"
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard_atualizado.html", **_ctx())
 
-    # % CPL vs meta
-    cpl_atual = _to_float(dados.get("cpl_medio", 0))
-    cpl_meta = 15.0
-    perc_cpl = 0.0 if cpl_meta <= 0 else ((cpl_atual - cpl_meta) / cpl_meta) * 100.0
-    extras["percentual_cpl"] = perc_cpl
-    extras["percentual_cpl_formatado"] = f"{perc_cpl:.1f}".replace(".", ",") + "%"
+@app.route("/origem-conversao")
+def origem_conversao():
+    return render_template("origem_conversao_atualizada.html", **_ctx())
 
-    # Formatações
-    dados["investimento_total_formatado"] = moeda_ptbr(inv)
-    dados["orcamento_total_formatado"] = moeda_ptbr(orc)
-    dados["total_leads_formatado"] = numero_ptbr(leads)
-    dados["meta_leads_formatado"] = numero_ptbr(meta_leads_raw)
-    dados["cpl_medio_formatado"] = moeda_ptbr(cpl_atual)
-    dados["meta_cpl_formatado"] = moeda_ptbr(cpl_meta)
+@app.route("/insights-ia")
+def insights_ia():
+    return render_template("insights_ia_atualizada.html", **_ctx())
 
-    return dados, extras
+@app.route("/profissao-canal")
+def profissao_canal():
+    return render_template("profissao_canal_atualizada.html", **_ctx())
 
-def last_sync_info():
-    tz = timezone(timedelta(hours=-3))  # Brasília
-    return datetime.now(tz).strftime("%d/%m/%Y %H:%M:%S")
+@app.route("/projecao-resultados")
+def projecao_resultados():
+    return render_template("projecao_resultados_atualizada.html", **_ctx())
+
+@app.route("/analise-regional")
+def analise_regional():
+    return render_template("analise_regional_atualizada.html", **_ctx())
+
+@app.route("/vendas")
+def vendas():
+    return render_template("vendas.html", **_ctx())
+
+# Healthcheck opcional
+@app.route("/healthz")
+def healthz():
+    return {"ok": True, "ts": datetime.now().isoformat()}
+
+# --------------
+# WSGI
+# --------------
+if __name__ == "__main__":
+    # Execução local
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", "8000")), debug=True)
