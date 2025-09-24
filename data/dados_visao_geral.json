@@ -1,0 +1,48 @@
+{
+  "dias": 28,
+  "periodo_inicio": "25/08/2025",
+  "periodo_fim": "24/09/2025",
+  "campanha_ativa": true,
+  "total_leads": 9500,
+  "cpl_medio": 15.83342211,
+  "meta_cpl": 15.0,
+  "investimento_total": 150417.51,
+  "orcamento_total": 200000.0,
+  "roas_geral": 2.006166034,
+  "seguidores_instagram": 167572,
+  "seguidores_youtube": 655031,
+  "taxa_conversao": 0.007,
+  "ticket_curso": 6300.0,
+  "ticket_mentoria": 20000.0,
+  "pct_vendas_mentoria": 0.1,
+  "canais": {
+    "facebook": {
+      "leads": 1200,
+      "cpl": 18.91994582,
+      "roas": 1.74270725,
+      "investimento": 2366.17
+    },
+    "youtube": {
+      "leads": 1340,
+      "cpl": 14.3285812,
+      "roas": 1.546311635,
+      "investimento": 1954.04
+    },
+    "google": {
+      "leads": 600,
+      "cpl": 29.28865578,
+      "roas": 2.347573148,
+      "investimento": 1051.98
+    },
+    "instagram": {
+      "leads": 930
+    },
+    "email": {
+      "leads": 35
+    }
+  },
+  "vendas_estimadas": 66,
+  "receita_curso": 415800.0,
+  "receita_mentoria": 132000,
+  "ultima_atualizacao": "2025-09-24 01:29:06"
+}
