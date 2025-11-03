@@ -1,5 +1,19 @@
-.git
-.github
+# Dependências locais
 node_modules
-incoming
+.pnpm-store
+
+# Logs
+npm-debug.log
+yarn-error.log
+
+# Git
+.git
+.gitignore
+
+# Sistema operacional / IDE
+.DS_Store
+.vscode
+.idea
+
+# Artefatos de build
 dist
