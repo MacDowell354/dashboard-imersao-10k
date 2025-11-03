@@ -1,0 +1,63 @@
+{
+  "timestamp": "2025-08-08T06:46:02.424993",
+  "periodo_analise": "3 dias",
+  "metricas_principais": {
+    "roas": -0.6599154158972849,
+    "cac": 463.93666666666667,
+    "ticket_medio": 157.77770833333335,
+    "total_vendas": 12,
+    "faturamento": 1893.3325000000002,
+    "investimento": 5567.24
+  },
+  "insights_ia": [
+    {
+      "categoria": "CRÍTICO",
+      "insight": "ROI Negativo Alarmante",
+      "detalhes": "ROAS de -0.66 indica que para cada R$ 1,00 investido, há perda de R$ 0.66",
+      "acao": "Pausar campanhas de baixa performance e otimizar segmentação imediatamente"
+    },
+    {
+      "categoria": "ALERTA",
+      "insight": "Custo de Aquisição Insustentável",
+      "detalhes": "CAC de R$ 463.94 representa 294.0% do ticket médio",
+      "acao": "Reduzir CAC para máximo de 30% do LTV do cliente"
+    },
+    {
+      "categoria": "ESTRATÉGICO",
+      "insight": "Alta Dependência de Tráfego Pago",
+      "detalhes": "66.7% das vendas vêm de tráfego pago",
+      "acao": "Fortalecer canais orgânicos e parcerias para reduzir dependência"
+    },
+    {
+      "categoria": "OPORTUNIDADE",
+      "insight": "Potencial Orgânico Subutilizado",
+      "detalhes": "4 vendas orgânicas com custo zero de aquisição",
+      "acao": "Investir em conteúdo orgânico e estratégias de engajamento"
+    },
+    {
+      "categoria": "DADOS",
+      "insight": "Falta de Dados de Especialidade",
+      "detalhes": "Ausência de informação sobre especialidade médica dos compradores",
+      "acao": "Implementar coleta obrigatória de especialidade no formulário"
+    }
+  ],
+  "recomendacoes_prioritarias": [
+    "Pausar campanhas com ROAS < -0.5",
+    "Implementar coleta de especialidade médica",
+    "Otimizar segmentação para médicos",
+    "Fortalecer estratégia orgânica",
+    "Reduzir CAC para R$ 150-200"
+  ],
+  "projecoes": {
+    "cenario_atual_7dias": {
+      "vendas": 28,
+      "investimento": 12990.226666666667,
+      "resultado": -8572.450833333332
+    },
+    "cenario_otimizado_7dias": {
+      "vendas": 28,
+      "investimento": 7794.135999999999,
+      "resultado": -3376.3601666666646
+    }
+  }
+}

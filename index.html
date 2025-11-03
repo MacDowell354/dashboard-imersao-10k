@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Imersão +10K - Análise de IA</title>
+
+    <!-- Debug overlay para capturar erros de JS em produção -->
+    <script>
+      window.addEventListener('error', function (e) {
+        const box = document.createElement('pre');
+        box.style.cssText =
+          'white-space:pre-wrap;font:14px/1.4 monospace;color:#b00020;background:#fff3f3;border:1px solid #b00020;padding:12px;margin:12px';
+        box.textContent =
+          '⚠️ Erro de runtime: ' + (e.message || (e.error && e.error.message));
+        document.body.prepend(box);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
