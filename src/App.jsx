@@ -1071,6 +1071,7 @@ function App() {
                           <th className="text-left py-3 px-4 font-semibold text-slate-700">Indicador</th>
                           <th className="text-center py-3 px-4 font-semibold text-blue-700">Cenário Conservador (Original)</th>
                           <th className="text-center py-3 px-4 font-semibold text-green-700">Projeção Realista (Atualizada)</th>
+                          <th className="text-center py-3 px-4 font-semibold text-purple-700">Realizado até 25-08</th>
                           <th className="text-center py-3 px-4 font-semibold text-orange-700">Diferença</th>
                         </tr>
                       </thead>
@@ -1079,67 +1080,85 @@ function App() {
                           <td className="py-3 px-4 font-medium">Custo por Lead (CPL)</td>
                           <td className="py-3 px-4 text-center">R$ 110</td>
                           <td className="py-3 px-4 text-center font-bold text-red-600">R$ 342</td>
-                          <td className="py-3 px-4 text-center text-red-600">+211%</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 300,08</td>
+                          <td className="py-3 px-4 text-center text-green-600">-R$ 41,92</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
-                          <td className="py-3 px-4 font-medium">Total de Leads Captados</td>
+                          <td className="py-3 px-4 font-medium">Total de Leads Captados (Ingressos)</td>
                           <td className="py-3 px-4 text-center">455</td>
-                          <td className="py-3 px-4 text-center font-bold">150</td>
-                          <td className="py-3 px-4 text-center text-red-600">-67%</td>
+                          <td className="py-3 px-4 text-center font-bold">152</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">157</td>
+                          <td className="py-3 px-4 text-center text-green-600">+5 leads</td>
+                        </tr>
+                        <tr className="hover:bg-slate-50 bg-blue-50">
+                          <td className="py-3 px-4 font-medium">Receita Ingressos</td>
+                          <td className="py-3 px-4 text-center">R$ 54.600</td>
+                          <td className="py-3 px-4 text-center font-bold">R$ 18.240</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 25.113</td>
+                          <td className="py-3 px-4 text-center text-green-600">+R$ 6.873</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Comparecimento (90%)</td>
                           <td className="py-3 px-4 text-center">410 presentes</td>
-                          <td className="py-3 px-4 text-center font-bold">135 presentes</td>
-                          <td className="py-3 px-4 text-center text-red-600">-67%</td>
+                          <td className="py-3 px-4 text-center font-bold">137 presentes</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">116 presentes (pico)</td>
+                          <td className="py-3 px-4 text-center text-red-600">-21 presentes</td>
                         </tr>
                         <tr className="hover:bg-slate-50 bg-gray-100">
                           <td className="py-3 px-4 font-medium">Taxa de Conversão (Curso)</td>
                           <td className="py-3 px-4 text-center">3%</td>
                           <td className="py-3 px-4 text-center">3%</td>
-                          <td className="py-3 px-4 text-center text-slate-600">Mantida</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">6%</td>
+                          <td className="py-3 px-4 text-center text-green-600">+3%</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Vendas Curso (Ticket R$ 6.300)</td>
                           <td className="py-3 px-4 text-center">13 vendas</td>
                           <td className="py-3 px-4 text-center font-bold">4 vendas</td>
-                          <td className="py-3 px-4 text-center text-red-600">-9 vendas</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">9 vendas</td>
+                          <td className="py-3 px-4 text-center text-green-600">+5 vendas</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Receita Curso</td>
                           <td className="py-3 px-4 text-center">R$ 81.900</td>
                           <td className="py-3 px-4 text-center font-bold">R$ 25.200</td>
-                          <td className="py-3 px-4 text-center text-red-600">-R$ 56.700</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 58.615</td>
+                          <td className="py-3 px-4 text-center text-green-600">+R$ 33.415</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Conversão Mentoria (Ticket R$ 22.000)</td>
                           <td className="py-3 px-4 text-center">4 vendas</td>
                           <td className="py-3 px-4 text-center font-bold">1 venda</td>
-                          <td className="py-3 px-4 text-center text-red-600">-3 vendas</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">0 vendas</td>
+                          <td className="py-3 px-4 text-center text-red-600">-1 venda</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Receita Mentoria</td>
                           <td className="py-3 px-4 text-center">R$ 88.000</td>
                           <td className="py-3 px-4 text-center font-bold">R$ 22.000</td>
-                          <td className="py-3 px-4 text-center text-red-600">-R$ 66.000</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 0</td>
+                          <td className="py-3 px-4 text-center text-red-600">-R$ 22.000</td>
                         </tr>
                         <tr className="hover:bg-slate-50 bg-blue-50">
                           <td className="py-3 px-4 font-bold">Receita Total Bruta</td>
                           <td className="py-3 px-4 text-center font-bold text-blue-600">R$ 224.500</td>
-                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 47.200</td>
-                          <td className="py-3 px-4 text-center font-bold text-red-600">-R$ 177.300</td>
+                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 65.440</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 83.728</td>
+                          <td className="py-3 px-4 text-center text-green-600">+R$ 18.288</td>
                         </tr>
                         <tr className="hover:bg-slate-50 bg-green-50">
                           <td className="py-3 px-4 font-bold">Receita Líquida (Lucro)</td>
-                          <td className="py-3 px-4 text-center font-bold text-blue-600">R$ 129.600</td>
-                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 26.139</td>
-                          <td className="py-3 px-4 text-center font-bold text-red-600">-R$ 103.461</td>
+                          <td className="py-3 px-4 text-center font-bold text-blue-600">R$ 208.448</td>
+                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 60.761</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 77.742</td>
+                          <td className="py-3 px-4 text-center text-green-600">+R$ 16.981</td>
                         </tr>
                         <tr className="hover:bg-slate-50 bg-yellow-50">
                           <td className="py-3 px-4 font-bold">ROAS (Retorno sobre Invest.)</td>
-                          <td className="py-3 px-4 text-center font-bold text-blue-600">4,49</td>
-                          <td className="py-3 px-4 text-center font-bold text-green-600">1,65</td>
-                          <td className="py-3 px-4 text-center font-bold text-red-600">-63%</td>
+                          <td className="py-3 px-4 text-center font-bold text-blue-600">4,486</td>
+                          <td className="py-3 px-4 text-center font-bold text-green-600">1,259</td>
+                          <td className="py-3 px-4 text-center font-bold text-purple-600">1,777</td>
+                          <td className="py-3 px-4 text-center text-green-600">+0,518</td>
                         </tr>
                       </tbody>
                     </table>
@@ -1176,26 +1195,67 @@ function App() {
                 </Card>
 
                 {/* Resultado Final */}
-                <Card className="border-green-200">
+                <Card className="border-slate-200">
                   <CardHeader>
-                    <CardTitle className="text-green-700 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5" />
-                      Resultado Final Positivo
+                    <CardTitle className="text-slate-700 flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5" />
+                      Resultado Final e Aprendizados
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-green-600">Campanha Lucrativa</h4>
+                      <h4 className="font-semibold text-slate-600">Campanha com Aprendizados Importantes</h4>
                       <p className="text-sm text-slate-600">
-                        A <strong>Projeção Realista</strong> aponta para um lucro de <strong>R$ 38.371</strong> 
-                        e ROAS de <strong>2,20</strong>. Resultado 70% menor que o original, mas ainda positivo.
+                        O <strong>Realizado até 25/08</strong> confirma <strong>ROAS de 1,777</strong> com receita total de 
+                        R$ 83.728 (ingressos + curso), mas <strong>não foi suficiente para gerar um ROI positivo</strong> 
+                        quando considerados todos os custos operacionais. ROI final de <strong>-0,306</strong>, o que significa que 
+                        <strong>para cada R$ 1 investido no projeto total, houve perda de R$ 0,31</strong>.
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-green-600">ROI Sustentável</h4>
+                      <h4 className="font-semibold text-red-600">Principais Impactos Identificados</h4>
                       <p className="text-sm text-slate-600">
-                        Mesmo com os desafios, a campanha se paga e gera lucro, 
-                        indicando que a estratégia tem fundamento sólido.
+                        <strong className="text-red-600">CAC Elevado:</strong> O custo por lead (R$ 300,08) ficou <strong className="text-red-600">172,8% acima</strong> 
+                        da meta (R$ 110), sendo o principal fator de impacto negativo na rentabilidade da campanha.
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-slate-600">Análise de Receita Detalhada</h4>
+                      <p className="text-sm text-slate-600">
+                        <strong>Receita Ingressos:</strong> R$ 25.113 (157 leads captados)<br/>
+                        <strong>Receita Curso:</strong> R$ 58.615 (9 vendas High Ticket)<br/>
+                        <strong>Receita Total Bruta:</strong> R$ 83.728<br/>
+                        <strong>Receita Líquida:</strong> R$ 77.742 (após impostos)<br/>
+                        <strong>Taxa de Conversão:</strong> 5,7%
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-slate-600">Análise de Custos Crítica</h4>
+                      <p className="text-sm text-slate-600">
+                        <strong>Investimento Tráfego:</strong> R$ 47.112<br/>
+                        <strong>Serviços Terceiros:</strong> R$ 32.900<br/>
+                        <strong>Software/Licenças:</strong> R$ 23.566<br/>
+                        <strong>Outros Custos:</strong> R$ 11.011<br/>
+                        <strong>Impostos:</strong> R$ 5.987<br/>
+                        <strong>Custos Totais:</strong> R$ 120.576<br/>
+                        <strong>Prejuízo Final:</strong> R$ 36.848
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-slate-600">Métricas de Performance</h4>
+                      <p className="text-sm text-slate-600">
+                        <strong>ROAS:</strong> 1,777 (tráfego eficiente)<br/>
+                        <strong>CPL:</strong> R$ 300,08 (172,8% acima da meta)<br/>
+                        <strong>Custo por Venda:</strong> R$ 5.235<br/>
+                        <strong>ROI Final:</strong> -0,306 (incluindo impostos)
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-slate-600">Aprendizados Estratégicos</h4>
+                      <p className="text-sm text-slate-600">
+                        ROAS positivo (1,777) demonstra eficiência do tráfego, mas <strong className="text-red-600">CPL 172,8% acima da meta</strong> 
+                        foi o principal fator de impacto. Próximas campanhas devem focar na <strong className="text-red-600">otimização do CAC</strong> 
+                        para viabilizar rentabilidade com a estrutura atual.
                       </p>
                     </div>
                   </CardContent>
@@ -1222,7 +1282,7 @@ function App() {
                 <Lightbulb className="h-4 w-4" />
                 <AlertTitle className="text-blue-800">Conclusão da Análise Realista</AlertTitle>
                 <AlertDescription className="text-blue-700">
-                  Com as <strong>taxas de conversão confirmadas</strong> (3% curso, 30% mentoria) e projeção de ~150 leads até 22/08, 
+                  Com as <strong>taxas de conversão confirmadas</strong> (3% curso, 30% mentoria) e <strong>152 leads captados</strong> em 22/08, 
                   o evento tem potencial de gerar <strong>R$ 47-75k</strong>, resultando em lucro final de <strong>R$ 26-54k</strong>. 
                   A campanha é <strong>lucrativa e sustentável</strong>, mesmo com o déficit atual de R$ 21k. 
                   Foco deve ser na <strong>qualidade dos leads</strong> e <strong>otimização da apresentação</strong> para médicos (59% dos leads).
