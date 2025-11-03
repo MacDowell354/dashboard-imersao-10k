@@ -18,57 +18,57 @@ import './App.css'
 
 // Cache Busting - Força atualização
 const CACHE_VERSION = Date.now();
-const BUILD_VERSION = "20250822_FINAL_" + CACHE_VERSION;
+const BUILD_VERSION = "20250821_" + CACHE_VERSION;
 
-// Dados FINAIS da campanha - 22/08/2025 - CAMPANHA ENCERRADA
+// Dados atualizados com foco em conversão histórica - 21/08/2025
 const dadosAtualizados = {
   metricas_principais: {
-    roas: -0.48,
-    cac: 309.95,
-    total_vendas: 152,
-    faturamento: 24513.40,
-    investimento: 47112.29,
-    deficit: 22598.89,
-    ticket_medio: 161.27,
-    data_atualizacao: '22/08/2025 - CAMPANHA ENCERRADA'
+    roas: -0.50,
+    cac: 326.60,
+    total_vendas: 137,
+    faturamento: 22226.51,
+    investimento: 44744.46,
+    deficit: 22517.95,
+    ticket_medio: 162.26,
+    data_atualizacao: '21/08/2025'
   },
   insights_ia: [
     {
       categoria: 'POSITIVO',
-      insight: '🎉 CAMPANHA ENCERRADA COM SUCESSO - 22/08',
-      detalhes: 'Último dia EXCEPCIONAL: 15 vendas com CAC R$ 157,86 (MELHOR CAC da campanha). Recuperação confirmada nos últimos 4 dias (10→12→8→15). Total final: 152 leads captados.',
-      acao: 'Campanha oficialmente encerrada. Focar na preparação do evento com os 152 leads finais para maximizar conversões.'
+      insight: '🎯 PENÚLTIMO DIA CONTROLADO - 21/08',
+      detalhes: 'Performance estável: 8 vendas com CAC R$ 285,72 (controlado). Três dias consecutivos de performance consistente (19/08: 10, 20/08: 12, 21/08: 8). CAC mantido abaixo de R$ 300.',
+      acao: 'Manter estratégias atuais no último dia. Focar em CAC < R$ 300 para fechar campanha com sucesso.'
+    },
+    {
+      categoria: 'CRÍTICO',
+      insight: '🚨 ÚLTIMO DIA DE CAPTAÇÃO - PRAZO FINAL HOJE 22/08',
+      detalhes: 'HOJE é o último dia para compra de ingressos: SEXTA-FEIRA 22/08/25. Com 137 leads atuais, projeção final: ~145-150 leads totais. Últimas horas críticas.',
+      acao: 'URGENTE: Máxima intensidade hoje. Comunicar ÚLTIMO DIA em todos os materiais. Push final em todas as campanhas.'
     },
     {
       categoria: 'ESTRATÉGICO',
-      insight: 'Projeção Final do Evento - 152 Leads Captados',
-      detalhes: 'Com 152 leads finais: Curso (3% conversão) = 4-5 vendas × R$ 6.300 = R$ 25-31k. Mentoria (30% das vendas curso) = 1-2 vendas × R$ 22k = R$ 22-44k. Total: R$ 47-75k.',
-      acao: 'Preparar evento com estratégias específicas para médicos (66% dos leads). Foco na qualidade da apresentação para maximizar conversões.'
+      insight: 'Projeção Final do Evento - Meta Alcançável',
+      detalhes: 'Com 145-150 leads finais: Curso (3% conversão) = 4-5 vendas × R$ 6.300 = R$ 25-31k. Mentoria (30% das vendas curso) = 1-2 vendas × R$ 22k = R$ 22-44k. Total: R$ 47-75k.',
+      acao: 'Preparar evento com foco em médicos (67% dos leads). Estratégias específicas para maximizar conversão dos 145-150 leads finais.'
     },
     {
-      categoria: 'SUCESSO',
-      insight: 'Bio Instagram: Canal Premium Consolidado',
-      detalhes: 'Bio Instagram: 34 vendas (22.4%) com CAC zero. Crescimento de +5 vendas no último dia. Leads orgânicos têm maior probabilidade de conversão no evento.',
-      acao: 'Usar cases de sucesso do Bio Instagram no evento. Leads orgânicos são premium para conversão em curso e mentoria.'
+      categoria: 'ALERTA',
+      insight: 'Déficit Final Controlável - Evento Decisivo',
+      detalhes: 'Déficit atual R$ 22.518. Com projeção conservadora do evento (R$ 47k), resultado final: +R$ 24k lucro. Cenário otimista (R$ 75k): +R$ 52k lucro.',
+      acao: 'Evento é decisivo para sucesso da campanha. Focar qualidade da apresentação e follow-up para maximizar conversões.'
     },
     {
-      categoria: 'RESULTADO',
-      insight: 'Déficit Controlável - Evento Decisivo para Lucro',
-      detalhes: 'Déficit final R$ 22.599. Com projeção conservadora do evento (R$ 47k), resultado final: +R$ 24k lucro. Cenário otimista (R$ 75k): +R$ 52k lucro.',
-      acao: 'Evento é decisivo para transformar déficit em lucro. Focar qualidade da apresentação e follow-up para maximizar conversões dos 152 leads.'
-    },
-    {
-      categoria: 'ANÁLISE',
-      insight: 'Métricas Finais - Melhoria Consistente',
-      detalhes: 'CAC final R$ 309,95 (melhoria vs R$ 327). ROAS -0.48 (melhoria vs -0.50). Último dia com melhor CAC da campanha (R$ 157,86). Tendência positiva confirmada.',
-      acao: 'Replicar estratégias do último dia em futuras campanhas. CAC abaixo de R$ 200 é o benchmark ideal para próximas captações.'
+      categoria: 'OPORTUNIDADE',
+      insight: 'Bio Instagram: Canal Premium em Crescimento',
+      detalhes: 'Bio Instagram: 29 vendas (21.2%) com CAC zero. Crescimento constante (+2 vendas vs 20/08). Leads orgânicos têm maior probabilidade de conversão no evento.',
+      acao: 'Último push orgânico: posts sobre ÚLTIMO DIA, urgência máxima, cases de transformação. Intensidade máxima hoje.'
     }
   ],
   vendas_por_canal: [
     { 
       canal: 'Tráfego Pago', 
-      vendas: 101, 
-      percentual: 66.4, 
+      vendas: 93, 
+      percentual: 67.9, 
       cor: '#ef4444',
       conversao_curso: 'ALTA',
       conversao_mentoria: 'ALTA',
@@ -76,8 +76,8 @@ const dadosAtualizados = {
     },
     { 
       canal: 'Bio Instagram', 
-      vendas: 34, 
-      percentual: 22.4, 
+      vendas: 29, 
+      percentual: 21.2, 
       cor: '#10b981',
       conversao_curso: 'MÁXIMA',
       conversao_mentoria: 'MÁXIMA',
@@ -85,8 +85,8 @@ const dadosAtualizados = {
     },
     { 
       canal: 'Outras', 
-      vendas: 8, 
-      percentual: 5.3, 
+      vendas: 7, 
+      percentual: 5.1, 
       cor: '#6b7280',
       conversao_curso: 'Baixa',
       conversao_mentoria: 'Baixa',
@@ -95,17 +95,8 @@ const dadosAtualizados = {
     { 
       canal: 'Email', 
       vendas: 4, 
-      percentual: 2.6, 
+      percentual: 2.9, 
       cor: '#3b82f6',
-      conversao_curso: 'Baixa',
-      conversao_mentoria: 'Baixa',
-      prioridade: 'Baixa'
-    },
-    { 
-      canal: 'YouTube', 
-      vendas: 3, 
-      percentual: 2.0, 
-      cor: '#8b5cf6',
       conversao_curso: 'Baixa',
       conversao_mentoria: 'Baixa',
       prioridade: 'Baixa'
@@ -113,9 +104,18 @@ const dadosAtualizados = {
     { 
       canal: 'WhatsApp', 
       vendas: 2, 
-      percentual: 1.3, 
+      percentual: 1.5, 
       cor: '#22c55e',
       conversao_curso: 'Média',
+      conversao_mentoria: 'Baixa',
+      prioridade: 'Baixa'
+    },
+    { 
+      canal: 'YouTube', 
+      vendas: 2, 
+      percentual: 1.5, 
+      cor: '#8b5cf6',
+      conversao_curso: 'Baixa',
       conversao_mentoria: 'Baixa',
       prioridade: 'Baixa'
     }
@@ -252,8 +252,7 @@ const dadosAtualizados = {
     { dia: '18/08', vendas: 3, investimento: 2654.30, faturamento: 518.09, cac: 884.77 },
     { dia: '19/08', vendas: 10, investimento: 2730.05, faturamento: 1631.38, cac: 273.01 },
     { dia: '20/08', vendas: 12, investimento: 2403.51, faturamento: 1954.40, cac: 200.29 },
-    { dia: '21/08', vendas: 8, investimento: 2285.74, faturamento: 1277.59, cac: 285.72 },
-    { dia: '22/08', vendas: 15, investimento: 2367.83, faturamento: 2286.89, cac: 157.86 }
+    { dia: '21/08', vendas: 8, investimento: 2285.74, faturamento: 1277.59, cac: 285.72 }
   ],
   segmentos_prioritarios: {
     medicos_dentistas: {
@@ -406,7 +405,7 @@ function App() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Dashboard Imersão +10K
           </h1>
-          <p className="text-slate-600 text-lg">Análise de IA • Dados FINAIS 22/08/2025 • CAMPANHA ENCERRADA</p>
+          <p className="text-slate-600 text-lg">Análise de IA • Dados de 21/08/2025 • Foco em Conversão Histórica</p>
           <div className="flex justify-center gap-2">
             <Badge variant="secondary" className="text-green-700 bg-green-100">
               🎯 Médicos + Dentistas: 69% das vendas
@@ -1071,7 +1070,6 @@ function App() {
                           <th className="text-left py-3 px-4 font-semibold text-slate-700">Indicador</th>
                           <th className="text-center py-3 px-4 font-semibold text-blue-700">Cenário Conservador (Original)</th>
                           <th className="text-center py-3 px-4 font-semibold text-green-700">Projeção Realista (Atualizada)</th>
-                          <th className="text-center py-3 px-4 font-semibold text-purple-700">Realizado até 25-08</th>
                           <th className="text-center py-3 px-4 font-semibold text-orange-700">Diferença</th>
                         </tr>
                       </thead>
@@ -1080,85 +1078,67 @@ function App() {
                           <td className="py-3 px-4 font-medium">Custo por Lead (CPL)</td>
                           <td className="py-3 px-4 text-center">R$ 110</td>
                           <td className="py-3 px-4 text-center font-bold text-red-600">R$ 342</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 300,08</td>
-                          <td className="py-3 px-4 text-center text-green-600">-R$ 41,92</td>
+                          <td className="py-3 px-4 text-center text-red-600">+211%</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
-                          <td className="py-3 px-4 font-medium">Total de Leads Captados (Ingressos)</td>
+                          <td className="py-3 px-4 font-medium">Total de Leads Captados</td>
                           <td className="py-3 px-4 text-center">455</td>
-                          <td className="py-3 px-4 text-center font-bold">152</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">157</td>
-                          <td className="py-3 px-4 text-center text-green-600">+5 leads</td>
-                        </tr>
-                        <tr className="hover:bg-slate-50 bg-blue-50">
-                          <td className="py-3 px-4 font-medium">Receita Ingressos</td>
-                          <td className="py-3 px-4 text-center">R$ 54.600</td>
-                          <td className="py-3 px-4 text-center font-bold">R$ 18.240</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 25.113</td>
-                          <td className="py-3 px-4 text-center text-green-600">+R$ 6.873</td>
+                          <td className="py-3 px-4 text-center font-bold">150</td>
+                          <td className="py-3 px-4 text-center text-red-600">-67%</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Comparecimento (90%)</td>
                           <td className="py-3 px-4 text-center">410 presentes</td>
-                          <td className="py-3 px-4 text-center font-bold">137 presentes</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">116 presentes (pico)</td>
-                          <td className="py-3 px-4 text-center text-red-600">-21 presentes</td>
+                          <td className="py-3 px-4 text-center font-bold">135 presentes</td>
+                          <td className="py-3 px-4 text-center text-red-600">-67%</td>
                         </tr>
                         <tr className="hover:bg-slate-50 bg-gray-100">
                           <td className="py-3 px-4 font-medium">Taxa de Conversão (Curso)</td>
                           <td className="py-3 px-4 text-center">3%</td>
                           <td className="py-3 px-4 text-center">3%</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">6%</td>
-                          <td className="py-3 px-4 text-center text-green-600">+3%</td>
+                          <td className="py-3 px-4 text-center text-slate-600">Mantida</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Vendas Curso (Ticket R$ 6.300)</td>
                           <td className="py-3 px-4 text-center">13 vendas</td>
                           <td className="py-3 px-4 text-center font-bold">4 vendas</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">9 vendas</td>
-                          <td className="py-3 px-4 text-center text-green-600">+5 vendas</td>
+                          <td className="py-3 px-4 text-center text-red-600">-9 vendas</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Receita Curso</td>
                           <td className="py-3 px-4 text-center">R$ 81.900</td>
                           <td className="py-3 px-4 text-center font-bold">R$ 25.200</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 58.615</td>
-                          <td className="py-3 px-4 text-center text-green-600">+R$ 33.415</td>
+                          <td className="py-3 px-4 text-center text-red-600">-R$ 56.700</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Conversão Mentoria (Ticket R$ 22.000)</td>
                           <td className="py-3 px-4 text-center">4 vendas</td>
                           <td className="py-3 px-4 text-center font-bold">1 venda</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">0 vendas</td>
-                          <td className="py-3 px-4 text-center text-red-600">-1 venda</td>
+                          <td className="py-3 px-4 text-center text-red-600">-3 vendas</td>
                         </tr>
                         <tr className="hover:bg-slate-50">
                           <td className="py-3 px-4 font-medium">Receita Mentoria</td>
                           <td className="py-3 px-4 text-center">R$ 88.000</td>
                           <td className="py-3 px-4 text-center font-bold">R$ 22.000</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 0</td>
-                          <td className="py-3 px-4 text-center text-red-600">-R$ 22.000</td>
+                          <td className="py-3 px-4 text-center text-red-600">-R$ 66.000</td>
                         </tr>
                         <tr className="hover:bg-slate-50 bg-blue-50">
                           <td className="py-3 px-4 font-bold">Receita Total Bruta</td>
                           <td className="py-3 px-4 text-center font-bold text-blue-600">R$ 224.500</td>
-                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 65.440</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 83.728</td>
-                          <td className="py-3 px-4 text-center text-green-600">+R$ 18.288</td>
+                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 47.200</td>
+                          <td className="py-3 px-4 text-center font-bold text-red-600">-R$ 177.300</td>
                         </tr>
                         <tr className="hover:bg-slate-50 bg-green-50">
                           <td className="py-3 px-4 font-bold">Receita Líquida (Lucro)</td>
-                          <td className="py-3 px-4 text-center font-bold text-blue-600">R$ 208.448</td>
-                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 60.761</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">R$ 77.742</td>
-                          <td className="py-3 px-4 text-center text-green-600">+R$ 16.981</td>
+                          <td className="py-3 px-4 text-center font-bold text-blue-600">R$ 129.600</td>
+                          <td className="py-3 px-4 text-center font-bold text-green-600">R$ 26.139</td>
+                          <td className="py-3 px-4 text-center font-bold text-red-600">-R$ 103.461</td>
                         </tr>
                         <tr className="hover:bg-slate-50 bg-yellow-50">
                           <td className="py-3 px-4 font-bold">ROAS (Retorno sobre Invest.)</td>
-                          <td className="py-3 px-4 text-center font-bold text-blue-600">4,486</td>
-                          <td className="py-3 px-4 text-center font-bold text-green-600">1,259</td>
-                          <td className="py-3 px-4 text-center font-bold text-purple-600">1,777</td>
-                          <td className="py-3 px-4 text-center text-green-600">+0,518</td>
+                          <td className="py-3 px-4 text-center font-bold text-blue-600">4,49</td>
+                          <td className="py-3 px-4 text-center font-bold text-green-600">1,65</td>
+                          <td className="py-3 px-4 text-center font-bold text-red-600">-63%</td>
                         </tr>
                       </tbody>
                     </table>
@@ -1195,67 +1175,26 @@ function App() {
                 </Card>
 
                 {/* Resultado Final */}
-                <Card className="border-slate-200">
+                <Card className="border-green-200">
                   <CardHeader>
-                    <CardTitle className="text-slate-700 flex items-center gap-2">
-                      <BarChart3 className="h-5 w-5" />
-                      Resultado Final e Aprendizados
+                    <CardTitle className="text-green-700 flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5" />
+                      Resultado Final Positivo
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-slate-600">Campanha com Aprendizados Importantes</h4>
+                      <h4 className="font-semibold text-green-600">Campanha Lucrativa</h4>
                       <p className="text-sm text-slate-600">
-                        O <strong>Realizado até 25/08</strong> confirma <strong>ROAS de 1,777</strong> com receita total de 
-                        R$ 83.728 (ingressos + curso), mas <strong>não foi suficiente para gerar um ROI positivo</strong> 
-                        quando considerados todos os custos operacionais. ROI final de <strong>-0,306</strong>, o que significa que 
-                        <strong>para cada R$ 1 investido no projeto total, houve perda de R$ 0,31</strong>.
+                        A <strong>Projeção Realista</strong> aponta para um lucro de <strong>R$ 38.371</strong> 
+                        e ROAS de <strong>2,20</strong>. Resultado 70% menor que o original, mas ainda positivo.
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-red-600">Principais Impactos Identificados</h4>
+                      <h4 className="font-semibold text-green-600">ROI Sustentável</h4>
                       <p className="text-sm text-slate-600">
-                        <strong className="text-red-600">CAC Elevado:</strong> O custo por lead (R$ 300,08) ficou <strong className="text-red-600">172,8% acima</strong> 
-                        da meta (R$ 110), sendo o principal fator de impacto negativo na rentabilidade da campanha.
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-slate-600">Análise de Receita Detalhada</h4>
-                      <p className="text-sm text-slate-600">
-                        <strong>Receita Ingressos:</strong> R$ 25.113 (157 leads captados)<br/>
-                        <strong>Receita Curso:</strong> R$ 58.615 (9 vendas High Ticket)<br/>
-                        <strong>Receita Total Bruta:</strong> R$ 83.728<br/>
-                        <strong>Receita Líquida:</strong> R$ 77.742 (após impostos)<br/>
-                        <strong>Taxa de Conversão:</strong> 5,7%
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-slate-600">Análise de Custos Crítica</h4>
-                      <p className="text-sm text-slate-600">
-                        <strong>Investimento Tráfego:</strong> R$ 47.112<br/>
-                        <strong>Serviços Terceiros:</strong> R$ 32.900<br/>
-                        <strong>Software/Licenças:</strong> R$ 23.566<br/>
-                        <strong>Outros Custos:</strong> R$ 11.011<br/>
-                        <strong>Impostos:</strong> R$ 5.987<br/>
-                        <strong>Custos Totais:</strong> R$ 120.576<br/>
-                        <strong>Prejuízo Final:</strong> R$ 36.848
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-slate-600">Métricas de Performance</h4>
-                      <p className="text-sm text-slate-600">
-                        <strong>ROAS:</strong> 1,777 (tráfego eficiente)<br/>
-                        <strong>CPL:</strong> R$ 300,08 (172,8% acima da meta)<br/>
-                        <strong>Custo por Venda:</strong> R$ 5.235<br/>
-                        <strong>ROI Final:</strong> -0,306 (incluindo impostos)
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-slate-600">Aprendizados Estratégicos</h4>
-                      <p className="text-sm text-slate-600">
-                        ROAS positivo (1,777) demonstra eficiência do tráfego, mas <strong className="text-red-600">CPL 172,8% acima da meta</strong> 
-                        foi o principal fator de impacto. Próximas campanhas devem focar na <strong className="text-red-600">otimização do CAC</strong> 
-                        para viabilizar rentabilidade com a estrutura atual.
+                        Mesmo com os desafios, a campanha se paga e gera lucro, 
+                        indicando que a estratégia tem fundamento sólido.
                       </p>
                     </div>
                   </CardContent>
@@ -1270,10 +1209,9 @@ function App() {
                   <strong>Recuperação Significativa:</strong> Dia 19/08 mostrou excelente recuperação:
                   <br />• 18/08: 3 vendas (CAC R$ 885) - Pior dia
                   <br />• 19/08: 10 vendas (CAC R$ 273) - Recuperação de 233%
-                  <br />• 22/08: 15 vendas (CAC R$ 158) - MELHOR CAC DA CAMPANHA
                   <br /><br />
-                  <strong>🎉 CAMPANHA ENCERRADA:</strong> <strong>152 leads captados</strong> em 22/08/2025.
-                  <br />Último dia excepcional com 15 vendas e melhor CAC da campanha (R$ 157,86).
+                  <strong>⏰ PRAZO FINAL:</strong> Último dia para compra de ingressos é <strong>SEXTA-FEIRA 22/08/25</strong>.
+                  <br />Apenas 3 dias restantes para captação. Estratégias do dia 19/08 devem ser replicadas.
                 </AlertDescription>
               </Alert>
 
@@ -1282,7 +1220,7 @@ function App() {
                 <Lightbulb className="h-4 w-4" />
                 <AlertTitle className="text-blue-800">Conclusão da Análise Realista</AlertTitle>
                 <AlertDescription className="text-blue-700">
-                  Com as <strong>taxas de conversão confirmadas</strong> (3% curso, 30% mentoria) e <strong>152 leads captados</strong> em 22/08, 
+                  Com as <strong>taxas de conversão confirmadas</strong> (3% curso, 30% mentoria) e projeção de ~150 leads até 22/08, 
                   o evento tem potencial de gerar <strong>R$ 47-75k</strong>, resultando em lucro final de <strong>R$ 26-54k</strong>. 
                   A campanha é <strong>lucrativa e sustentável</strong>, mesmo com o déficit atual de R$ 21k. 
                   Foco deve ser na <strong>qualidade dos leads</strong> e <strong>otimização da apresentação</strong> para médicos (59% dos leads).

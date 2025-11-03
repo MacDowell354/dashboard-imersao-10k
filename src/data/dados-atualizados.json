@@ -1,44 +1,44 @@
 {
   "metricas_principais": {
-    "roas": -0.48,
-    "cac": 309.95,
-    "total_vendas": 152,
-    "faturamento": 24513.4,
-    "investimento": 47112.29,
-    "deficit": 22598.89,
-    "ticket_medio": 161.27,
-    "data_atualizacao": "22/08/2025 - CAMPANHA ENCERRADA"
+    "roas": -0.5,
+    "cac": 326.6,
+    "total_vendas": 137,
+    "faturamento": 22226.51,
+    "investimento": 44744.46,
+    "deficit": 22517.95,
+    "ticket_medio": 162.26,
+    "data_atualizacao": "21/08/2025"
   },
   "vendas_por_canal": [
     {
       "canal": "Tráfego Pago",
-      "vendas": 101,
-      "percentual": 66.4
+      "vendas": 93,
+      "percentual": 67.9
     },
     {
       "canal": "Bio Instagram",
-      "vendas": 34,
-      "percentual": 22.4
+      "vendas": 29,
+      "percentual": 21.2
     },
     {
       "canal": "Outras",
-      "vendas": 8,
-      "percentual": 5.3
+      "vendas": 7,
+      "percentual": 5.1
     },
     {
       "canal": "Email",
       "vendas": 4,
-      "percentual": 2.6
-    },
-    {
-      "canal": "YouTube",
-      "vendas": 3,
-      "percentual": 2.0
+      "percentual": 2.9
     },
     {
       "canal": "WhatsApp",
       "vendas": 2,
-      "percentual": 1.3
+      "percentual": 1.5
+    },
+    {
+      "canal": "YouTube",
+      "vendas": 2,
+      "percentual": 1.5
     }
   ],
   "vendas_por_dia": [
@@ -111,28 +111,13 @@
       "investimento": 2285.74,
       "faturamento": 1277.59,
       "cac": 285.72
-    },
-    {
-      "dia": "22/08",
-      "vendas": 15,
-      "investimento": 2367.83,
-      "faturamento": 2286.89,
-      "cac": 157.86
     }
   ],
-  "insights_finais": [
-    "CAMPANHA ENCERRADA: 152 leads captados em 22/08/2025",
-    "ÚLTIMO DIA EXCEPCIONAL: 15 vendas com CAC R$ 157,86 (melhor CAC da campanha)",
-    "RECUPERAÇÃO CONFIRMADA: Últimos 4 dias consistentes (10→12→8→15 vendas)",
-    "BIO INSTAGRAM PREMIUM: 34 vendas (22.4%) - crescimento de +5 vs 21/08",
-    "PROJEÇÃO EVENTO: 152 leads → 4-5 vendas curso + 1-2 mentoria = R$ 47-75k"
-  ],
-  "comparacao_vs_21_08": {
-    "vendas": "+15 vendas (137→152)",
-    "faturamento": "+R$ 2.287 (R$ 22.227→R$ 24.513)",
-    "investimento": "+R$ 2.368 (R$ 44.744→R$ 47.112)",
-    "cac": "MELHORIA -R$ 17 (R$ 327→R$ 310)",
-    "roas": "MELHORIA +0.02 (-0.50→-0.48)",
-    "bio_instagram": "+5 vendas (29→34)"
-  }
+  "insights_principais": [
+    "PENÚLTIMO DIA: 21/08 teve 8 vendas com CAC R$ 285,72 (controlado)",
+    "TENDÊNCIA ESTÁVEL: Três dias consecutivos de performance (19/08: 10, 20/08: 12, 21/08: 8)",
+    "CAC CONTROLADO: 21/08 manteve CAC abaixo de R$ 300 (R$ 285,72)",
+    "ÚLTIMO DIA CRÍTICO: Apenas 22/08 restante para captação",
+    "BIO INSTAGRAM CRESCENDO: 29 vendas (+2 vs 20/08) - 21.2% do total"
+  ]
 }
